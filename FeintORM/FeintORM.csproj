@@ -47,6 +47,8 @@
   <ItemGroup>
     <Compile Include="Collumn.cs" />
     <Compile Include="DatabaseHelper.cs" />
+    <Compile Include="DBSetting.cs" />
+    <Compile Include="SQLiteDatabaseHelper.cs" />
     <Compile Include="DBForeignKey.cs" />
     <Compile Include="DBJoinInformation.cs" />
     <Compile Include="DBModel.cs" />

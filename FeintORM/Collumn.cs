@@ -17,8 +17,8 @@ namespace Feint.FeintORM
 
         public Collumn(String name, String type)
         {
-            this.Name = DatabaseHelper.Esc(name);
-            this.Type = DatabaseHelper.Esc(type);
+            this.Name = SQLiteDatabaseHelper.Esc(name);
+            this.Type = SQLiteDatabaseHelper.Esc(type);
             this.AutoIncrement = false;
             this.Unique = false;
             this.AllowNull = true;
@@ -26,8 +26,8 @@ namespace Feint.FeintORM
 
         public Collumn(String name, String type, bool primaryKey)
         {
-            this.Name = DatabaseHelper.Esc(name);
-            this.Type = DatabaseHelper.Esc(type);
+            this.Name = SQLiteDatabaseHelper.Esc(name);
+            this.Type = SQLiteDatabaseHelper.Esc(type);
             this.PrimaryKey = primaryKey;
             this.AutoIncrement = true;
             this.Unique = true;
@@ -35,8 +35,8 @@ namespace Feint.FeintORM
         }
         public Collumn(String name, String type, bool primaryKey, bool autoIncrement, bool unique, bool allowNull)
         {
-            this.Name = DatabaseHelper.Esc(name);
-            this.Type = DatabaseHelper.Esc(type);
+            this.Name = SQLiteDatabaseHelper.Esc(name);
+            this.Type = SQLiteDatabaseHelper.Esc(type);
             this.PrimaryKey = primaryKey;
             this.AutoIncrement = autoIncrement;
             this.Unique = unique;

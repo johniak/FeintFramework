@@ -10,24 +10,23 @@ namespace Feint.FeintORM
 {
     public class FeintORM
     {
-        Assembly assembly;
-        String dbName;
-        public DatabaseHelper Helper;
-        static FeintORM instance;
-        private FeintORM(Assembly assembly, String dbName)
+        protected Assembly assembly;
+        public DatabaseHelper Helper { get; protected set; }
+        protected static FeintORM instance;
+        protected DBSetting settings;
+        protected FeintORM(Assembly assembly, DBSetting settings)
         {
             this.assembly = assembly;
-            this.dbName = dbName;
-            if (!File.Exists(dbName))
-                SQLiteConnection.CreateFile(dbName);
-            this.Helper = new DatabaseHelper(new SQLiteConnection("Data Source = " + dbName + ";"));
+            this.Helper = settings.Helper;
+            Helper.Connect(settings.Name, settings.User, settings.Password, settings.Host, settings.Port);
+            
             //CreateTablesFromModel();
 
         }
-        public static FeintORM GetInstance(Assembly assembly, String dbName)
+        public static FeintORM GetInstance(Assembly assembly, DBSetting settings)
         {
             if (instance == null)
-                instance = new FeintORM(assembly, dbName);
+                instance = new FeintORM(assembly, settings);
             return instance;
         }
         public static FeintORM GetInstance()
@@ -42,7 +41,7 @@ namespace Feint.FeintORM
         }
         public void CreateTablesFromModel()
         {
-
+            Helper.CreateDatabase(settings.Name);
             var types = getAllModelClass();
             foreach (var t in types)
             {
@@ -54,7 +53,7 @@ namespace Feint.FeintORM
                 foreach (var p in properties)
                 {
                     var attr = (DBProperty)p.GetCustomAttribute(typeof(DBProperty));
-                    var collumn = new Collumn(p.Name, getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
+                    var collumn = new Collumn(p.Name, Helper.getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
                     collumns.Add(collumn);
                 }
                 var foreignersTypes = getForeignersFromClass(t);
@@ -81,28 +80,7 @@ namespace Feint.FeintORM
                     yield return p;
         }
 
-        public static string getDBType(Type type)
-        {
-            if (typeof(int) == type)
-                return "INTEGER";
-            if (typeof(bool) == type)
-                return "BOOL";
-            if (typeof(double) == type)
-                return "DOUBLE";
-            if (typeof(float) == type)
-                return "FLOAT";
-            if (typeof(char) == type)
-                return "CHAR";
-            if (typeof(string) == type)
-                return "TEXT";
-            if (typeof(Int64) == type)
-                return "INTEGER";
-            if (typeof(DateTime) == type)
-                return "DATATIME";
-            if (typeof(byte[]) == type)
-                return "BLOB";
-            return null;
-        }
+        
 
 
     }

@@ -29,3 +29,5 @@ C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintSDK.pdb
 C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\DotLiquid.dll
 C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\System.Data.SQLite.dll
 C:\Users\johniak\Dropbox\Feint\FeintSDK\obj\Debug\FeintSDK.pdb
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintORM.dll
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintORM.pdb

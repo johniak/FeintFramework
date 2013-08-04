@@ -36,9 +36,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\dll\DotLiquid.dll</HintPath>
     </Reference>
-    <Reference Include="HttpServer">
-      <HintPath>dll\HttpServer.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

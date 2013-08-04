@@ -20,7 +20,7 @@ namespace Feint
             Template.FileSystem = new LocalFileSystem(AppDomain.CurrentDomain.BaseDirectory + "FeintSite\\" +Settings.ViewsFolder.Replace("/", "\\"));
             var site = assembly.GetType("Site.Site");
             site.GetMethod("Main").Invoke(null, null);
-            FeintORM.FeintORM orm =  FeintORM.FeintORM.GetInstance(assembly, Settings.DatabaseFile);
+            FeintORM.FeintORM orm =  FeintORM.FeintORM.GetInstance(assembly, Settings.databaseSettings);
             orm.CreateTablesFromModel();
             Server server = new Server();
         }
