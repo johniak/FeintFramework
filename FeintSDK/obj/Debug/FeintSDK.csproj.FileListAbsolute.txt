@@ -1,0 +1,31 @@
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\bin\Debug\DjangoSDK.dll.config
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\bin\Debug\DjangoSDK.dll
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\bin\Debug\DjangoSDK.pdb
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\bin\Debug\DotLiquid.dll
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\bin\Debug\System.Data.SQLite.dll
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\obj\Debug\FeintSDK.csprojResolveAssemblyReference.cache
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\obj\Debug\DjangoSDK.dll
+C:\Users\LOL\Documents\Visual Studio 2012\Projects\Feint\FeintSDK\obj\Debug\DjangoSDK.pdb
+D:\Feint\FeintSDK\bin\Debug\DjangoSDK.dll.config
+D:\Feint\FeintSDK\bin\Debug\DjangoSDK.dll
+D:\Feint\FeintSDK\bin\Debug\DjangoSDK.pdb
+D:\Feint\FeintSDK\bin\Debug\DotLiquid.dll
+D:\Feint\FeintSDK\bin\Debug\System.Data.SQLite.dll
+D:\Feint\FeintSDK\obj\Debug\FeintSDK.csprojResolveAssemblyReference.cache
+D:\Feint\FeintSDK\obj\Debug\DjangoSDK.dll
+D:\Feint\FeintSDK\obj\Debug\DjangoSDK.pdb
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\bin\Debug\DotLiquid.dll
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\bin\Debug\System.Data.SQLite.dll
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\bin\Debug\FeintSDK.dll.config
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\bin\Debug\FeintSDK.dll
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\bin\Debug\FeintSDK.pdb
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\obj\Debug\FeintSDK.dll
+C:\Users\Johniak\Documents\GitHub\Feint\FeintSDK\obj\Debug\FeintSDK.pdb
+C:\Users\johniak\Dropbox\Feint\FeintSDK\obj\Debug\FeintSDK.csprojResolveAssemblyReference.cache
+C:\Users\johniak\Dropbox\Feint\FeintSDK\obj\Debug\FeintSDK.dll
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintSDK.dll.config
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintSDK.dll
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\FeintSDK.pdb
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\DotLiquid.dll
+C:\Users\johniak\Dropbox\Feint\FeintSDK\bin\Debug\System.Data.SQLite.dll
+C:\Users\johniak\Dropbox\Feint\FeintSDK\obj\Debug\FeintSDK.pdb
