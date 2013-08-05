@@ -16,9 +16,9 @@ C:\Users\johniak\Dropbox\FeintSite\FeintSite\obj\Debug\Site.dll
 C:\Users\johniak\Dropbox\FeintSite\FeintSite\obj\Debug\Site.pdb
 C:\Users\johniak\Dropbox\FeintSite\Site.dll
 C:\Users\johniak\Dropbox\FeintSite\Site.pdb
-C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\FeintSite.csprojResolveAssemblyReference.cache
-C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\Site.dll
-C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\Site.pdb
 C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\Site.dll.config
 C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\Site.dll
 C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\Site.pdb
+C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\FeintSite.csprojResolveAssemblyReference.cache
+C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\Site.dll
+C:\Users\johniak\Dropbox\Feint\FeintSite\obj\Debug\Site.pdb

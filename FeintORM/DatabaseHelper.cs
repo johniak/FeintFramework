@@ -10,7 +10,6 @@ namespace Feint.FeintORM
     public interface DatabaseHelper
     {
         void Connect(String name, String user, String password, String host, int port);
-        DataTable Select(string table, Dictionary<string, string> where);
         DataTable Select(string table, List<WhereComponent> where);
         DataTable SelectWithJoin(string table, List<WhereComponent> where, List<DBJoinInformation> joins);
         Int64 Insert(string table, List<DBPair> what);

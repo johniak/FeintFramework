@@ -14,12 +14,15 @@ namespace Feint.FeintORM
         public DatabaseHelper Helper { get; protected set; }
         protected static FeintORM instance;
         protected DBSetting settings;
+        List<String> tablesCreated;
+        public String Prefix { get; set; }
         protected FeintORM(Assembly assembly, DBSetting settings)
         {
             this.assembly = assembly;
             this.Helper = settings.Helper;
+            this.settings = settings;
             Helper.Connect(settings.Name, settings.User, settings.Password, settings.Host, settings.Port);
-            
+            Prefix = "feint_";
             //CreateTablesFromModel();
 
         }
@@ -43,29 +46,39 @@ namespace Feint.FeintORM
         {
             Helper.CreateDatabase(settings.Name);
             var types = getAllModelClass();
+            tablesCreated = new List<string>();
             foreach (var t in types)
             {
-                var tableName = t.Name;
-                List<Collumn> collumns = new List<Collumn>();
-                List<Foreign> foreigners = new List<Foreign>();
-                var properties = getPropertiesFromClass(t);
-                // collumns.Add(new Collumn("id", "INTEGER", true));
-                foreach (var p in properties)
-                {
-                    var attr = (DBProperty)p.GetCustomAttribute(typeof(DBProperty));
-                    var collumn = new Collumn(p.Name, Helper.getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
-                    collumns.Add(collumn);
-                }
-                var foreignersTypes = getForeignersFromClass(t);
-                foreach (var f in foreignersTypes)
-                {
-                    var collumn = new Collumn("fk_" + f.Name, "INTEGER");
-                    var foreignKey = new Foreign("fk_" + f.Name, f.PropertyType.Name, "id");
-                    collumns.Add(collumn);
-                    foreigners.Add(foreignKey);
-                }
-                this.Helper.CreateTable(tableName, collumns, foreigners);
+                if(tablesCreated.IndexOf(t.Name)<0)
+                    createTable(t);
             }
+        }
+        private void createTable(Type t)
+        {
+            var tableName = Prefix+t.Name;
+            List<Collumn> collumns = new List<Collumn>();
+            List<Foreign> foreigners = new List<Foreign>();
+            var properties = getPropertiesFromClass(t);
+            // collumns.Add(new Collumn("id", "INTEGER", true));
+            foreach (var p in properties)
+            {
+                var attr = (DBProperty)p.GetCustomAttribute(typeof(DBProperty));
+                var collumn = new Collumn(p.Name, Helper.getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
+                collumns.Add(collumn);
+            }
+            var foreignersTypes = getForeignersFromClass(t);
+            foreach (var f in foreignersTypes)
+            {
+                if (tablesCreated.IndexOf(f.PropertyType.Name) < 0)
+                    createTable(f.PropertyType);
+                var collumn = new Collumn("fk_" + f.Name, "INTEGER");
+                var foreignKey = new Foreign("fk_" + f.Name, Prefix + f.PropertyType.Name, "id") { Col = collumn };
+                collumns.Add(collumn);
+                foreigners.Add(foreignKey);
+            }
+            this.Helper.CreateTable(tableName, collumns, foreigners);
+
+            tablesCreated.Add(t.Name);
         }
         private IEnumerable<PropertyInfo> getPropertiesFromClass(Type t)
         {

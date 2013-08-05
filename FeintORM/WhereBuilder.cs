@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -119,7 +120,7 @@ namespace Feint.FeintORM
                     String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).Name;
 
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
                     dynamic d = value;
                     lastAlias = columns[i] + id;
                     type = type.GetProperty(columns[i]).PropertyType;
@@ -127,7 +128,7 @@ namespace Feint.FeintORM
                 if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
                 {
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
                     dynamic d = value;
                     column = columns.Last() + id + ".Id";
 
@@ -141,25 +142,26 @@ namespace Feint.FeintORM
                 if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
                 {
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
                     dynamic d = value;
                     column = column + id + ".Id";
                     value = d.Id;
                 }
             }
         }
-
+        
         /// <summary>
         /// Execute query and fill object
         /// </summary>
         /// <returns></returns>
-        public List<T> execute()
+        public List<T> Execute()
         {
+
             DataTable table;
             if (joins.Count == 0)
-                table = FeintORM.GetInstance().Helper.Select(typeof(T).Name, whereList);
+                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
             else
-                table = FeintORM.GetInstance().Helper.SelectWithJoin(typeof(T).Name, whereList, joins);
+                table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
 
             List<T> tets = new List<T>();
             foreach (DataRow row in table.Rows)
@@ -169,12 +171,16 @@ namespace Feint.FeintORM
                 {
                     if (table.Columns[i].ColumnName.StartsWith("fk_"))
                     {
-                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.Public | BindingFlags.Instance);
+                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         if (prop1 == null)
                             continue;
                         if (row.ItemArray[i].GetType() == typeof(Int64))
                         {
                             prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)row.ItemArray[i]), null);
+                        }
+                        else if (row.ItemArray[i].GetType() == typeof(Int32))
+                        {
+                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int32)row.ItemArray[i]), null);
                         }
                         else
                         {
@@ -182,7 +188,7 @@ namespace Feint.FeintORM
                         }
                         continue;
                     }
-                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.Public | BindingFlags.Instance);
+                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                     if (null != prop && prop.CanWrite)
                     {
                         if (prop.PropertyType != typeof(DateTime))
@@ -213,7 +219,7 @@ namespace Feint.FeintORM
                 return null;
             List<WhereComponent> whereList = new List<WhereComponent>();
             whereList.Add(new WhereComponent() { column = "Id", value = id.ToString(), operatorType = DBQueryOperators.Equals });
-            var table = FeintORM.GetInstance().Helper.Select(t.Name, whereList);
+            var table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + t.Name, whereList);
             List<dynamic> tets = new List<dynamic>();
             foreach (DataRow row in table.Rows)
             {
@@ -223,7 +229,7 @@ namespace Feint.FeintORM
 
                     if (table.Columns[i].ColumnName.StartsWith("fk_"))
                     {
-                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.Public | BindingFlags.Instance);
+                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         if (row.ItemArray[i].GetType() == typeof(Int64))
                         {
                             prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)row.ItemArray[i]), null);
@@ -234,7 +240,7 @@ namespace Feint.FeintORM
                         }
                         continue;
                     }
-                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.Public | BindingFlags.Instance);
+                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                     if (null != prop && prop.CanWrite)
                     {
                         prop.SetValue(obj, row.ItemArray[i], null);

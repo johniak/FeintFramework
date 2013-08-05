@@ -44,7 +44,7 @@ namespace Feint.FeintORM
         }
         public override string ToString()
         {
-            string cmd = "'" + this.Name + "' " + this.Type + " ";
+            string cmd = "" + this.Name + " " + this.Type + " ";
             if (PrimaryKey)
                 cmd += "PRIMARY KEY ";
             if (AutoIncrement)

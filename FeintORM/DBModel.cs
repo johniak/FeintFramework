@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Reflection;
 using System.Data;
 using System.Diagnostics;
+using System.Linq.Expressions;
 
 namespace Feint.FeintORM
 {
@@ -15,16 +16,29 @@ namespace Feint.FeintORM
         [DBProperty(true)]
         public Int64 Id { get; set; }
 
+        /// <summary>
+        /// Very slow, gets all rows and use selector on list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="selector"></param>
+        /// <returns></returns>
         [ObsoleteAttribute]
         public static List<T> get<T>(Func<T, bool> selector)
         {
             return getAll<T>().Where(selector).ToList<T>();
         }
 
+        /// <summary>
+        /// Very slow, gets all rows and use selector on list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="selector"></param>
+        /// <returns></returns>
         [ObsoleteAttribute]
         public static dynamic getOne<T>(Func<T, bool> selector)
         {
-            var tets = getAll<T>().Where(selector).ToList<T>();
+            var all = getAll<T>();
+            var tets = all.Where(selector).ToList<T>();
             if (tets.Count > 0)
                 return tets[0];
             return null;
@@ -61,86 +75,35 @@ namespace Feint.FeintORM
         }
         public static List<T> getAll<T>()
         {
-            List<T> h = new List<T>();
-            SQLiteCommandBuilder trol = new SQLiteCommandBuilder();
-            FeintORM orm = FeintORM.GetInstance();
-            Dictionary<string, string> where = new Dictionary<string, string>();
-            var table = orm.Helper.Select(typeof(T).Name, where);
-            List<T> tets = new List<T>();
-            foreach (DataRow row in table.Rows)
-            {
-                Object obj = Activator.CreateInstance(typeof(T));
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-                    if (table.Columns[i].ColumnName.StartsWith("fk_"))
-                    {
-                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.Public | BindingFlags.Instance);
-                        if (row.ItemArray[i].GetType() == typeof(Int64))
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)row.ItemArray[i]), null);
-                        else
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)(-1)), null);
-
-                        continue;
-                    }
-                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.Public | BindingFlags.Instance);
-                    if (null != prop && prop.CanWrite)
-                    {
-                        if (prop.PropertyType != typeof(DateTime))
-                        {
-                            if (prop.PropertyType == typeof(Int32))
-                                prop.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
-                            else
-                                prop.SetValue(obj, row.ItemArray[i], null);
-                        }
-                        else
-                            prop.SetValue(obj, DateTime.Parse(row.ItemArray[i].ToString()), null);
-                    }
-                }
-                tets.Add((T)obj);
-            }
-            return tets;
+            return Find<T>().Where().Execute();
         }
-
-        private static dynamic getForeign(Type t, Int64 id)
+        public static List<T> Where<T>(Expression<Func<T, bool>> predicate)
         {
-            SQLiteCommandBuilder trol = new SQLiteCommandBuilder();
-            FeintORM orm = FeintORM.GetInstance();
-            Dictionary<string, string> where = new Dictionary<string, string>();
-            where.Add("Id", id.ToString());
-            var table = orm.Helper.Select(t.Name, where);
-            List<dynamic> tets = new List<dynamic>();
-            foreach (DataRow row in table.Rows)
+            WhereBuilder<T> wh=new QueryBuilder<T>().Where();
+            //LogicalBinaryExpression name = predicate.Body.GetType().Name;
+            dynamic operation = predicate.Body;
+           // Find<T>().Where().Eq("", "");
+            if (operation.Left.GetType().Name == "LogicalBinaryExpression")
             {
-                Object obj = Activator.CreateInstance(t);
-                for (int i = 0; i < row.ItemArray.Length; i++)
-                {
-
-                    if (table.Columns[i].ColumnName.StartsWith("fk_"))
-                    {
-                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.Public | BindingFlags.Instance);
-                        if (row.ItemArray[i].GetType() == typeof(Int64))
-                        {
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)row.ItemArray[i]), null);
-                        }
-                        else
-                        {
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)(-1)), null);
-                        }
-                        continue;
-                    }
-                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.Public | BindingFlags.Instance);
-                    if (null != prop && prop.CanWrite)
-                    {
-                        prop.SetValue(obj, row.ItemArray[i], null);
-                    }
-                }
-                tets.Add(obj);
+                
             }
-            if (tets.Count > 0)
-                return tets[0];
             else
-                return null;
+            {
+                dynamic left = operation.Left;
+                dynamic right = operation.Right;
+                switch ((ExpressionType)operation.NodeType)
+                {
+                    case ExpressionType.Equal:
+                        String name =((String)left.ToString()).Substring(left.ToString().IndexOf(".")+1);
+                        object value= right.Value;
+                        return wh.Eq(name, value).Execute();
+                        break;
+                }
+            }
+            return null;
+
         }
+        
         public static void Add(DBModel model)
         {
             if (model.Id != 0)
@@ -175,7 +138,7 @@ namespace Feint.FeintORM
             }
             try
             {
-                model.Id = orm.Helper.Insert(model.GetType().Name, paramsDictionary);
+                model.Id = orm.Helper.Insert(orm.Prefix+model.GetType().Name, paramsDictionary);
             }
             catch (SQLiteException e)
             {
@@ -211,7 +174,7 @@ namespace Feint.FeintORM
                     paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(this) == null ? "" : p.GetValue(this).ToString() });
 
             }
-            orm.Helper.Update(this.GetType().Name, paramsDictionary, this.Id);
+            orm.Helper.Update(orm.Prefix + this.GetType().Name, paramsDictionary, this.Id);
         }
 
 

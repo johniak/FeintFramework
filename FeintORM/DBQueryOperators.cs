@@ -8,6 +8,6 @@ namespace Feint.FeintORM
 {
     public enum DBQueryOperators
     {
-        Equals,Less,Greater,LessOrEquals,GreaterOrEquals,Or,And
+        Equals,NotEquals,Less,Greater,LessOrEquals,GreaterOrEquals,Or,And
     }
 }

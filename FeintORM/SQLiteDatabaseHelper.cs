@@ -18,6 +18,7 @@ namespace Feint.FeintORM
         public SQLiteDatabaseHelper()
         {
             queryOperators.Add(DBQueryOperators.Equals, "=");
+            queryOperators.Add(DBQueryOperators.NotEquals, "!=");
             queryOperators.Add(DBQueryOperators.Less, "<");
             queryOperators.Add(DBQueryOperators.Greater, ">");
             queryOperators.Add(DBQueryOperators.LessOrEquals, "<=");
@@ -41,33 +42,12 @@ namespace Feint.FeintORM
             connection = new SQLiteConnection("Data Source = " + name + ";");
             connection.Open();
         }
-        //public static DatabaseHelper getInstance(SQLiteConnection connection)
-        //{
-        //    if (helper == null)
-        //        helper = new DatabaseHelper(connection);
-        //    return helper;
-        //}
+
         public static string Esc(string text)
         {
             return System.Security.SecurityElement.Escape (text);
         }
-        public DataTable Select(string table,Dictionary<string,string> where)
-        {
-            string query="SELECT * from '" + System.Security.SecurityElement.Escape (table)+"'";
-            if (where.Count != 0)
-            {
-                query += " WHERE ";
-                foreach (var v in where)
-                {
-                    query += "" + Esc(v.Key) + "='" + Esc(v.Value) + "'";
-                }
-            }
-            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
-            var dataSet = new DataSet();
-            DataTable dataTable = new DataTable();
-            adapter.Fill(dataSet);
-            return dataSet.Tables[0];
-        }
+
         public DataTable Select(string table, List<WhereComponent> where)
         {
             StringBuilder builder = new StringBuilder();
@@ -92,6 +72,7 @@ namespace Feint.FeintORM
             adapter.Fill(dataSet);
             return dataSet.Tables[0];
         }
+
         public DataTable SelectWithJoin(string table, List<WhereComponent> where,List<DBJoinInformation> joins)
         {
             StringBuilder builder = new StringBuilder();
@@ -120,6 +101,7 @@ namespace Feint.FeintORM
             adapter.Fill(dataSet);
             return dataSet.Tables[0];
         }
+
         public Int64 Insert(string table, List<DBPair> what)
         {
             var commandString= "INSERT INTO 'main'.'"+Esc(table)+"' ";
@@ -133,17 +115,16 @@ namespace Feint.FeintORM
             collumns=collumns.Substring(0,collumns.Length-1)+") ";
             values=values.Substring(0,values.Length-1)+")";
             commandString+=collumns+values;
-            var command = new SQLiteCommand(commandString,connection);
-            
+            var command = new SQLiteCommand(commandString,connection);            
             command.ExecuteNonQuery();
-            string query="SELECT Max(ID) from '" + System.Security.SecurityElement.Escape (table)+"'";
-           
+            string query="SELECT Max(ID) from '" + System.Security.SecurityElement.Escape (table)+"'";           
             SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
             return  (Int64)dataSet.Tables[0].Rows[0][0];
         }
+
         public void Update(string table, List<DBPair> what,Int64 id)
         {
             var commandString = "UPDATE '" + Esc(table) + "' SET ";
@@ -156,15 +137,16 @@ namespace Feint.FeintORM
             }
             commandString += "WHERE Id ='" + Esc(id.ToString())+"'"; 
             var command = new SQLiteCommand(commandString, connection);
-
             command.ExecuteNonQuery();
         }
+
         public void RemoveFromTable(string table, Int64 id)
         {
             string query = "DELETE FROM " + Esc(table) + " WHERE Id= '" + Esc(id.ToString()) + "'";
             var command = new SQLiteCommand(query, connection);
             command.ExecuteNonQuery();
         }
+
         public void CreateTable(string table, List<Collumn> collumns)
         {
             //CREATE TABLE "Key" ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "key" TEXT UNIQUE , "date" DATETIME DEFAULT CURRENT_TIME)
@@ -180,6 +162,7 @@ namespace Feint.FeintORM
             var command = new SQLiteCommand(commandString,connection);
             command.ExecuteNonQuery();
         }
+
         public void CreateTable(string table, List<Collumn> collumns, List<Foreign> foreigners)
         {
             //CREATE TABLE "Key" ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "key" TEXT UNIQUE , "date" DATETIME DEFAULT CURRENT_TIME)
@@ -201,9 +184,15 @@ namespace Feint.FeintORM
             var command = new SQLiteCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
+
+        /// <summary>
+        ///  Not used
+        /// </summary>
+        /// <param name="name">not used</param>
         public void CreateDatabase(String name)
         {
         }
+
         public string getDBType(Type type)
         {
             if (typeof(int) == type)

@@ -21,15 +21,23 @@ namespace Site
         {
             User.SignUp("johniak", "test");
             User.SignUp("ania", "test");
-            var user = User.Find<User>().Where().execute();
+            var user = User.Find<User>().Where().Execute();
             foreach (var u in user)
             {
-               
+               //if(u.Username=="johniak"){
+               //    u.model = new SampleModel();
+               //    u.model.flag = true;
+               //    u.model.Save();
+               //    u.Save();
+               //}
                 Console.WriteLine(u.Id + "\t" + u.Username + "\t" + u.Password);
             }
-            var model = SampleModel.Find<SampleModel>().Where().execute();
-            var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).execute();
-            var tasks = ToDoTask.getAll<ToDoTask>();
+            User.Where<User>(u=> (u.Username=="johniak"||u.Username=="ania")&&u.model.flag);
+            var model = SampleModel.Find<SampleModel>().Where().Execute();
+            var mess = Message.Find<Message>().Where().Eq("From.model.flag", true).Execute();
+            var mvss = User.Where<Message>(m=>m.From.model.flag==true);
+            //var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).Execute();
+           // var tasks = ToDoTask.getAll<ToDoTask>();
             var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
             return response;
         }

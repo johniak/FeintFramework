@@ -33,6 +33,12 @@
     <Reference Include="DotLiquid">
       <HintPath>..\dll\DotLiquid.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>..\dll\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\dll\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.SQLite">
@@ -48,6 +54,7 @@
     <Compile Include="Collumn.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DBSetting.cs" />
+    <Compile Include="PostgreSQLDatabaseHelper.cs" />
     <Compile Include="SQLiteDatabaseHelper.cs" />
     <Compile Include="DBForeignKey.cs" />
     <Compile Include="DBJoinInformation.cs" />
