@@ -132,75 +132,75 @@ namespace Feint.FeintORM
         }
         public static void Add(DBModel model)
         {
-            //if (model.Id != 0)
-            //    return;
-            //var prop = model.GetType().GetProperties();
-            //FeintORM orm = FeintORM.GetInstance();
-            //var paramsDictionary = new List<DBPair>();
-            //foreach (var p in prop)
-            //{
-            //    if (p.GetCustomAttributes(typeof(DBForeignKey<>)).ToList<Attribute>().Count != 0)
-            //    {
-            //        var fmodel = (DBModel)p.GetValue(model);
-            //        if (fmodel != null)
-            //        {
-            //            Add(fmodel);
-            //            paramsDictionary.Add(new DBPair() { Collumn = "fk_" + p.Name, Value = fmodel.Id.ToString() });
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
-            //        {
-            //            if (p.PropertyType == typeof(DateTime))
-            //                paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : ((DateTime)p.GetValue(model)).ToString("yyyy-MM-dd hh:mm:ss") });
-            //            else if (p.PropertyType == typeof(bool)) paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = (((bool)p.GetValue(model)) == true ? 1 : 0).ToString() });
-            //            else
-            //                paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : p.GetValue(model).ToString() });
-            //        }
+            if (model.Id != 0)
+                return;
+            var prop = model.GetType().GetProperties();
+            FeintORM orm = FeintORM.GetInstance();
+            var paramsDictionary = new List<DBPair>();
+            foreach (var p in prop)
+            {
+                if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
+                {
+                    var fmodel = (DBModel)p.GetValue(model);
+                    if (fmodel != null)
+                    {
+                        Add(fmodel);
+                        paramsDictionary.Add(new DBPair() { Collumn = "fk_" + p.Name, Value = fmodel.Id.ToString() });
+                    }
+                }
+                else
+                {
+                    if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
+                    {
+                        if (p.PropertyType == typeof(DateTime))
+                            paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : ((long)(((DateTime)p.GetValue(model)) - new DateTime(1970, 1, 1)).TotalMilliseconds).ToString()});
+                        else if (p.PropertyType == typeof(bool)) paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = (((bool)p.GetValue(model)) == true ? 1 : 0).ToString() });
+                        else
+                            paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : p.GetValue(model).ToString() });
+                    }
 
-            //    }
+                }
 
-            //}
-            //try
-            //{
-            //    model.Id = orm.Helper.Insert(orm.Prefix + model.GetType().Name, paramsDictionary);
-            //}
-            //catch (SQLiteException e)
-            //{
-            //    if (e.ErrorCode != 19)
-            //        throw e;
-            //    var mes = e.Message;
-            //    int indexOfStart = mes.IndexOf("column") + "colSumn".Length;
-            //    int len = mes.IndexOf(" ", indexOfStart) - indexOfStart;
-            //    var col = mes.Substring(indexOfStart, len);
-            //    throw new ORMNotUniqueException() { collumn = col };
-            //}
+            }
+            try
+            {
+                model.Id = orm.Helper.Insert(orm.Prefix + model.GetType().Name, paramsDictionary);
+            }
+            catch (SQLiteException e)
+            {
+                if (e.ErrorCode != 19)
+                    throw e;
+                var mes = e.Message;
+                int indexOfStart = mes.IndexOf("column") + "colSumn".Length;
+                int len = mes.IndexOf(" ", indexOfStart) - indexOfStart;
+                var col = mes.Substring(indexOfStart, len);
+                throw new ORMNotUniqueException() { collumn = col };
+            }
 
         }
         public void Save()
         {
-            //if (this.Id == 0)
-            //{
-            //    Add(this);
-            //    return;
-            //}
-            //var prop = this.GetType().GetProperties();
-            //FeintORM orm = FeintORM.GetInstance();
-            //var paramsDictionary = new List<DBPair>();
-            //foreach (var p in prop)
-            //{
-            //    if (p.GetCustomAttributes(typeof(DBForeignKey)).ToList<Attribute>().Count != 0)
-            //    {
-            //        var fmodel = (DBModel)p.GetValue(this);
-            //        fmodel.Save();
-            //        paramsDictionary.Add(new DBPair() { Collumn = "fk_" + p.Name, Value = fmodel.Id.ToString() });
-            //    }
-            //    if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
-            //        paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(this) == null ? "" : p.GetValue(this).ToString() });
+            if (this.Id == 0)
+            {
+                Add(this);
+                return;
+            }
+            var prop = this.GetType().GetProperties();
+            FeintORM orm = FeintORM.GetInstance();
+            var paramsDictionary = new List<DBPair>();
+            foreach (var p in prop)
+            {
+                if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
+                {
+                    var fmodel = (DBModel)p.GetValue(this);
+                    fmodel.Save();
+                    paramsDictionary.Add(new DBPair() { Collumn = "fk_" + p.Name, Value = fmodel.Id.ToString() });
+                }
+                if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
+                    paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(this) == null ? "" : p.GetValue(this).ToString() });
 
-            //}
-            //orm.Helper.Update(orm.Prefix + this.GetType().Name, paramsDictionary, this.Id);
+            }
+            orm.Helper.Update(orm.Prefix + this.GetType().Name, paramsDictionary, this.Id);
         }
 
 

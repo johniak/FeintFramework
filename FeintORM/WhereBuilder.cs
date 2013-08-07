@@ -171,6 +171,7 @@ namespace Feint.FeintORM
         {
 
             Stopwatch timer = new Stopwatch();
+            timer.Start();
             DataTable table;
             if (joins.Count == 0)
                 table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
@@ -199,6 +200,7 @@ namespace Feint.FeintORM
                     {
                         if (p.PropertyType == int32Type)
                         {
+                            
                             p.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
                         }
                         else
@@ -208,11 +210,11 @@ namespace Feint.FeintORM
                     }
                     else
                     {
-                        p.SetValue(obj, DateTime.Parse(row.ItemArray[i].ToString()), null);
+                        p.SetValue(obj,new  DateTime(((long)row.ItemArray[i]) * 10000), null);
                     }
                 }
 
-                timer.Start();
+                
                 foreach (PropertyInfo f in fr)
                 {
                     Object fobj = Activator.CreateInstance(f.PropertyType, true);
@@ -221,9 +223,9 @@ namespace Feint.FeintORM
                         f.PropertyType.GetField("id", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fobj, value);
                     f.SetValue(obj, fobj);
                 }
-                timer.Stop();
                 tets.Add((T)obj);
             }
+            timer.Stop();
             Log.E(timer.ElapsedMilliseconds);
             return tets;
         }

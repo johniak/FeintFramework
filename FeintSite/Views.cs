@@ -19,11 +19,11 @@ namespace Site
         }
         public static Response Index(Request request)
         {
-        //    for (int i = 1; i < 1000; i++)
-        //    {
-           //     Message.SendMessage(request.Session, User.Find<User>().Where().Eq("Id", i).Execute()[0],"aaaa","bbb");
-                //User.SignUp("johniak"+i, "test");
-       //     }
+           // for (int i = 1; i < 100000; i++)
+           // {
+          //      //    Message.SendMessage(request.Session, User.Find<User>().Where().Eq("Id", i).Execute()[0],"aaaa","bbb");
+          //      User.SignUp("johniak" + i, "test123", "johniak@hn" + i + ".pl");
+          //  }
           //  var user = User.Find<User>().Where().Execute();
           //  foreach (var u in user)
          //   {
@@ -42,7 +42,7 @@ namespace Site
             //var mvss = User.Where<Message>(m=>m.From.model.flag&&m.To.Id==us.Id);
             //var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).Execute();
            // var tasks = ToDoTask.getAll<ToDoTask>();
-           var m=  User.getAll<User>();
+           var u=  User.getAll<User>();
             //User u= m[0].From;
             var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
             return response;
@@ -69,8 +69,8 @@ namespace Site
                 return Response.Redirect("/");
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);
-            if (!User.SignUp(request.POST["username"], request.POST["password"]))
-                return new Response("register.html", Hash.FromAnonymousObject(new { registerMassage="Wrong input data." }));
+            //if (!User.SignUp(request.POST["username"], request.POST["password"]))
+            //    return new Response("register.html", Hash.FromAnonymousObject(new { registerMassage="Wrong input data." }));
             return Response.Redirect("/");
         }
         public static Response LogOut(Request request)
@@ -84,8 +84,8 @@ namespace Site
         }
         public static Response Messages(Request request)
         {
-            var messages = Message.GetReciveBox(request.Session);
-            return new Response("messages.html", Hash.FromAnonymousObject(new {messages=messages  }));
+          //  var messages = Message.GetReciveBox(request.Session);
+            return new Response("messages.html", Hash.FromAnonymousObject(new { }));
         }
 
         public static Response SendMessage(Request request)
@@ -97,19 +97,20 @@ namespace Site
             User user= User.getOne<User>(u=> u.Username== request.POST["to"]);
             if (user==null)
              return new Response(JsonConvert.SerializeObject(false));
-           return new Response(JsonConvert.SerializeObject( Message.SendMessage(request.Session, user, request.POST["title"], request.POST["text"])));
+            return null;//new Response(JsonConvert.SerializeObject( Message.SendMessage(request.Session, user, request.POST["title"], request.POST["text"])));
         }
         public static Response GetReciveBoxJson(Request request)
         {
-            if (!User.isLogged(request.Session))
-                return Response.Redirect("/");
-            var messages = Message.GetReciveBox(request.Session);
-            var lis = new List<object>();
-            foreach(var m in messages)
-            {
-                lis.Add(new { m.Id, m.Title, m.Text, From = ((User)m.From).Username, To = ((User)m.To).Username });
-            }
-            return new Response(JsonConvert.SerializeObject(lis));
+            //if (!User.isLogged(request.Session))
+            //    return Response.Redirect("/");
+            //var messages = Message.GetReciveBox(request.Session);
+            //var lis = new List<object>();
+            //foreach(var m in messages)
+            //{
+            //    lis.Add(new { m.Id, m.Title, m.Text, From = ((User)m.From).Username, To = ((User)m.To).Username });
+            //}
+            //return new Response(JsonConvert.SerializeObject(lis));
+            return null;
         }
     }
 }

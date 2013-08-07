@@ -14,7 +14,7 @@ namespace Site
     {
         public static void Main()
         {
-            Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="web4test",Name="testowa"};
+            Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="web4test",Name="task"};
             Settings.DebugMode = false;
             Settings.Urls.Add(new Url(@"^/$", Views.Index));
             #region user administration

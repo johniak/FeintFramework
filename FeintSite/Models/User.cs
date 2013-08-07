@@ -7,42 +7,54 @@ using FeintSDK;
 using Feint.FeintORM;
 using DotLiquid;
 using Site.Models;
+using System.Security.Cryptography;
 
 namespace Site
 {
-    class User:DBModel,ILiquidizable
+    class User : DBModel, ILiquidizable
     {
-        [DBProperty(false,false,true,false)]
+        [DBProperty(false, false, true, false)]
         public String Username { get; set; }
 
-        [DBProperty(false,false,false,false)]
+        [DBProperty(false, false, false, false)]
         public String Password { get; set; }
 
+        [DBProperty(false, false, true, false)]
+        public String Mail { get; set; }
 
-        public DBForeignKey<SampleModel> model { get; set; }
+        [DBProperty]
+        public DateTime Created { get; set; }
+
+        [DBProperty]
+        public DateTime Updated { get; set; }
+
 
         public static bool SignIn(String username, String password)
         {
-            var users=User.Find<User>().Where().Eq("Username", username).Execute();
+            var users = User.Find<User>().Where().Eq("Username", username).Execute();
             if (users.Count <= 0)
                 return false;
+            password = MD5Hash(password);
             if (users[0].Password.Length != 0 && users[0].Password == password)
                 return true;
             return false;
         }
-        public static bool SignUp(String username,String password)
+        public static int SignUp(String username, String password,String mail)
         {
-            //User user = User.getOne<User>(u => u.Username == username);
-            
-            if (User.Find<User>().Where().Eq("Username",username).Execute().Count>0)
-                return false;
-            if (password.Length == 0)
-                return false;
+            if (User.Find<User>().Where().Eq("Username", username).Execute().Count > 0)
+                return 1;
+            if (password.Length < 5)
+                return 2;
+            if(mail.Length<1)
+                return 3;
             User user = new User();
             user.Username = username;
-            user.Password = password;
+            user.Password = MD5Hash(password);
+            user.Mail = mail;
+            user.Created = DateTime.Now;
+            user.Updated = DateTime.Now;
             user.Save();
-            return true;
+            return 0;
         }
         public static bool isLogged(Session session)
         {
@@ -51,9 +63,23 @@ namespace Site
                 return true;
             return false;
         }
+
+        public static string MD5Hash(string text)
+        {
+            MD5 md5 = new MD5CryptoServiceProvider();
+            md5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(text));
+            byte[] result = md5.Hash;
+            StringBuilder strBuilder = new StringBuilder();
+            for (int i = 0; i < result.Length; i++)
+            {
+                strBuilder.Append(result[i].ToString("x2"));
+            }
+            return strBuilder.ToString();
+        }
+
         public object ToLiquid()
         {
-            return new {Id, Username, Password,};
+            return new { Id, Username, Password, };
         }
     }
 }
