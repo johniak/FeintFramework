@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Feint.FeintORM
 {
-    public class Collumn
+    public class Column
     {
         public String Name { get; protected set; }
         public String Type { get; protected set; }
@@ -15,7 +15,7 @@ namespace Feint.FeintORM
         public bool Unique { get; set; }
         public bool AllowNull { get; set; }
 
-        public Collumn(String name, String type)
+        public Column(String name, String type)
         {
             this.Name = SQLiteDatabaseHelper.Esc(name);
             this.Type = SQLiteDatabaseHelper.Esc(type);
@@ -24,7 +24,7 @@ namespace Feint.FeintORM
             this.AllowNull = true;
         }
 
-        public Collumn(String name, String type, bool primaryKey)
+        public Column(String name, String type, bool primaryKey)
         {
             this.Name = SQLiteDatabaseHelper.Esc(name);
             this.Type = SQLiteDatabaseHelper.Esc(type);
@@ -33,7 +33,7 @@ namespace Feint.FeintORM
             this.Unique = true;
             this.AllowNull = false;
         }
-        public Collumn(String name, String type, bool primaryKey, bool autoIncrement, bool unique, bool allowNull)
+        public Column(String name, String type, bool primaryKey, bool autoIncrement, bool unique, bool allowNull)
         {
             this.Name = SQLiteDatabaseHelper.Esc(name);
             this.Type = SQLiteDatabaseHelper.Esc(type);

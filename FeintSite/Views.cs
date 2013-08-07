@@ -43,6 +43,7 @@ namespace Site
             //var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).Execute();
            // var tasks = ToDoTask.getAll<ToDoTask>();
            var m=  User.getAll<User>();
+            //User u= m[0].From;
             var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
             return response;
         }
@@ -106,7 +107,7 @@ namespace Site
             var lis = new List<object>();
             foreach(var m in messages)
             {
-                lis.Add(new { m.Id, m.Title, m.Text, From = m.From.Username, To = m.To.Username });
+                lis.Add(new { m.Id, m.Title, m.Text, From = ((User)m.From).Username, To = ((User)m.To).Username });
             }
             return new Response(JsonConvert.SerializeObject(lis));
         }

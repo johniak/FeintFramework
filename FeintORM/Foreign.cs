@@ -11,7 +11,7 @@ namespace Feint.FeintORM
        public string Name { get; set; }
        public string Table { get; set; }
        public string Collumn { get; set; }
-       public Collumn Col { get; set; }
+       public Column Col { get; set; }
        public Foreign(string name,string table ,string collumn)
        {
            this.Name = name;

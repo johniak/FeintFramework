@@ -11,10 +11,10 @@ namespace Site
 {
     class Message : DBModel, ILiquidizable
     {
-        [DBForeignKey]
-        public User From { get; set; }
-        [DBForeignKey]
-        public User To { get; set; }
+
+        public DBForeignKey<User> From { get; set; }
+
+        public DBForeignKey<User> To { get; set; }
         [DBProperty]
         public String Title { get; set; }
         [DBProperty]
@@ -35,7 +35,7 @@ namespace Site
         public static List<Message> GetSentBox(Session session)
         {
             User user = User.getOne<User>(u => u.Username == session.GetProperty("userId"));
-            var messages = Message.get<Message>(m => m.From.Id == user.Id);
+            var messages = Message.get<Message>(m => ((User)m.From).Id == user.Id);
             return messages;
         }
 

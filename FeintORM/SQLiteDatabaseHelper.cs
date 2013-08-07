@@ -148,7 +148,7 @@ namespace Feint.FeintORM
             command.ExecuteNonQuery();
         }
 
-        public void CreateTable(string table, List<Collumn> collumns)
+        public void CreateTable(string table, List<Column> collumns)
         {
             //CREATE TABLE "Key" ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "key" TEXT UNIQUE , "date" DATETIME DEFAULT CURRENT_TIME)
 
@@ -164,7 +164,7 @@ namespace Feint.FeintORM
             command.ExecuteNonQuery();
         }
 
-        public void CreateTable(string table, List<Collumn> collumns, List<Foreign> foreigners)
+        public void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners)
         {
             //CREATE TABLE "Key" ("id" INTEGER PRIMARY KEY  NOT NULL  UNIQUE , "key" TEXT UNIQUE , "date" DATETIME DEFAULT CURRENT_TIME)
 

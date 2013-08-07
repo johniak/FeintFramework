@@ -11,8 +11,7 @@ namespace Site.Models
 {
     class ToDoTask:DBModel
     {
-        [DBForeignKey]
-        public User Owner { get; set; }
+        public DBForeignKey<User> Owner { get; set; }
 
         [DBProperty]
         public DateTime UpdatedDate { get; set; }

@@ -15,8 +15,8 @@ namespace Feint.FeintORM
         Int64 Insert(string table, List<DBPair> what);
         void Update(string table, List<DBPair> what, Int64 id);
         void RemoveFromTable(string table, Int64 id);
-        void CreateTable(string table, List<Collumn> collumns);
-        void CreateTable(string table, List<Collumn> collumns, List<Foreign> foreigners);
+        void CreateTable(string table, List<Column> collumns);
+        void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners);
         void CreateDatabase(String name);
         string getDBType(Type type);
     }

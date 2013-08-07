@@ -139,7 +139,7 @@ namespace Feint.FeintORM
             command.ExecuteNonQuery();
         }
 
-        public void CreateTable(string table, List<Collumn> collumns)
+        public void CreateTable(string table, List<Column> collumns)
         {
             var commandString = "CREATE TABLE IF NOT EXISTS '" + Esc(table) + "' (";
             for (int i = 0; i < collumns.Count; i++)
@@ -153,7 +153,7 @@ namespace Feint.FeintORM
             command.ExecuteNonQuery();
         }
 
-        public void CreateTable(string table, List<Collumn> collumns, List<Foreign> foreigners)
+        public void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners)
         {
             var commandString = "CREATE TABLE IF NOT EXISTS " + Esc(table) + " (";
             for (int i = 0; i < collumns.Count; i++)
@@ -171,7 +171,7 @@ namespace Feint.FeintORM
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
-        private Foreign getForeginForCollumn(Collumn c, List<Foreign> foreigners)
+        private Foreign getForeginForCollumn(Column c, List<Foreign> foreigners)
         {
             foreach (var f in foreigners)
             {
@@ -180,7 +180,7 @@ namespace Feint.FeintORM
             }
             return null;
         }
-        public  string columnToString(Collumn col)
+        public  string columnToString(Column col)
         {
             string cmd = "" + col.Name + " ";
             if (col.AutoIncrement)

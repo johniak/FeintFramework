@@ -56,23 +56,23 @@ namespace Feint.FeintORM
         private void createTable(Type t)
         {
             var tableName = Prefix+t.Name;
-            List<Collumn> collumns = new List<Collumn>();
+            List<Column> collumns = new List<Column>();
             List<Foreign> foreigners = new List<Foreign>();
             var properties = getPropertiesFromClass(t);
             // collumns.Add(new Collumn("id", "INTEGER", true));
             foreach (var p in properties)
             {
                 var attr = (DBProperty)p.GetCustomAttribute(typeof(DBProperty));
-                var collumn = new Collumn(p.Name, Helper.getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
+                var collumn = new Column(p.Name, Helper.getDBType(p.PropertyType), attr.PrimaryKey, attr.AutoIncrement, attr.Unique, attr.AllowNull);
                 collumns.Add(collumn);
             }
             var foreignersTypes = getForeignersFromClass(t);
             foreach (var f in foreignersTypes)
             {
-                if (tablesCreated.IndexOf(f.PropertyType.Name) < 0)
-                    createTable(f.PropertyType);
-                var collumn = new Collumn("fk_" + f.Name, "INTEGER");
-                var foreignKey = new Foreign("fk_" + f.Name, Prefix + f.PropertyType.Name, "id") { Col = collumn };
+                if (tablesCreated.IndexOf(f.PropertyType.GenericTypeArguments[0].Name) < 0)
+                    createTable(f.PropertyType.GenericTypeArguments[0]);
+                var collumn = new Column("fk_" + f.Name, "INTEGER");
+                var foreignKey = new Foreign("fk_" + f.Name, Prefix + f.PropertyType.GenericTypeArguments[0].Name, "id") { Col = collumn };
                 collumns.Add(collumn);
                 foreigners.Add(foreignKey);
             }
@@ -89,7 +89,7 @@ namespace Feint.FeintORM
         private IEnumerable<PropertyInfo> getForeignersFromClass(Type t)
         {
             foreach (var p in t.GetProperties())
-                if (p.GetCustomAttributes(typeof(DBForeignKey), false).Length > 0)
+                if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
                     yield return p;
         }
 

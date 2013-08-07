@@ -18,8 +18,8 @@ namespace Site
         [DBProperty(false,false,false,false)]
         public String Password { get; set; }
 
-        [DBForeignKey]
-        public SampleModel model { get; set; }
+
+        public DBForeignKey<SampleModel> model { get; set; }
 
         public static bool SignIn(String username, String password)
         {

@@ -8,16 +8,24 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Reflection.Emit;
 namespace Feint.FeintORM
 {
     public class WhereBuilder<T>
     {
         List<WhereComponent> whereList = new List<WhereComponent>();
         List<DBJoinInformation> joins = new List<DBJoinInformation>();
+        List<JoinInfo> Foregins = new List<JoinInfo>();
+        class JoinInfo
+        {
+            public DBJoinInformation DBJoin { get; set; }
+            public List<string> pathToMember { get; set; }
+            public PropertyInfo propertyInfo { get; set; }
+        }
         QueryBuilder<T> queryBuilder;
         public WhereBuilder(QueryBuilder<T> queryBuilder)
         {
+            getAllForeginesDependencies(typeof(T));
             this.queryBuilder = queryBuilder;
         }
         /// <summary>
@@ -155,6 +163,8 @@ namespace Feint.FeintORM
 
         /// <summary>
         /// Execute query and fill object
+        /// iterate by all properties of model class and assign values from rows
+        /// implements lazy forgins keys
         /// </summary>
         /// <returns></returns>
         public List<T> Execute()
@@ -166,55 +176,54 @@ namespace Feint.FeintORM
                 table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
             else
                 table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
-            PropertyInfo[] pr = typeof(T).GetProperties(BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-            List<T> tets = new List<T>(table.Rows.Count); 
-            timer.Start();
+            var pr = getPropertiesFromClass(typeof(T)); 
+            var fr = getForeignersFromClass(typeof(T));
+
+            List<T> tets = new List<T>(table.Rows.Count);
+
+            var columns = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            Type int32Type = typeof(Int32);
+            Type dateType = typeof(DateTime);
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                columns.Add(table.Columns[i].ColumnName, i);
+            }
+
             foreach (DataRow row in table.Rows)
             {
                 Object obj = Activator.CreateInstance(typeof(T));
-                for (int i = 0; i < row.ItemArray.Length; i++)
+                foreach (PropertyInfo p in pr)
                 {
-                    if (table.Columns[i].ColumnName.StartsWith("fk_"))
+                    int i = columns[p.Name];
+                    if (p.PropertyType != dateType)
                     {
-                        PropertyInfo prop1 = getProperty(pr,table.Columns[i].ColumnName.Substring(3));
-                          //  typeof(T).GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                        if (prop1 == null)
-                            continue;
-                        if (row.ItemArray[i].GetType() == typeof(Int64))
+                        if (p.PropertyType == int32Type)
                         {
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)row.ItemArray[i]), null);
-                        }
-                        else if (row.ItemArray[i].GetType() == typeof(Int32))
-                        {
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int32)row.ItemArray[i]), null);
+                            p.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
                         }
                         else
                         {
-                            prop1.SetValue(obj, getForeign(prop1.PropertyType, (Int64)(-1)), null);
+                            p.SetValue(obj, row.ItemArray[i], null);
                         }
-                        continue;
                     }
-                   
-                    PropertyInfo prop = getProperty(pr, table.Columns[i].ColumnName);
-                    //PropertyInfo prop =typeof(T).GetProperty(table.Columns[i].ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                    
-                    if (null != prop && prop.CanWrite)
+                    else
                     {
-                        if (prop.PropertyType != typeof(DateTime))
-                        {
-                            if (prop.PropertyType == typeof(Int32))
-                                prop.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
-                            else
-                                prop.SetValue(obj, row.ItemArray[i], null);
-                        }
-                        else
-                            prop.SetValue(obj, DateTime.Parse(row.ItemArray[i].ToString()), null);
-
+                        p.SetValue(obj, DateTime.Parse(row.ItemArray[i].ToString()), null);
                     }
                 }
+
+                timer.Start();
+                foreach (PropertyInfo f in fr)
+                {
+                    Object fobj = Activator.CreateInstance(f.PropertyType, true);
+                    var value=row.ItemArray[columns["fk_" + f.Name]];
+                    if (value!=null&&value.GetType() != typeof(DBNull))
+                        f.PropertyType.GetField("id", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fobj, value);
+                    f.SetValue(obj, fobj);
+                }
+                timer.Stop();
                 tets.Add((T)obj);
             }
-            timer.Stop();
             Log.E(timer.ElapsedMilliseconds);
             return tets;
         }
@@ -225,6 +234,7 @@ namespace Feint.FeintORM
                     return p;
             return null;
         }
+
         /// <summary>
         /// Fill foregins objects 
         /// </summary>
@@ -270,6 +280,46 @@ namespace Feint.FeintORM
                 return tets[0];
             else
                 return null;
+        }
+        private List<PropertyInfo> getPropertiesFromClass(Type t)
+        {
+            List<PropertyInfo> pi = new List<PropertyInfo>(10);
+            foreach (var p in t.GetProperties())
+                if (p.GetCustomAttributes(typeof(DBProperty), false).Length > 0)
+                    pi.Add(p);
+            return pi;
+        }
+
+        private List<PropertyInfo> getForeignersFromClass(Type t)
+        {
+            List<PropertyInfo> pi = new List<PropertyInfo>(10);
+            foreach (var p in t.GetProperties())
+                if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
+                    pi.Add(p);
+            return pi;
+        }
+        void getAllForeginesDependencies(Type t)
+        {
+            List<String> path = new List<string>();
+            var fr = getForeignersFromClass(t);
+            foreach (var f in fr)
+            {
+                var p = new List<string>(path);
+                p.Add(f.Name);
+                Foregins.Add(new JoinInfo() { pathToMember = p, propertyInfo = f });
+                getAllForeginesDependenciesN(f.PropertyType, p);
+            }
+        }
+        void getAllForeginesDependenciesN(Type t, List<String> path)
+        {
+            var fr = getForeignersFromClass(t);
+            foreach (var f in fr)
+            {
+                var p = new List<string>(path);
+                p.Add(f.Name);
+                Foregins.Add(new JoinInfo() { pathToMember = p, propertyInfo = f });
+                getAllForeginesDependenciesN(f.PropertyType, p);
+            }
         }
     }
     public struct WhereComponent
