@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using FeintORM;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -55,7 +56,7 @@ namespace Feint.FeintORM
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
                 }
             }
-            Console.WriteLine(query);
+            Log.D(query);
             NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(query, connection);
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
@@ -84,7 +85,7 @@ namespace Feint.FeintORM
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
                 }
             }
-            Console.WriteLine(query);
+            Log.D(query);
             NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(new NpgsqlCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();

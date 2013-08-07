@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Data;
 using System.Reflection;
 using System.IO;
+using FeintORM;
 
 namespace Feint.FeintORM
 {
@@ -65,7 +66,7 @@ namespace Feint.FeintORM
                     query += "" + Esc(w.column)+"" +queryOperators[w.operatorType]+ "'" + Esc(w.value) + "'";
                 }
             }
-            Console.WriteLine(query);
+            Log.D(query);
             SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
@@ -94,7 +95,7 @@ namespace Feint.FeintORM
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
                 }
             }
-            Console.WriteLine(query);
+            Log.D(query);
             SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();

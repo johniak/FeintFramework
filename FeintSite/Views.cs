@@ -19,25 +19,30 @@ namespace Site
         }
         public static Response Index(Request request)
         {
-            User.SignUp("johniak", "test");
-            User.SignUp("ania", "test");
-            var user = User.Find<User>().Where().Execute();
-            foreach (var u in user)
-            {
+        //    for (int i = 1; i < 1000; i++)
+        //    {
+           //     Message.SendMessage(request.Session, User.Find<User>().Where().Eq("Id", i).Execute()[0],"aaaa","bbb");
+                //User.SignUp("johniak"+i, "test");
+       //     }
+          //  var user = User.Find<User>().Where().Execute();
+          //  foreach (var u in user)
+         //   {
                //if(u.Username=="johniak"){
                //    u.model = new SampleModel();
                //    u.model.flag = true;
                //    u.model.Save();
                //    u.Save();
                //}
-                Console.WriteLine(u.Id + "\t" + u.Username + "\t" + u.Password);
-            }
-            User.Where<User>(u=> (u.Username=="johniak"||u.Username=="ania")&&u.model.flag);
-            var model = SampleModel.Find<SampleModel>().Where().Execute();
-            var mess = Message.Find<Message>().Where().Eq("From.model.flag", true).Execute();
-            var mvss = User.Where<Message>(m=>m.From.model.flag==true);
+              //  Log.D(u.Id + "\t" + u.Username + "\t" + u.Password);
+          //  }
+           // User.Where<User>(u=> (u.Username=="johniak"||u.Username=="ania")&&u.model.flag);
+           // var model = SampleModel.Find<SampleModel>().Where().Execute();
+           // var mess = Message.Find<Message>().Where().Eq("From.model.flag", true).Execute();
+       //     var us=user[1];
+            //var mvss = User.Where<Message>(m=>m.From.model.flag&&m.To.Id==us.Id);
             //var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).Execute();
            // var tasks = ToDoTask.getAll<ToDoTask>();
+           var m=  User.getAll<User>();
             var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
             return response;
         }
@@ -52,7 +57,6 @@ namespace Site
 
             if (!User.SignIn(request.POST["username"], request.POST["password"]))
                 return new Response("index.html", Hash.FromAnonymousObject(new { loginMessage = "Bad username or password." }));
-            User user= User.getOne<User>(u => u.Username == request.POST["username"]);
             request.Session.SetProperty("isLogged", true.ToString());
             request.Session.SetProperty("userId", request.POST["username"]);
             return Response.Redirect("/");
@@ -98,7 +102,7 @@ namespace Site
         {
             if (!User.isLogged(request.Session))
                 return Response.Redirect("/");
-            var messages = Message.getAll<Message>();
+            var messages = Message.GetReciveBox(request.Session);
             var lis = new List<object>();
             foreach(var m in messages)
             {

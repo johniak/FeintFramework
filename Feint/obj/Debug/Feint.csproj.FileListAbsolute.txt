@@ -73,3 +73,5 @@ C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\zh-CN\Npgsql.resources.dll
 C:\Users\johniak\Dropbox\Feint\Feint\obj\Debug\Feint.csprojResolveAssemblyReference.cache
 C:\Users\johniak\Dropbox\Feint\Feint\obj\Debug\manage.exe
 C:\Users\johniak\Dropbox\Feint\Feint\obj\Debug\manage.pdb
+C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\FastCGI.dll
+C:\Users\johniak\Dropbox\Feint\Feint\bin\Debug\FastCGI.xml

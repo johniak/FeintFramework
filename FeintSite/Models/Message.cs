@@ -21,15 +21,15 @@ namespace Site
         public String Text { get; set; }
         public static bool SendMessage(Session session, User to, string title, string text)
         {
-            User user = User.getOne<User>(u => u.Username == session.GetProperty("userId"));
+            User user = User.Find<User>().Where().Eq("Username", session.GetProperty("userId")).Execute()[0];// User.getOne<User>(u => u.Username == session.GetProperty("userId"));
             Message mes = new Message() { From = user, To = to, Title = title, Text = text };
             mes.Save();
             return true;
         }
         public static List<Message> GetReciveBox(Session session)
         {
-            User user = User.getOne<User>(u => u.Username == session.GetProperty("userId"));
-            var messages = Message.get<Message>(m => m.To.Id == user.Id);
+            User user = User.Find<User>().Where().Eq("Username", session.GetProperty("userId")).Execute()[0];
+            var messages = Message.Find<Message>().Where().Eq("To", user).Execute();
             return messages;
         }
         public static List<Message> GetSentBox(Session session)

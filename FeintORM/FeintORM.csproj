@@ -54,6 +54,7 @@
     <Compile Include="Collumn.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DBSetting.cs" />
+    <Compile Include="Log.cs" />
     <Compile Include="PostgreSQLDatabaseHelper.cs" />
     <Compile Include="SQLiteDatabaseHelper.cs" />
     <Compile Include="DBForeignKey.cs" />

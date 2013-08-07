@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Data;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Collections.ObjectModel;
 
 namespace Feint.FeintORM
 {
@@ -77,33 +78,58 @@ namespace Feint.FeintORM
         {
             return Find<T>().Where().Execute();
         }
-        public static List<T> Where<T>(Expression<Func<T, bool>> predicate)
+
+        [Obsolete]
+        private static List<T> Where<T>(Expression<Func<T, bool>> predicate)
         {
-            WhereBuilder<T> wh=new QueryBuilder<T>().Where();
+            WhereBuilder<T> wh = new QueryBuilder<T>().Where();
             //LogicalBinaryExpression name = predicate.Body.GetType().Name;
+           
             dynamic operation = predicate.Body;
-           // Find<T>().Where().Eq("", "");
-            if (operation.Left.GetType().Name == "LogicalBinaryExpression")
+            
+            // Find<T>().Where().Eq("", "");
+            where<T>(operation, wh);
+            return wh.Execute();
+
+        }
+        private static void where<T>(dynamic operation, WhereBuilder<T> wh)
+        {
+            if (operation.GetType().Name == "LogicalBinaryExpression" && (operation.NodeType == ExpressionType.AndAlso || operation.NodeType == ExpressionType.Or))
             {
-                
+                where<T>(operation.Left, wh);
+                switch ((ExpressionType)operation.NodeType)
+                {
+                    case ExpressionType.AndAlso:
+                        wh.And();
+                        break;
+                    case ExpressionType.Or:
+                        wh.Or();
+                        break;
+                }
+                where<T>(operation.Right, wh);
             }
             else
             {
-                dynamic left = operation.Left;
-                dynamic right = operation.Right;
+                
+                dynamic left;
+                dynamic right;
+                String name;
                 switch ((ExpressionType)operation.NodeType)
                 {
                     case ExpressionType.Equal:
-                        String name =((String)left.ToString()).Substring(left.ToString().IndexOf(".")+1);
-                        object value= right.Value;
-                        return wh.Eq(name, value).Execute();
+                        left = operation.Left;
+                        right = operation.Right;
+                        name = ((String)left.ToString()).Substring(left.ToString().IndexOf(".") + 1);
+                        object value = right.Value;
+                        wh.Eq(name, value);
+                        break;
+                    case ExpressionType.MemberAccess:
+                        name = ((String)operation.ToString()).Substring(operation.ToString().IndexOf(".") + 1);
+                        wh.Eq(name, true);
                         break;
                 }
             }
-            return null;
-
         }
-        
         public static void Add(DBModel model)
         {
             if (model.Id != 0)
@@ -128,8 +154,8 @@ namespace Feint.FeintORM
                     {
                         if (p.PropertyType == typeof(DateTime))
                             paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : ((DateTime)p.GetValue(model)).ToString("yyyy-MM-dd hh:mm:ss") });
-                        else if (p.PropertyType == typeof(bool)) paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = (((bool)p.GetValue(model))==true?1:0).ToString() });
-                        else 
+                        else if (p.PropertyType == typeof(bool)) paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = (((bool)p.GetValue(model)) == true ? 1 : 0).ToString() });
+                        else
                             paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(model) == null ? "" : p.GetValue(model).ToString() });
                     }
 
@@ -138,7 +164,7 @@ namespace Feint.FeintORM
             }
             try
             {
-                model.Id = orm.Helper.Insert(orm.Prefix+model.GetType().Name, paramsDictionary);
+                model.Id = orm.Helper.Insert(orm.Prefix + model.GetType().Name, paramsDictionary);
             }
             catch (SQLiteException e)
             {

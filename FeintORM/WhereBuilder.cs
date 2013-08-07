@@ -1,6 +1,8 @@
-﻿using System;
+﻿using FeintORM;
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -93,6 +95,7 @@ namespace Feint.FeintORM
             return this;
         }
 
+
         /// <summary>
         /// Or between to logic
         /// </summary>
@@ -149,7 +152,7 @@ namespace Feint.FeintORM
                 }
             }
         }
-        
+
         /// <summary>
         /// Execute query and fill object
         /// </summary>
@@ -157,13 +160,15 @@ namespace Feint.FeintORM
         public List<T> Execute()
         {
 
+            Stopwatch timer = new Stopwatch();
             DataTable table;
             if (joins.Count == 0)
                 table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
             else
                 table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
-
-            List<T> tets = new List<T>();
+            PropertyInfo[] pr = typeof(T).GetProperties(BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+            List<T> tets = new List<T>(table.Rows.Count); 
+            timer.Start();
             foreach (DataRow row in table.Rows)
             {
                 Object obj = Activator.CreateInstance(typeof(T));
@@ -171,7 +176,8 @@ namespace Feint.FeintORM
                 {
                     if (table.Columns[i].ColumnName.StartsWith("fk_"))
                     {
-                        PropertyInfo prop1 = obj.GetType().GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        PropertyInfo prop1 = getProperty(pr,table.Columns[i].ColumnName.Substring(3));
+                          //  typeof(T).GetProperty(table.Columns[i].ColumnName.Substring(3), BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                         if (prop1 == null)
                             continue;
                         if (row.ItemArray[i].GetType() == typeof(Int64))
@@ -188,7 +194,10 @@ namespace Feint.FeintORM
                         }
                         continue;
                     }
-                    PropertyInfo prop = obj.GetType().GetProperty(table.Columns[i].ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                   
+                    PropertyInfo prop = getProperty(pr, table.Columns[i].ColumnName);
+                    //PropertyInfo prop =typeof(T).GetProperty(table.Columns[i].ColumnName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                    
                     if (null != prop && prop.CanWrite)
                     {
                         if (prop.PropertyType != typeof(DateTime))
@@ -200,13 +209,22 @@ namespace Feint.FeintORM
                         }
                         else
                             prop.SetValue(obj, DateTime.Parse(row.ItemArray[i].ToString()), null);
+
                     }
                 }
                 tets.Add((T)obj);
             }
+            timer.Stop();
+            Log.E(timer.ElapsedMilliseconds);
             return tets;
         }
-
+        PropertyInfo getProperty(PropertyInfo[] pi, String name)
+        {
+            foreach (var p in pi)
+                if (p.Name.ToLower() == name)
+                    return p;
+            return null;
+        }
         /// <summary>
         /// Fill foregins objects 
         /// </summary>

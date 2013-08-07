@@ -10,16 +10,16 @@ using System.Text.RegularExpressions;
 using System.Reflection;
 namespace Feint
 {
-    class Server
+    class DebugServer
     {
         HttpListener listener;
-        public Server()
+        public DebugServer(String address)
         {
             listener = new HttpListener();
-            var adress = "http://*:8000/";
-            listener.Prefixes.Add(adress);
+            listener.Prefixes.Add(address);
             listener.Start();
-            Console.WriteLine("Fint server started at: " + adress);
+            Log.I("Fint server started at: " + address);
+          //  Console.WriteLine("Fint server started at: " + adress);
             IAsyncResult result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
             while (true)
             {
@@ -150,7 +150,8 @@ namespace Feint
             }
             catch (IOException e)
             {
-                Console.WriteLine(e);
+                Log.D(e);
+               // Console.WriteLine(e);
                 string responseString = "<HTML><BODY>Im n00b- internal server erron- 503!!!</BODY></HTML>";
                 byte[] buffer = System.Text.Encoding.GetEncoding(1252).GetBytes(responseString);
                 response.ContentLength64 = buffer.Length;

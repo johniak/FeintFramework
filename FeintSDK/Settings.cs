@@ -13,6 +13,6 @@ namespace FeintSDK
         public static String ViewsFolder = "views/";
         public static String StaticFolder = "static/";
         public static DBSetting databaseSettings = new DBSetting (){Helper=new SQLiteDatabaseHelper(),Name="db.sqlite"};
-
+        public static bool DebugMode = true;
     }
 }
