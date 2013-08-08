@@ -172,42 +172,48 @@ namespace Feint.FeintORM
 
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            DataTable table;
+            IDataReader table=null;
             if (joins.Count == 0)
-                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
-            else
-                table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
+                table = FeintORM.GetInstance().Helper.SelectR(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
+         //   else
+        //        table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
             
             var pr = getPropertiesFromClass(typeof(T)); 
             var fr = getForeignersFromClass(typeof(T));
 
-            List<Lazy<T>> tets = new List<Lazy<T>>(table.Rows.Count);
+            List<Lazy<T>> tets = new List<Lazy<T>>();
 
             var columns = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             Type int32Type = typeof(Int32);
             Type dateType = typeof(DateTime);
-            for (int i = 0; i < table.Columns.Count; i++)
+            for (int i = 0; i < table.FieldCount; i++)
             {
-                columns.Add(table.Columns[i].ColumnName, i);
+                columns.Add(table.GetName(i), i);
             }
-            foreach (DataRow row in table.Rows)
+           // foreach (DataRow row in table.Rows)
+           while(table.Read())
             {
                 //  intialize(pr, fr, columns, int32Type, dateType, row);
                 
-                Lazy<T> lazyObj = new Lazy<T>(() => (T)intialize(pr, fr, columns, int32Type, dateType, row));
+
+               Initialize(table, pr, fr, columns, int32Type, dateType);
+
+
+
+          //      Lazy<T> lazyObj = new Lazy<T>(() => (T)Initialize(table, pr, fr, columns, int32Type, dateType));
                 
             // Object obj = intialize(pr, fr, columns, int32Type, dateType, row);
                 
-             tets.Add(lazyObj);
+            // tets.Add(lazyObj);
             }
             timer.Stop();
             Log.E(timer.ElapsedMilliseconds);
             return tets;
         }
 
-        private static object intialize(List<PropertyInfo> pr, List<PropertyInfo> fr, Dictionary<string, int> columns, Type int32Type, Type dateType, DataRow row)
+        private  Object Initialize(IDataReader table, List<PropertyInfo> pr, List<PropertyInfo> fr, Dictionary<string, int> columns, Type int32Type, Type dateType)
         {
-            Log.D("Inicjalizacja");
+        //    Log.D("Inicjalizacja");
             Object obj = Activator.CreateInstance(typeof(T));
             foreach (PropertyInfo p in pr)
             {
@@ -217,16 +223,16 @@ namespace Feint.FeintORM
                     if (p.PropertyType == int32Type)
                     {
 
-                        p.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
+                        p.SetValue(obj, Convert.ToInt32((Int64)table[i]), null);
                     }
                     else
                     {
-                        p.SetValue(obj, row.ItemArray[i], null);
+                        p.SetValue(obj, table[i], null);
                     }
                 }
                 else
                 {
-                    p.SetValue(obj, new DateTime(((long)row.ItemArray[i]) * 10000), null);
+                    p.SetValue(obj, new DateTime(((long)table[i]) * 10000), null);
                 }
             }
 
@@ -234,13 +240,15 @@ namespace Feint.FeintORM
             foreach (PropertyInfo f in fr)
             {
                 Object fobj = Activator.CreateInstance(f.PropertyType, true);
-                var value = row.ItemArray[columns["fk_" + f.Name]];
+                var value = table[columns["fk_" + f.Name]];
                 if (value != null && value.GetType() != typeof(DBNull))
                     f.PropertyType.GetField("id", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fobj, value);
                 f.SetValue(obj, fobj);
             }
             return obj;
         }
+
+
         PropertyInfo getProperty(PropertyInfo[] pi, String name)
         {
             foreach (var p in pi)

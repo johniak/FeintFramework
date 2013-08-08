@@ -44,7 +44,7 @@ namespace Site
             // var tasks = ToDoTask.getAll<ToDoTask>();
             var u = User.getAll<User>();
             //var us = u[0].Value;
-            //User u= m[0].From;
+            //var us1 = u[1].Value;
             var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!", isLogged = User.isLogged(request.Session) }));
             return response;
         }

@@ -60,10 +60,33 @@ namespace Feint.FeintORM
             Log.D(query);
             NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(query, connection);
             var dataSet = new DataSet();
-            DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
 
             return dataSet.Tables[0];
+        }
+        public IDataReader SelectR(string table, List<WhereComponent> where)
+        {
+            StringBuilder builder = new StringBuilder();
+            string query = "SELECT * from " + System.Security.SecurityElement.Escape(table) + "";
+            if (where.Count != 0)
+            {
+                query += " WHERE ";
+                foreach (var w in where)
+                {
+                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    {
+                        query += " " + queryOperators[w.operatorType] + " ";
+                        continue;
+                    }
+                    query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
+                }
+            }
+            Log.D(query);
+            NpgsqlCommand cmd = new NpgsqlCommand(query, connection);
+           
+            NpgsqlDataReader rdr = cmd.ExecuteReader();
+
+            return rdr;
         }
 
         public DataTable SelectWithJoin(string table, List<WhereComponent> where, List<DBJoinInformation> joins)

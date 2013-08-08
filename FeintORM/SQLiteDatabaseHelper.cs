@@ -103,6 +103,10 @@ namespace Feint.FeintORM
             return dataSet.Tables[0];
         }
 
+        public IDataReader SelectR(string table, List<WhereComponent> where)
+        {
+            return null;
+        }
         public Int64 Insert(string table, List<DBPair> what)
         {
             var commandString= "INSERT INTO 'main'.'"+Esc(table)+"' ";
