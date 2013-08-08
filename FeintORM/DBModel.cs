@@ -17,33 +17,6 @@ namespace Feint.FeintORM
         [DBProperty(true)]
         public Int64 Id { get; set; }
 
-        /// <summary>
-        /// Very slow, gets all rows and use selector on list
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        [ObsoleteAttribute]
-        public static List<T> get<T>(Func<T, bool> selector)
-        {
-            return getAll<T>().Where(selector).ToList<T>();
-        }
-
-        /// <summary>
-        /// Very slow, gets all rows and use selector on list
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="selector"></param>
-        /// <returns></returns>
-        [ObsoleteAttribute]
-        public static dynamic getOne<T>(Func<T, bool> selector)
-        {
-            var all = getAll<T>();
-            var tets = all.Where(selector).ToList<T>();
-            if (tets.Count > 0)
-                return tets[0];
-            return null;
-        }
         public static T CreateFromPost<T>(Dictionary<String, String> post)
         {
             Type t = typeof(T);
@@ -74,13 +47,13 @@ namespace Feint.FeintORM
         {
             return new QueryBuilder<T>();
         }
-        public static List<T> getAll<T>()
+        public static List<Lazy<T>> getAll<T>()
         {
             return Find<T>().Where().Execute();
         }
 
         [Obsolete]
-        private static List<T> Where<T>(Expression<Func<T, bool>> predicate)
+        private static List<Lazy<T>> Where<T>(Expression<Func<T, bool>> predicate)
         {
             WhereBuilder<T> wh = new QueryBuilder<T>().Where();
             //LogicalBinaryExpression name = predicate.Body.GetType().Name;

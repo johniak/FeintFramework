@@ -38,7 +38,7 @@ namespace Site.Models
         {
             Done=1, Waiting=0
         }
-        public static List<Task> getUserTask(User u){
+        public static List<Lazy<Task>> getUserTask(User u){
             return Find<Task>().Where().Eq("Owner", u).Execute();
         }
     }

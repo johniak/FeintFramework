@@ -19,37 +19,38 @@ namespace Site
         }
         public static Response Index(Request request)
         {
-           // for (int i = 1; i < 100000; i++)
-           // {
-          //      //    Message.SendMessage(request.Session, User.Find<User>().Where().Eq("Id", i).Execute()[0],"aaaa","bbb");
-          //      User.SignUp("johniak" + i, "test123", "johniak@hn" + i + ".pl");
-          //  }
-          //  var user = User.Find<User>().Where().Execute();
-          //  foreach (var u in user)
-         //   {
-               //if(u.Username=="johniak"){
-               //    u.model = new SampleModel();
-               //    u.model.flag = true;
-               //    u.model.Save();
-               //    u.Save();
-               //}
-              //  Log.D(u.Id + "\t" + u.Username + "\t" + u.Password);
-          //  }
-           // User.Where<User>(u=> (u.Username=="johniak"||u.Username=="ania")&&u.model.flag);
-           // var model = SampleModel.Find<SampleModel>().Where().Execute();
-           // var mess = Message.Find<Message>().Where().Eq("From.model.flag", true).Execute();
-       //     var us=user[1];
+            //for (int i = 1; i < 40000; i++)
+            //{
+            //    //    Message.SendMessage(request.Session, User.Find<User>().Where().Eq("Id", i).Execute()[0],"aaaa","bbb");
+            //    User.SignUp("johniak" + i, "test123", "johniak@hn" + i + ".pl");
+            //}
+            //  var user = User.Find<User>().Where().Execute();
+            //  foreach (var u in user)
+            //   {
+            //if(u.Username=="johniak"){
+            //    u.model = new SampleModel();
+            //    u.model.flag = true;
+            //    u.model.Save();
+            //    u.Save();
+            //}
+            //  Log.D(u.Id + "\t" + u.Username + "\t" + u.Password);
+            //  }
+            // User.Where<User>(u=> (u.Username=="johniak"||u.Username=="ania")&&u.model.flag);
+            // var model = SampleModel.Find<SampleModel>().Where().Execute();
+            // var mess = Message.Find<Message>().Where().Eq("From.model.flag", true).Execute();
+            //     var us=user[1];
             //var mvss = User.Where<Message>(m=>m.From.model.flag&&m.To.Id==us.Id);
             //var mess = Message.Find<Message>().Where().Eq("To", user[1]).And().Ge("From.model", model[1]).Execute();
-           // var tasks = ToDoTask.getAll<ToDoTask>();
-           var u=  User.getAll<User>();
+            // var tasks = ToDoTask.getAll<ToDoTask>();
+            var u = User.getAll<User>();
+            //var us = u[0].Value;
             //User u= m[0].From;
-            var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
+            var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!", isLogged = User.isLogged(request.Session) }));
             return response;
         }
         public static Response Register(Request request)
         {
-            return new Response("register.html", Hash.FromAnonymousObject(new {  }));
+            return new Response("register.html", Hash.FromAnonymousObject(new { }));
         }
         public static Response SignIn(Request request)
         {
@@ -84,7 +85,7 @@ namespace Site
         }
         public static Response Messages(Request request)
         {
-          //  var messages = Message.GetReciveBox(request.Session);
+            //  var messages = Message.GetReciveBox(request.Session);
             return new Response("messages.html", Hash.FromAnonymousObject(new { }));
         }
 
@@ -94,9 +95,9 @@ namespace Site
                 return Response.Redirect("/");
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);
-            User user= User.getOne<User>(u=> u.Username== request.POST["to"]);
-            if (user==null)
-             return new Response(JsonConvert.SerializeObject(false));
+            User user = null;// User.getOne<User>(u => u.Username == request.POST["to"]);
+            if (user == null)
+                return new Response(JsonConvert.SerializeObject(false));
             return null;//new Response(JsonConvert.SerializeObject( Message.SendMessage(request.Session, user, request.POST["title"], request.POST["text"])));
         }
         public static Response GetReciveBoxJson(Request request)

@@ -3,6 +3,7 @@ using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace Feint.FeintORM
             connection = new NpgsqlConnection("Server=" + host + ";Port=" + port + ";User Id=" + user + ";Password=" + password + ";");
             connection.Open();
         }
-       
+
         public static string Esc(string text)
         {
             return System.Security.SecurityElement.Escape(text);
@@ -61,6 +62,7 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
+
             return dataSet.Tables[0];
         }
 
@@ -113,7 +115,7 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
-           
+
             return (int)dataSet.Tables[0].Rows[0][0];
         }
 
@@ -162,7 +164,7 @@ namespace Feint.FeintORM
                 Foreign f;
                 if ((f = getForeginForCollumn(collumns[i], foreigners)) != null)
                 {
-                    commandString += "references "+Esc(f.Table)+"("+Esc(f.Collumn)+")";
+                    commandString += "references " + Esc(f.Table) + "(" + Esc(f.Collumn) + ")";
                 }
                 if (i + 1 < collumns.Count)
                     commandString += ",";
@@ -180,7 +182,7 @@ namespace Feint.FeintORM
             }
             return null;
         }
-        public  string columnToString(Column col)
+        public string columnToString(Column col)
         {
             string cmd = "" + col.Name + " ";
             if (col.AutoIncrement)

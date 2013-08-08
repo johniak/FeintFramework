@@ -35,7 +35,7 @@ namespace Site
             if (users.Count <= 0)
                 return false;
             password = MD5Hash(password);
-            if (users[0].Password.Length != 0 && users[0].Password == password)
+            if (users[0].Value.Username.Length != 0 && users[0].Value.Password == password)
                 return true;
             return false;
         }

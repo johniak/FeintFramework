@@ -18,7 +18,7 @@ namespace Feint.FeintORM
                 if(_value==null){
                     var values=DBModel.Find<T>().Where().Eq("Id",id).Execute();
                     if (values.Count > 0)
-                        _value = values[0];
+                        _value = values[0].Value;
                 }
                 return _value;
             }

@@ -14,7 +14,7 @@ namespace Site.Models
 
         public DBForeignKey<User> Owner { get; set; }
 
-        public List<Project> getUserProjects(User u)
+        public List<Lazy<Project>> getUserProjects(User u)
         {
             return Find<Project>().Where().Eq("Owner", u).Execute();
         }

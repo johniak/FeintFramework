@@ -35,8 +35,8 @@ C:\Users\johniak\Dropbox\Feint\FeintORM\bin\Debug\ja\Npgsql.resources.dll
 C:\Users\johniak\Dropbox\Feint\FeintORM\bin\Debug\zh-CN\Npgsql.resources.dll
 C:\Users\johniak\Dropbox\Feint\FeintORM\obj\Debug\FeintORM.dll
 C:\Users\johniak\Dropbox\Feint\FeintORM\obj\Debug\FeintORM.pdb
-C:\Users\johniak\Dropbox\Feint\FeintORM\obj\Debug\FeintORM.csprojResolveAssemblyReference.cache
 C:\Users\johniak\Dropbox\Feint\FeintORM\bin\Debug\PostSharp.dll
 C:\Users\johniak\Dropbox\Feint\FeintORM\bin\Debug\PostSharp.xml
 C:\Users\johniak\Dropbox\Feint\FeintORM\bin\Debug\FeintORM.pssym
 C:\Users\johniak\Dropbox\Feint\FeintORM\obj\Debug\FeintORM.dll.postsharp
+C:\Users\johniak\Dropbox\Feint\FeintORM\obj\Debug\FeintORM.csprojResolveAssemblyReference.cache
