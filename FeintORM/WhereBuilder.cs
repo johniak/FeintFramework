@@ -171,12 +171,12 @@ namespace Feint.FeintORM
         {
 
             Stopwatch timer = new Stopwatch();
-            timer.Start();
             DataTable table;
             if (joins.Count == 0)
                 table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
             else
                 table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
+            timer.Start();
             var pr = getPropertiesFromClass(typeof(T)); 
             var fr = getForeignersFromClass(typeof(T));
 

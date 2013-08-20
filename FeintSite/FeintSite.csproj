@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controlers\Application.cs" />
     <Compile Include="ErrorPages.cs" />
     <Compile Include="Models\Project.cs" />
     <Compile Include="Models\Task.cs" />

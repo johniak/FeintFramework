@@ -44,7 +44,7 @@ namespace Site
            // var tasks = ToDoTask.getAll<ToDoTask>();
            var u=  User.getAll<User>();
             //User u= m[0].From;
-            var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.isLogged(request.Session)}));
+            var response = new Response("index.html", Hash.FromAnonymousObject(new { message = "Hello World!",isLogged=User.IsLogged(request.Session)}));
             return response;
         }
         public static Response Register(Request request)
@@ -65,7 +65,7 @@ namespace Site
         }
         public static Response SignUp(Request request)
         {
-            if (User.isLogged(request.Session))
+            if (User.IsLogged(request.Session))
                 return Response.Redirect("/");
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);
@@ -75,7 +75,7 @@ namespace Site
         }
         public static Response LogOut(Request request)
         {
-            if (User.isLogged(request.Session))
+            if (User.IsLogged(request.Session))
             {
                 request.Session.UnsetProperty("isLogged");
                 request.Session.UnsetProperty("userId");
@@ -90,7 +90,7 @@ namespace Site
 
         public static Response SendMessage(Request request)
         {
-            if (!User.isLogged(request.Session))
+            if (!User.IsLogged(request.Session))
                 return Response.Redirect("/");
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);

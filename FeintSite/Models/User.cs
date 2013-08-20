@@ -39,13 +39,13 @@ namespace Site
                 return true;
             return false;
         }
-        public static int SignUp(String username, String password,String mail)
+        public static int SignUp(String username, String password, String mail)
         {
             if (User.Find<User>().Where().Eq("Username", username).Execute().Count > 0)
                 return 1;
-            if (password.Length < 5)
+            if (password.Length < 4)
                 return 2;
-            if(mail.Length<1)
+            if (mail.Length < 5)
                 return 3;
             User user = new User();
             user.Username = username;
@@ -56,12 +56,28 @@ namespace Site
             user.Save();
             return 0;
         }
-        public static bool isLogged(Session session)
+        public static bool IsLogged(Session session)
         {
             var logString = session.GetProperty("isLogged");
             if (logString == true.ToString())
                 return true;
             return false;
+        }
+        public static User GetLoggedUser(Session session)
+        {
+            var logString = session.GetProperty("isLogged");
+            if (logString == true.ToString())
+            {
+                var users = Find<User>().Where().Eq("Username", session.GetProperty("username")).Execute();
+                if (users.Count != 1)
+                    return null;
+                else
+                    return users[0];
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static string MD5Hash(string text)

@@ -19,4 +19,22 @@ namespace Site.Models
             return Find<Project>().Where().Eq("Owner", u).Execute();
         }
     }
+    public class ProjectDisplay
+    {
+        public long Id { get; set; }
+        public String Name { get; set; }
+        public long Count { get; set; }
+
+        public ProjectDisplay(long id, String name, long count)
+        {
+            this.Id = id;
+            this.Name = name;
+            this.Count = count;
+        }
+        //public static implicit operator ProjectDisplay(Project p)
+        //{
+        //    return new ProjectDisplay(p.Id,p.Name,p
+        //}
+
+    }
 }
