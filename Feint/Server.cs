@@ -59,7 +59,7 @@ namespace Feint
                         var postTabs = text.Split('&');
                         foreach (var p in postTabs)
                         {
-                            req.POST.Add(p.Split('=')[0], p.Split('=')[1]);
+                            req.FormData.Add(p.Split('=')[0], p.Split('=')[1]);
                         }
                     }else
                     {
@@ -77,7 +77,7 @@ namespace Feint
                                 continue;
                             }
                             if (postTab[i].Length > 0)
-                                req.POST.Add(postName, postTab[i]);
+                                req.FormData.Add(postName, postTab[i]);
 
                         }
                     }

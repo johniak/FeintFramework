@@ -141,7 +141,7 @@ namespace Feint.FeintORM
             {
                 if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
                 {
-                    var fmodel = (DBModel)p.GetValue(model);
+                    var fmodel = ((dynamic)p.GetValue(model)).Value;
                     if (fmodel != null)
                     {
                         Add(fmodel);
@@ -182,6 +182,7 @@ namespace Feint.FeintORM
         {
             if (this.Id == 0)
             {
+
                 Add(this);
                 return;
             }
@@ -211,6 +212,10 @@ namespace Feint.FeintORM
             FeintORM orm = FeintORM.GetInstance();
             orm.Helper.RemoveFromTable(this.GetType().Name, Id);
         }
+		public static T Ref<T>(long id)
+		{
+			return Find<T>().Where().Eq("Id",id).Execute()[0];
+		}
     }
 
 }

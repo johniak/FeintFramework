@@ -11,6 +11,8 @@
     <AssemblyName>Site</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProductVersion>12.0.0</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,16 +31,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Alchemy">
       <HintPath>packages\Alchemy.2.2.1\lib\net40\Alchemy.dll</HintPath>
-    </Reference>
-    <Reference Include="DotLiquid, Version=1.7.0.0, Culture=neutral, PublicKeyToken=82e46016ecf9f07c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dll\DotLiquid.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\dll\Newtonsoft.Json.dll</HintPath>
@@ -56,6 +51,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="DotLiquid">
+      <HintPath>..\dll\DotLiquid.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controlers\Application.cs" />
@@ -67,6 +65,9 @@
     <Compile Include="Sock.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Views.cs" />
+    <Compile Include="Controlers\Tasks.cs" />
+    <Compile Include="Util\DateRegExpr.cs" />
+    <Compile Include="Util\PriorityRegExpr.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config">
@@ -94,14 +95,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="static\img\" />
+    <Folder Include="Util\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FeintORM\FeintORM.csproj">
-      <Project>{30bbfb3d-ffd0-4f77-93b8-9bbf20267595}</Project>
+      <Project>{30BBFB3D-FFD0-4F77-93B8-9BBF20267595}</Project>
       <Name>FeintORM</Name>
     </ProjectReference>
     <ProjectReference Include="..\FeintSDK\FeintSDK.csproj">
-      <Project>{f63a64a6-97b6-478d-bebc-45af892cc6f7}</Project>
+      <Project>{F63A64A6-97B6-478D-BEBC-45AF892CC6F7}</Project>
       <Name>FeintSDK</Name>
     </ProjectReference>
   </ItemGroup>

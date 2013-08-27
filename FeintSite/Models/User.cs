@@ -9,7 +9,7 @@ using DotLiquid;
 using Site.Models;
 using System.Security.Cryptography;
 
-namespace Site
+namespace Site.Models
 {
     class User : DBModel, ILiquidizable
     {
@@ -54,6 +54,11 @@ namespace Site
             user.Created = DateTime.Now;
             user.Updated = DateTime.Now;
             user.Save();
+			Project p = new Project () {
+				Name = "Home",
+				Owner = user
+			};
+			p.Save ();
             return 0;
         }
         public static bool IsLogged(Session session)

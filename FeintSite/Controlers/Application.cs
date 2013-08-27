@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Site.Models;
 namespace Site.Controlers
 {
     class Application
@@ -23,7 +23,7 @@ namespace Site.Controlers
 
         public static Response Dashboard(Request request)
         {
-            return null;
+			return DashboardDisplay(request,null,"all");
         }
 
         public static Response DashboardWeek(Request request)
@@ -43,14 +43,15 @@ namespace Site.Controlers
         /// <param name="projectId"></param>
         /// <param name="global"></param>
         /// <returns></returns>
-        public static Response dashboardDisplay(Request request,int projectId, String global)
+        public static Response DashboardDisplay(Request request,int? projectId, String global)
         {
 
             User loggedUser = User.GetLoggedUser(request.Session);
             if (loggedUser == null)
                 return Response.Redirect("/login/");
-	//	List<ProjectDisplay> projects = Projects.getUserProjects();
-            return null;
+			List<ProjectDisplay> projects = Project.getUserProjectsDisplays (loggedUser);
+			var response = new Response("dashboard.html", Hash.FromAnonymousObject(new { projects=projects,selectedProject=projectId,user=loggedUser,type=global }));
+			return response;
 		//return ok(dashboard.render(logged_user, projects, project_id, global, projects.size()>1));
 	}
 
@@ -61,13 +62,13 @@ namespace Site.Controlers
 
         public static Response Authenticate(Request request)
         {
-            var username = request.POST["username"];
-            var password = request.POST["password"];
+            var username = request.FormData["username"];
+            var password = request.FormData["password"];
             var status = User.SignIn(username, password);
             if (status)
             {
                 request.Session.SetProperty("isLogged", true.ToString());
-                request.Session.SetProperty("username", request.POST["username"]);
+                request.Session.SetProperty("username", request.FormData["username"]);
                 return Response.Redirect("/dashboard/#message/success/Welcome " + username);
             }
             return new Response("login.html", Hash.FromAnonymousObject(new {hasError=true,errorMessage= "Wrong username or password"}));
@@ -85,10 +86,10 @@ namespace Site.Controlers
 
         public static Response RegisterPost(Request request)
         {
-            var username = request.POST["username"];
-            var password = request.POST["password"];
-            var rePassword = request.POST["rePassword"];
-            var email = request.POST["email"];
+            var username = request.FormData["username"];
+            var password = request.FormData["password"];
+            var rePassword = request.FormData["rePassword"];
+            var email = request.FormData["email"];
             if (password != rePassword)
             {
                 return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Passwords don't match." }));

@@ -14,7 +14,7 @@ namespace Site
     {
         public static void Main()
         {
-            Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="web4test",Name="task"};
+            Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
             Settings.DebugMode = false;
             Settings.Urls.Add(new Url(@"^/$", Controlers.Application.Index));
             Settings.Urls.Add(new Url(@"^/dashboard/$", Controlers.Application.Dashboard));
@@ -34,9 +34,9 @@ namespace Site
             Settings.Urls.Add(new Url(@"^/projects/all/tasks/$", Views.Index, RequestMethod.GET));
             Settings.Urls.Add(new Url(@"^/projects/week/tasks/$", Views.Index, RequestMethod.GET));
             Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Views.Index, RequestMethod.GET));
-            Settings.Urls.Add(new Url(@"^/projects/all/tasks/$", Views.Index, RequestMethod.POST));
+            Settings.Urls.Add(new Url(@"^/projects/all/tasks/$", Controlers.Tasks.AddAll, RequestMethod.POST));
             Settings.Urls.Add(new Url(@"^/projects/week/tasks/$", Views.Index, RequestMethod.POST));
-            Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Views.Index,RequestMethod.POST));
+			Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Controlers.Tasks.Add,RequestMethod.POST));
             Settings.Urls.Add(new Url(@"^/projects/all/tasks/(?<task>[0-9]*?)/$", Views.Index,RequestMethod.PUT));
             Settings.Urls.Add(new Url(@"^/projects/week/tasks/(?<task>[0-9]*?)/$", Views.Index, RequestMethod.PUT));
             Settings.Urls.Add(new Url(@"^/projects/:project/tasks/(?<task>[0-9]*?)/$", Views.Index, RequestMethod.PUT));

@@ -56,10 +56,10 @@ namespace Site
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);
 
-            if (!User.SignIn(request.POST["username"], request.POST["password"]))
+            if (!User.SignIn(request.FormData["username"], request.FormData["password"]))
                 return new Response("index.html", Hash.FromAnonymousObject(new { loginMessage = "Bad username or password." }));
             request.Session.SetProperty("isLogged", true.ToString());
-            request.Session.SetProperty("userId", request.POST["username"]);
+            request.Session.SetProperty("userId", request.FormData["username"]);
             return Response.Redirect("/");
 
         }
@@ -94,7 +94,7 @@ namespace Site
                 return Response.Redirect("/");
             if (request.Method != "POST")
                 return ErrorPages.ExpectedPostMethod(request);
-            User user= User.getOne<User>(u=> u.Username== request.POST["to"]);
+            User user= User.getOne<User>(u=> u.Username== request.FormData["to"]);
             if (user==null)
              return new Response(JsonConvert.SerializeObject(false));
             return null;//new Response(JsonConvert.SerializeObject( Message.SendMessage(request.Session, user, request.POST["title"], request.POST["text"])));

@@ -2,7 +2,7 @@ var app = app || {};
 var appView = null;
 
 requirejs.config({
-    baseUrl: '/assets/js/'
+    baseUrl: '/static/js/'
 });
 
 requirejs(["views/app"],

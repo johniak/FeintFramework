@@ -1,7 +1,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Task Manager - {{username}}</title>
+    <title>Task Manager - {{user.Username}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -46,7 +46,7 @@
             <div class="nav-collapse collapse">
                 <div class="btn-group pull-right">
                     <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="icon-user"></i> {{username}}
+                        <i class="icon-user"></i> {{user.Username}}
                         <span class="caret"></span>
                     </a>
                     <ul class="dropdown-menu">
@@ -72,14 +72,14 @@
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">Global</li>
-                    {%if type=="all" %}
+                    {%if type == 'all' %}
                         <li class="active">
                     {%else%}
                         <li >
                     {%endif%}
                     <a href="/dashboard/all">All Tasks</a></a></li>
                     
-                    {%if type=="week" %}
+                    {%if type == 'week' %}
                         <li class="active">
                     {%else%}
                         <li >
@@ -90,15 +90,15 @@
             <div class="well sidebar-nav">
                 <ul class="nav nav-list">
                     <li class="nav-header">Projects</li>
-                    {% for project in projects %} 
-                        {%if selectedProject == project.id %} 
+                    {% for project in projects %}
+                        {%if selectedProject == project.Id %} 
                             <li class="active">
                         {%else%}
                             <li >
-                        {%endif%}
-                        <a href="/dashboard/{{project.id}}">{{project.name}} 
-                            {%if project.count>0 %}
-                            <span class="badge" data-id="{{project.id}}">{{project.count}}</span>
+                        {% endif %}
+                        <a href="/dashboard/{{project.Id}}">{{project.Name}} 
+                            {%if project.Count>0 %}
+                            <span class="badge" data-id="{{project.Id}}">{{project.Count}}</span>
                             {%endif%}
                         </a>
                     </li>
