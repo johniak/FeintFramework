@@ -200,7 +200,7 @@ namespace Feint.FeintORM
                     int i = columns[p.Name];
                     if (p.PropertyType != dateType)
                     {
-                        if (p.PropertyType == int32Type)
+						if (p.PropertyType == int32Type&&row.ItemArray[i].GetType()==typeof(Int64))
                         {
                             
                             p.SetValue(obj, Convert.ToInt32((Int64)row.ItemArray[i]), null);
@@ -212,7 +212,9 @@ namespace Feint.FeintORM
                     }
                     else
                     {
-                        p.SetValue(obj,new  DateTime(((long)row.ItemArray[i]) * 10000), null);
+						DateTime dt = new DateTime (1970, 1, 1, 0, 0, 0, 0);
+						dt= dt.AddSeconds (((long)row.ItemArray [i])/1000);
+                        p.SetValue(obj,dt, null);
                     }
                 }
 
@@ -222,7 +224,7 @@ namespace Feint.FeintORM
                     Object fobj = Activator.CreateInstance(f.PropertyType, true);
                     var value=row.ItemArray[columns["fk_" + f.Name]];
                     if (value!=null&&value.GetType() != typeof(DBNull))
-                        f.PropertyType.GetField("id", BindingFlags.Instance | BindingFlags.NonPublic).SetValue(fobj, value);
+						f.PropertyType.GetProperty("Id", BindingFlags.Instance|BindingFlags.NonPublic|BindingFlags.Public).SetValue(fobj, value);
                     f.SetValue(obj, fobj);
                 }
                 tets.Add((T)obj);

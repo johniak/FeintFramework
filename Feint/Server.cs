@@ -103,13 +103,29 @@ namespace Feint
                         }
                     }
                 }
-                else
+                else{
+					FeintSDK.RequestMethod actualMethod = FeintSDK.RequestMethod.POST;
+					switch (request.HttpMethod)
+					{
+						case "GET":
+						actualMethod = FeintSDK.RequestMethod.GET;
+						break;
+						case "POST":
+						actualMethod = FeintSDK.RequestMethod.POST;
+						break;
+						case "PUT":
+						actualMethod = FeintSDK.RequestMethod.PUT;
+						break;
+						case "DELETE":
+						actualMethod = FeintSDK.RequestMethod.DELETE;
+						break;
+					}
                     for (int i = 0; i < Settings.Urls.Count; i++)
                     {
-                        var match = Regex.Match(request.Url.LocalPath.ToString(), Settings.Urls[i].UrlMatch);
+						var match = Regex.Match(req.Url.ToString(), FeintSDK.Settings.Urls[i].UrlMatch);
 
-                        if (match.Success)
-                        {
+						if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
+						{
                             setNonPublicSetProperty(req, req.GetType(), "variables", match.Groups);
 
 
@@ -129,6 +145,7 @@ namespace Feint
                             break;
                         }
                     }
+				}
                 if (res != null)
                 {
                     response.ContentLength64 = res.Data.Length;

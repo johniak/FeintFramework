@@ -21,7 +21,9 @@ namespace Site.Controlers
 
 
 		public static Response Add(Request request) {
-			User user = User.GetLoggedUser(request.Session);
+			User user = User.GetLoggedUser (request.Session);
+			if (user == null)
+				return Response.Redirect("/login/");
 			var project = Project.Ref<Project> (int.Parse(request.FormData ["project"])); //Find<Project> ().Where ().Eq ("Id", request.FormData ["project"]).Execute()[0];
 			if (!project.isOwnerOfProject(user))
 			{
@@ -37,7 +39,7 @@ namespace Site.Controlers
 			String message = request.FormData ["message"];
 			int status = int.Parse (request.FormData ["status"]);
 			DateTime deadline = DateTime.ParseExact (request.FormData ["deadline"], "dd/MM/yyyy", null);
-			int projectId = int.Parse (request.FormData ["project"]);
+			var projectId = Project.Find<Project>().Where().Eq("Name",request.FormData ["project_name"]);
 			DateRegExpr dateRX = new DateRegExpr (message);
 			if (dateRX.Success) {
 				message = dateRX.Message;
@@ -163,17 +165,19 @@ namespace Site.Controlers
 //			return ok(result);
 //		}
 //
-//		public static Result getAll() {
-//			User user = Secured.getUser();
-//
-//			List<Task> tasks= Task.findAll(user.id);
-//			List<TaskSafe> tasksSafe= new ArrayList<TaskSafe>();
-//			for(Task t : tasks){
-//				tasksSafe.add(new TaskSafe(t.id, t.project.id, t.priority, t.message, t.status,new SimpleDateFormat("dd/MM/yyyy").format(t.deadline), t.project.name));
-//			}
-//			JsonNode result = Json.toJson(tasksSafe);
-//			return ok(result);
-//		}
+		public static Response GetAll(Request request) {
+			User user = User.GetLoggedUser (request.Session);
+			if (user == null)
+				return Response.Redirect("/login/");
+
+			List<Task> tasks = Task.getUserTask (user);
+
+			List<TaskSafe> tasksSafe= new List<TaskSafe>();
+			foreach(Task t in tasks){
+				tasksSafe.Add(new TaskSafe(t.Id, t.ProjectToTask.Id, t.Priority, t.Message, t.Status,t.Deadline.ToString("dd/MM/yyyy"), t.ProjectToTask.Value.Name));
+			}
+			return new Response (JsonConvert.SerializeObject (tasksSafe));
+		}
 //
 //		public static Result getByProject(Long project) {
 //			User user = Secured.getUser();

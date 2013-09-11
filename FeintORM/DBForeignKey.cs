@@ -16,7 +16,7 @@ namespace Feint.FeintORM
             get
             {
                 if(_value==null){
-                    var values=DBModel.Find<T>().Where().Eq("Id",id).Execute();
+                    var values=DBModel.Find<T>().Where().Eq("Id",Id).Execute();
                     if (values.Count > 0)
                         _value = values[0];
                 }
@@ -28,7 +28,7 @@ namespace Feint.FeintORM
             }
         }
         private T _value;
-        private Int64 id;
+		public Int64 Id{ get; private set; }
 
         private DBForeignKey()
         {

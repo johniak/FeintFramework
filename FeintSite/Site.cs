@@ -8,6 +8,9 @@ using System.Reflection;
 using Feint.FeintORM;
 using DotLiquid;
 using DotLiquid.FileSystems;
+using Site.Models;
+
+
 namespace Site
 {
     public class Site
@@ -15,7 +18,7 @@ namespace Site
         public static void Main()
         {
             Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
-            Settings.DebugMode = false;
+            Settings.DebugMode = true;
             Settings.Urls.Add(new Url(@"^/$", Controlers.Application.Index));
             Settings.Urls.Add(new Url(@"^/dashboard/$", Controlers.Application.Dashboard));
             Settings.Urls.Add(new Url(@"^/dashboard/all/$", Controlers.Application.Dashboard));
@@ -31,10 +34,10 @@ namespace Site
             Settings.Urls.Add(new Url(@"^/user/$", Controlers.Application.UpdateUser, RequestMethod.PUT));
 
             Settings.Urls.Add(new Url(@"^/tasks/$", Views.Index, RequestMethod.GET));
-            Settings.Urls.Add(new Url(@"^/projects/all/tasks/$", Views.Index, RequestMethod.GET));
+			Settings.Urls.Add(new Url(@"^/projects/all/tasks$", Controlers.Tasks.GetAll, RequestMethod.GET));
             Settings.Urls.Add(new Url(@"^/projects/week/tasks/$", Views.Index, RequestMethod.GET));
             Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Views.Index, RequestMethod.GET));
-            Settings.Urls.Add(new Url(@"^/projects/all/tasks/$", Controlers.Tasks.AddAll, RequestMethod.POST));
+            Settings.Urls.Add(new Url(@"^/projects/all/tasks$", Controlers.Tasks.AddAll, RequestMethod.POST));
             Settings.Urls.Add(new Url(@"^/projects/week/tasks/$", Views.Index, RequestMethod.POST));
 			Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Controlers.Tasks.Add,RequestMethod.POST));
             Settings.Urls.Add(new Url(@"^/projects/all/tasks/(?<task>[0-9]*?)/$", Views.Index,RequestMethod.PUT));

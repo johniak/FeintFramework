@@ -9,17 +9,15 @@ namespace Site.Util
 		private static String REGEX = "@(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\\d{2}(-|/)\\d{2}(-|/)\\d{4})( |$)";
 		public DateTime Date{ get; private set; }
 		public string Message{ get; private set;}
-		public bool Success 
-		{
-			get
-			{
-				return Date==null?false:true;
-			}
+		public bool Success {
+			get;
+			private set;
 		}
 
 		public DateRegExpr(String input) {
 			Match m = Regex.Match(input,REGEX);
 			if( m.Success ) {
+				Success = true;
 				String inputPattern = m.Groups[0].Value;
 				DateTime now =DateTime.Now;
 				int dayOfweek = -1;
