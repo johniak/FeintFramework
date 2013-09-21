@@ -141,7 +141,8 @@ namespace Feint.FeintORM
             {
                 if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
                 {
-                    var fmodel = ((dynamic)p.GetValue(model)).Value;
+                    var obj = p.GetValue(model);
+                    var fmodel =(DBModel) obj.GetType().GetProperty("Value").GetValue(obj);
                     if (fmodel != null)
                     {
                         Add(fmodel);

@@ -13,13 +13,13 @@ namespace Site.Models
 {
     class User : DBModel, ILiquidizable
     {
-        [DBProperty(false, false, true, false)]
+        [DBProperty(Unique=true)]
         public String Username { get; set; }
 
-        [DBProperty(false, false, false, false)]
+        [DBProperty(AllowNull=false)]
         public String Password { get; set; }
 
-        [DBProperty(false, false, true, false)]
+        [DBProperty(Unique=true)]
         public String Mail { get; set; }
 
         [DBProperty]

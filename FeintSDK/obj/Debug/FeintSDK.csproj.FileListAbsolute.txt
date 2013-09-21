@@ -49,7 +49,6 @@ C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\FeintSDK.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\FeintSDK.pdb
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\DotLiquid.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\FeintORM.dll
-C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\System.Data.SQLite.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\Npgsql.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\Mono.Security.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\FeintORM.pdb
@@ -61,3 +60,4 @@ C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\fi\Npgsql.resources
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\fr\Npgsql.resources.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\ja\Npgsql.resources.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\zh-CN\Npgsql.resources.dll
+C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\System.Data.SQLite.dll

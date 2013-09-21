@@ -18,7 +18,7 @@ namespace Site
         public static void Main()
         {
             Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
-            Settings.DebugMode = true;
+            Settings.DebugMode = false;
             Settings.Urls.Add(new Url(@"^/$", Controlers.Application.Index));
             Settings.Urls.Add(new Url(@"^/dashboard/$", Controlers.Application.Dashboard));
             Settings.Urls.Add(new Url(@"^/dashboard/all/$", Controlers.Application.Dashboard));
