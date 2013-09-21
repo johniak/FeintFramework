@@ -35,7 +35,7 @@ namespace FeintSDK
 			this.Requierd = requierd;
 		}
 
-		public virtual bool IsValid (object o);
+		public abstract bool IsValid (object o);
 	}
 
 	public class CharField :FormField
