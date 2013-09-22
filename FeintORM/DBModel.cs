@@ -132,6 +132,7 @@ namespace Feint.FeintORM
         }
         public static void Add(DBModel model)
         {
+            var ass = GetAssemblyNameContainingType(model.GetType());
             if (model.Id != 0)
                 return;
             var prop = model.GetType().GetProperties();
@@ -217,6 +218,17 @@ namespace Feint.FeintORM
 		{
 			return Find<T>().Where().Eq("Id",id).Execute()[0];
 		}
+        public static Assembly GetAssemblyNameContainingType(Type type)
+        {
+             var v=AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly currentassembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Type t = currentassembly.GetType(type.FullName, false, true);
+                if (t != null) { return currentassembly; }
+            }
+
+            return null;
+        }
     }
 
 }

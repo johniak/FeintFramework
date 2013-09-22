@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Site.Models;
-using Site.Util;
+using Api.Util;
 using Newtonsoft.Json;
 
-namespace Site.Controlers
+namespace Api.Controlers
 {
 	public class Tasks
 	{	

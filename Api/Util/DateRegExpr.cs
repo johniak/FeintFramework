@@ -2,7 +2,7 @@ using System;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Site.Util
+namespace Api.Util
 {
 	public class DateRegExpr
 	{

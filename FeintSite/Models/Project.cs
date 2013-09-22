@@ -8,7 +8,7 @@ using DotLiquid;
 
 namespace Site.Models
 {
-	class Project:DBModel, ILiquidizable
+	public class Project:DBModel, ILiquidizable
 	{
 		[DBProperty]
 		public String Name { get; set; }
@@ -44,7 +44,7 @@ namespace Site.Models
 		}
 	}
 
-	class ProjectDisplay: ILiquidizable
+	public class ProjectDisplay: ILiquidizable
 	{
 		public long Id { get; set; }
 

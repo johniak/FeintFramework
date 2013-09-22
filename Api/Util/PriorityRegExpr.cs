@@ -1,7 +1,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Site.Util
+namespace Api.Util
 {
 	public class PriorityRegExpr
 	{

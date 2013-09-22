@@ -10,26 +10,25 @@ namespace Feint.FeintORM
 {
     public class FeintORM
     {
-        protected Assembly assembly;
+        protected List<Assembly> assemblies;
         public DatabaseHelper Helper { get; protected set; }
         protected static FeintORM instance;
         protected DBSetting settings;
         List<String> tablesCreated;
         public String Prefix { get; set; }
-        protected FeintORM(Assembly assembly, DBSetting settings)
+        protected FeintORM(List<Assembly> assemblies, DBSetting settings)
         {
-            this.assembly = assembly;
+            this.assemblies = assemblies;
             this.Helper = settings.Helper;
             this.settings = settings;
             Helper.Connect(settings.Name, settings.User, settings.Password, settings.Host, settings.Port);
             Prefix = "feint_";
-            //CreateTablesFromModel();
 
         }
-        public static FeintORM GetInstance(Assembly assembly, DBSetting settings)
+        public static FeintORM GetInstance(List<Assembly> assemblies, DBSetting settings)
         {
             if (instance == null)
-                instance = new FeintORM(assembly, settings);
+                instance = new FeintORM(assemblies, settings);
             return instance;
         }
         public static FeintORM GetInstance()
@@ -38,9 +37,12 @@ namespace Feint.FeintORM
         }
         IEnumerable<Type> getAllModelClass()
         {
-            foreach (var t in assembly.GetTypes())
-                if (t.BaseType == typeof(DBModel))
-                    yield return t;
+            foreach (var assembly in assemblies)
+            {
+                foreach (var t in assembly.GetTypes())
+                    if (t.BaseType == typeof(DBModel))
+                        yield return t;
+            }
         }
         public void CreateTablesFromModel()
         {

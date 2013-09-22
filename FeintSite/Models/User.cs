@@ -11,7 +11,7 @@ using System.Security.Cryptography;
 
 namespace Site.Models
 {
-    class User : DBModel, ILiquidizable
+    public class User : DBModel, ILiquidizable
     {
         [DBProperty(Unique=true)]
         public String Username { get; set; }

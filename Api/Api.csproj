@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C924C99F-D80D-487E-A02B-408F6BA60C50}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{EBE5413D-08C6-4ACE-81E9-05AB96B526B1}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Feint</RootNamespace>
-    <AssemblyName>manage</AssemblyName>
+    <RootNamespace>Api</RootNamespace>
+    <AssemblyName>Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,12 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DotLiquid, Version=1.7.0.0, Culture=neutral, PublicKeyToken=82e46016ecf9f07c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\dll\DotLiquid.dll</HintPath>
+    <Reference Include="DotLiquid">
+      <HintPath>..\Feint\bin\Debug\DotLiquid.dll</HintPath>
     </Reference>
-    <Reference Include="FastCGI">
-      <HintPath>..\dll\FastCGI.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Feint\bin\Debug\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -48,26 +45,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FastCGIServer.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Api.cs" />
+    <Compile Include="Controlers\Tasks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Server.cs" />
+    <Compile Include="Util\DateRegExpr.cs" />
+    <Compile Include="Util\PriorityRegExpr.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Api\Api.csproj">
-      <Project>{ebe5413d-08c6-4ace-81e9-05ab96b526b1}</Project>
-      <Name>Api</Name>
+    <ProjectReference Include="..\FeintORM\FeintORM.csproj">
+      <Project>{30bbfb3d-ffd0-4f77-93b8-9bbf20267595}</Project>
+      <Name>FeintORM</Name>
     </ProjectReference>
     <ProjectReference Include="..\FeintSDK\FeintSDK.csproj">
       <Project>{f63a64a6-97b6-478d-bebc-45af892cc6f7}</Project>
       <Name>FeintSDK</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FeintORM\FeintORM.csproj">
-      <Project>{30bbfb3d-ffd0-4f77-93b8-9bbf20267595}</Project>
-      <Name>FeintORM</Name>
     </ProjectReference>
     <ProjectReference Include="..\FeintSite\FeintSite.csproj">
       <Project>{4113ef84-7bb0-463e-b332-c9aa7533616c}</Project>

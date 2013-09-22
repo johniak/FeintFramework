@@ -14,5 +14,7 @@ namespace FeintSDK
         public static String StaticFolder = "static/";
         public static DBSetting databaseSettings = new DBSetting (){Helper=new SQLiteDatabaseHelper(),Name="db.sqlite"};
         public static bool DebugMode = true;
+        public static List<string> Modules = new List<string>();
+        public static Dictionary<String, object> Configurations = new Dictionary<string, object>();
     }
 }

@@ -14,11 +14,20 @@ namespace Feint
         static void Main(string[] args)
         {
             Session s = new Session();
+            Template.FileSystem = new LocalFileSystem(AppDomain.CurrentDomain.BaseDirectory + "FeintSite\\" + Settings.ViewsFolder.Replace("/", "\\"));
+            List<Assembly> modulesAsseblies = new List<Assembly>();
             Assembly assembly = Assembly.LoadFrom(@"Site.dll");
-            Template.FileSystem = new LocalFileSystem(AppDomain.CurrentDomain.BaseDirectory + "FeintSite\\" +Settings.ViewsFolder.Replace("/", "\\"));
-            var site = assembly.GetType("Site.Site");
-            site.GetMethod("Main").Invoke(null, null);
-            FeintORM.FeintORM orm =  FeintORM.FeintORM.GetInstance(assembly, Settings.databaseSettings);
+            getMainMethod(assembly).Invoke(null, null);
+            modulesAsseblies.Add(assembly);
+            foreach (var str in Settings.Modules)
+            {
+                Assembly moduleAssembly = Assembly.LoadFrom(str + @".dll");
+
+                getMainMethod(moduleAssembly).Invoke(null, null);
+                modulesAsseblies.Add(moduleAssembly);
+            }
+
+            FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings);
             orm.CreateTablesFromModel();
             if (Settings.DebugMode)
             {
@@ -28,6 +37,17 @@ namespace Feint
             {
                 FastCGIServer server = new FastCGIServer("127.0.0.1:9000");
             }
+        }
+        public static MethodInfo getMainMethod(Assembly assembly)
+        {
+            var types = assembly.GetTypes();
+            foreach (var t in types)
+            {
+                var method = t.GetMethod("Main", BindingFlags.Static | BindingFlags.Public);
+                if (method != null)
+                    return method;
+            }
+            return null;
         }
     }
 }

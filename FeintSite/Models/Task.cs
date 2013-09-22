@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Site.Models
 {
-    class Task :DBModel
+    public class Task : DBModel
     {
         public DBForeignKey<User> Owner { get; set; }
         public DBForeignKey<Project> ProjectToTask { get; set; }
