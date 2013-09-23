@@ -18,7 +18,6 @@ namespace Feint.FeintORM
         }
 
 
-
     }
 
 

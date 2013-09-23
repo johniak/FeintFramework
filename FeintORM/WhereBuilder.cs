@@ -16,6 +16,8 @@ namespace Feint.FeintORM
         List<WhereComponent> whereList = new List<WhereComponent>();
         List<DBJoinInformation> joins = new List<DBJoinInformation>();
         List<JoinInfo> Foregins = new List<JoinInfo>();
+        long limitStart=-1;
+        long limitCount=-1;
         class JoinInfo
         {
             public DBJoinInformation DBJoin { get; set; }
@@ -114,6 +116,20 @@ namespace Feint.FeintORM
             return this;
         }
 
+        public WhereBuilder<T> Limit(long count)
+        {
+            limitStart = -1;
+            limitCount = count;
+            return this;
+        }
+        public WhereBuilder<T> Limit(long start,long count)
+        {
+            limitStart = start;
+            limitCount = count;
+            return this;
+        }
+
+
         /// <summary>
         /// Convert paramters from object moddel to database relation create joins
         /// </summary>
@@ -175,9 +191,9 @@ namespace Feint.FeintORM
             Stopwatch timer = new Stopwatch();
             DataTable table;
             if (joins.Count == 0)
-                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList);
+                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList,null,limitStart,limitCount);
             else
-                table = FeintORM.GetInstance().Helper.SelectWithJoin(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
+                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins,limitStart,limitCount);
             timer.Start();
             var pr = getPropertiesFromClass(typeof(T)); 
             var fr = getForeignersFromClass(typeof(T));
@@ -233,6 +249,15 @@ namespace Feint.FeintORM
             Log.E(timer.ElapsedMilliseconds);
             return tets;
         }
+        public long Count()
+        {
+            long count=0;
+            if (joins.Count == 0)
+                count = FeintORM.GetInstance().Helper.Count(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, null);
+            else
+                count = FeintORM.GetInstance().Helper.Count(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
+            return count;
+        }
         PropertyInfo getProperty(PropertyInfo[] pi, String name)
         {
             foreach (var p in pi)
@@ -253,7 +278,7 @@ namespace Feint.FeintORM
                 return null;
             List<WhereComponent> whereList = new List<WhereComponent>();
             whereList.Add(new WhereComponent() { column = "Id", value = id.ToString(), operatorType = DBQueryOperators.Equals });
-            var table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + t.Name, whereList);
+            var table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + t.Name, whereList,null,limitStart,limitCount);
             List<dynamic> tets = new List<dynamic>();
             foreach (DataRow row in table.Rows)
             {

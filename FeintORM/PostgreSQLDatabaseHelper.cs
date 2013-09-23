@@ -33,7 +33,7 @@ namespace Feint.FeintORM
             connection = new NpgsqlConnection("Server=" + host + ";Port=" + port + ";User Id=" + user + ";Password=" + password + ";");
             connection.Open();
         }
-       
+
         public static string Esc(string text)
         {
             return System.Security.SecurityElement.Escape(text);
@@ -64,13 +64,16 @@ namespace Feint.FeintORM
             return dataSet.Tables[0];
         }
 
-        public DataTable SelectWithJoin(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
+        public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount)
         {
             StringBuilder builder = new StringBuilder();
             string query = "SELECT * from " + System.Security.SecurityElement.Escape(table) + "";
-            foreach (var join in joins)
+            if (joins != null)
             {
-                query += " JOIN " + join.Table + " AS " + join.Alias + " ON " + join.LeftCollumn + "=" + join.Alias + "." + join.RightCollumn + "";
+                foreach (var join in joins)
+                {
+                    query += " JOIN " + join.Table + " AS " + join.Alias + " ON " + join.LeftCollumn + "=" + join.Alias + "." + join.RightCollumn + "";
+                }
             }
             if (where.Count != 0)
             {
@@ -85,12 +88,53 @@ namespace Feint.FeintORM
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
                 }
             }
+            if (limitStart != -1 && limitCount != -1)
+            {
+                query += " LIMIT " +limitStart+","+ limitCount;
+            }
+            else if (limitCount != -1)
+            {
+                query += " LIMIT " + limitCount;
+            }
             Log.D(query);
             NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(new NpgsqlCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
             return dataSet.Tables[0];
+        }
+        
+       public  long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
+        {
+            StringBuilder builder = new StringBuilder();
+            string query = "SELECT COUNT (*) from " + System.Security.SecurityElement.Escape(table) + "";
+            if (joins != null)
+            {
+                foreach (var join in joins)
+                {
+                    query += " JOIN " + join.Table + " AS " + join.Alias + " ON " + join.LeftCollumn + "=" + join.Alias + "." + join.RightCollumn + "";
+                }
+            }
+            if (where.Count != 0)
+            {
+                query += " WHERE ";
+                foreach (var w in where)
+                {
+                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    {
+                        query += " " + queryOperators[w.operatorType] + " ";
+                        continue;
+                    }
+                    query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
+                }
+            }
+            
+            Log.D(query);
+            NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(new NpgsqlCommand(query, connection));
+            var dataSet = new DataSet();
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataSet);
+            return (long) dataSet.Tables[0].Rows[0].ItemArray[0];
         }
 
         public Int64 Insert(string table, List<DBPair> what)
@@ -113,7 +157,7 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
-           
+
             return (int)dataSet.Tables[0].Rows[0][0];
         }
 
@@ -162,7 +206,7 @@ namespace Feint.FeintORM
                 Foreign f;
                 if ((f = getForeginForCollumn(collumns[i], foreigners)) != null)
                 {
-                    commandString += "references "+Esc(f.Table)+"("+Esc(f.Collumn)+")";
+                    commandString += "references " + Esc(f.Table) + "(" + Esc(f.Collumn) + ")";
                 }
                 if (i + 1 < collumns.Count)
                     commandString += ",";
@@ -180,7 +224,7 @@ namespace Feint.FeintORM
             }
             return null;
         }
-        public  string columnToString(Column col)
+        public string columnToString(Column col)
         {
             string cmd = "" + col.Name + " ";
             if (col.AutoIncrement)

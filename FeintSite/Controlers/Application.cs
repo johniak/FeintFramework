@@ -13,6 +13,7 @@ namespace Site.Controlers
 
         public static Response Index(Request request)
         {
+            Log.D("Count: "+User.Find<User>().Where().Count());
             if (User.IsLogged(request.Session))
             {
                 return Response.Redirect("/dashboard/");

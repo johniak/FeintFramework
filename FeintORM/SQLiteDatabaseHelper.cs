@@ -11,11 +11,11 @@ using FeintORM;
 
 namespace Feint.FeintORM
 {
-    public class SQLiteDatabaseHelper :DatabaseHelper
+    public class SQLiteDatabaseHelper : DatabaseHelper
     {
         private static SQLiteDatabaseHelper helper;
         SQLiteConnection connection;
-        Dictionary<DBQueryOperators,String> queryOperators= new Dictionary<DBQueryOperators,String>();
+        Dictionary<DBQueryOperators, String> queryOperators = new Dictionary<DBQueryOperators, String>();
         public SQLiteDatabaseHelper()
         {
             queryOperators.Add(DBQueryOperators.Equals, "=");
@@ -46,42 +46,13 @@ namespace Feint.FeintORM
 
         public static string Esc(string text)
         {
-            return System.Security.SecurityElement.Escape (text);
+            return System.Security.SecurityElement.Escape(text);
         }
 
         public DataTable Select(string table, List<WhereComponent> where)
         {
             StringBuilder builder = new StringBuilder();
             string query = "SELECT * from '" + System.Security.SecurityElement.Escape(table) + "'";
-            if (where.Count != 0)
-            {
-                query += " WHERE ";
-                foreach (var w in where)
-                {
-                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
-                    {
-                        query += " "+queryOperators[w.operatorType]+" ";
-                        continue;
-                    }
-                    query += "" + Esc(w.column)+"" +queryOperators[w.operatorType]+ "'" + Esc(w.value) + "'";
-                }
-            }
-            Log.D(query);
-            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
-            var dataSet = new DataSet();
-            DataTable dataTable = new DataTable();
-            adapter.Fill(dataSet);
-            return dataSet.Tables[0];
-        }
-
-        public DataTable SelectWithJoin(string table, List<WhereComponent> where,List<DBJoinInformation> joins)
-        {
-            StringBuilder builder = new StringBuilder();
-            string query = "SELECT * from '" + System.Security.SecurityElement.Escape(table) + "'";
-            foreach(var join in joins)
-            {
-                query += " JOIN " + join.Table +" AS "+join.Alias+ " ON " + join.LeftCollumn + "=" + join.Alias+"."+join.RightCollumn + "";
-            }
             if (where.Count != 0)
             {
                 query += " WHERE ";
@@ -103,40 +74,110 @@ namespace Feint.FeintORM
             return dataSet.Tables[0];
         }
 
-        public Int64 Insert(string table, List<DBPair> what)
+        public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount)
         {
-            var commandString= "INSERT INTO 'main'.'"+Esc(table)+"' ";
-            string collumns="(";
-            string values="VALUES(";
-            foreach(var v in what)
+            StringBuilder builder = new StringBuilder();
+            string query = "SELECT * from '" + System.Security.SecurityElement.Escape(table) + "'";
+            if (joins != null)
             {
-                collumns+="'"+Esc(v.Collumn)+"',";
-                values+="'"+Esc(v.Value)+"',";
+                foreach (var join in joins)
+                {
+                    query += " JOIN " + join.Table + " AS " + join.Alias + " ON " + join.LeftCollumn + "=" + join.Alias + "." + join.RightCollumn + "";
+                }
             }
-            collumns=collumns.Substring(0,collumns.Length-1)+") ";
-            values=values.Substring(0,values.Length-1)+")";
-            commandString+=collumns+values;
-            var command = new SQLiteCommand(commandString,connection);            
-            command.ExecuteNonQuery();
-            string query="SELECT Max(ID) from '" + System.Security.SecurityElement.Escape (table)+"'";           
+            if (where.Count != 0)
+            {
+                query += " WHERE ";
+                foreach (var w in where)
+                {
+                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    {
+                        query += " " + queryOperators[w.operatorType] + " ";
+                        continue;
+                    }
+                    query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
+                }
+            }
+            if (limitStart != -1 && limitCount != -1)
+            {
+                query += " LIMIT " + limitStart + "," + limitCount;
+            }
+            else if (limitCount != -1)
+            {
+                query += " LIMIT " + limitCount;
+            }
+            Log.D(query);
             SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
-            return  (Int64)dataSet.Tables[0].Rows[0][0];
+            return dataSet.Tables[0];
+        }
+        public long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
+        {
+            StringBuilder builder = new StringBuilder();
+            string query = "SELECT COUNT (*) from '" + System.Security.SecurityElement.Escape(table) + "'";
+            if (joins != null)
+            {
+                foreach (var join in joins)
+                {
+                    query += " JOIN " + join.Table + " AS " + join.Alias + " ON " + join.LeftCollumn + "=" + join.Alias + "." + join.RightCollumn + "";
+                }
+            }
+            if (where.Count != 0)
+            {
+                query += " WHERE ";
+                foreach (var w in where)
+                {
+                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    {
+                        query += " " + queryOperators[w.operatorType] + " ";
+                        continue;
+                    }
+                    query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
+                }
+            }
+            Log.D(query);
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
+            var dataSet = new DataSet();
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataSet);
+            return (long)dataSet.Tables[0].Rows[0].ItemArray[0];
+        }
+        public Int64 Insert(string table, List<DBPair> what)
+        {
+            var commandString = "INSERT INTO 'main'.'" + Esc(table) + "' ";
+            string collumns = "(";
+            string values = "VALUES(";
+            foreach (var v in what)
+            {
+                collumns += "'" + Esc(v.Collumn) + "',";
+                values += "'" + Esc(v.Value) + "',";
+            }
+            collumns = collumns.Substring(0, collumns.Length - 1) + ") ";
+            values = values.Substring(0, values.Length - 1) + ")";
+            commandString += collumns + values;
+            var command = new SQLiteCommand(commandString, connection);
+            command.ExecuteNonQuery();
+            string query = "SELECT Max(ID) from '" + System.Security.SecurityElement.Escape(table) + "'";
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
+            var dataSet = new DataSet();
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataSet);
+            return (Int64)dataSet.Tables[0].Rows[0][0];
         }
 
-        public void Update(string table, List<DBPair> what,Int64 id)
+        public void Update(string table, List<DBPair> what, Int64 id)
         {
             var commandString = "UPDATE '" + Esc(table) + "' SET ";
-            for(int i=0;i<what.Count;i++)
+            for (int i = 0; i < what.Count; i++)
             {
-                var v =what[i];
-                commandString += Esc(v.Collumn) + "='" +Esc(v.Value) +"' ";
-                if(i<what.Count-1)
-                    commandString+=",";
+                var v = what[i];
+                commandString += Esc(v.Collumn) + "='" + Esc(v.Value) + "' ";
+                if (i < what.Count - 1)
+                    commandString += ",";
             }
-            commandString += "WHERE Id ='" + Esc(id.ToString())+"'"; 
+            commandString += "WHERE Id ='" + Esc(id.ToString()) + "'";
             var command = new SQLiteCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
@@ -160,7 +201,7 @@ namespace Feint.FeintORM
                     commandString += ",";
             }
             commandString += ")";
-            var command = new SQLiteCommand(commandString,connection);
+            var command = new SQLiteCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
 
@@ -172,7 +213,7 @@ namespace Feint.FeintORM
             for (int i = 0; i < collumns.Count; i++)
             {
                 commandString += collumns[i].ToString();
-                if (i + 1 < collumns.Count || foreigners.Count>0)
+                if (i + 1 < collumns.Count || foreigners.Count > 0)
                     commandString += ",";
             }
             for (int i = 0; i < foreigners.Count; i++)
