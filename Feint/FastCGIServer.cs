@@ -149,10 +149,24 @@ namespace Feint
 
 
                         setSesion(request, response, req);
-                        res = FeintSDK.Settings.Urls[i].View(req);
+                        MethodInfo mi= FeintSDK.Settings.Urls[i].View.GetMethodInfo();
+                        FeintSDK.AOPAttribute[] aops=(FeintSDK.AOPAttribute[]) mi.GetCustomAttributes(typeof( FeintSDK.AOPAttribute), true);
+                        res = null;
+                        foreach (var aop in aops)
+                        {
+                            res = aop.PreRequest(req);
+                        }
+                        if (res == null)
+                        {
+                            res = FeintSDK.Settings.Urls[i].View(req);
+                        }
                         var redirect = res.GetType().GetField("redirectUrl",
                          BindingFlags.NonPublic |
                          BindingFlags.Instance);
+                        foreach (var aop in aops)
+                        {
+                            aop.PostRequest(req);
+                        }
                         String url = (String)redirect.GetValue(res);
                         if (url != null)
                         {

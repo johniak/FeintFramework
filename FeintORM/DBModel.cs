@@ -74,6 +74,10 @@ namespace Feint.FeintORM
         {
             return new QueryBuilder<T>();
         }
+        public static QueryBuilderDynamic Find(Type t)
+        {
+            return new QueryBuilderDynamic(t);
+        }
         public static List<T> getAll<T>()
         {
             return Find<T>().Where().Execute();

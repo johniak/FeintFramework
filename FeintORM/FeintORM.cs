@@ -35,7 +35,7 @@ namespace Feint.FeintORM
         {
             return instance;
         }
-        IEnumerable<Type> getAllModelClass()
+        public IEnumerable<Type> getAllModelClass()
         {
             foreach (var assembly in assemblies)
             {
@@ -82,21 +82,17 @@ namespace Feint.FeintORM
 
             tablesCreated.Add(t.Name);
         }
-        private IEnumerable<PropertyInfo> getPropertiesFromClass(Type t)
+        public IEnumerable<PropertyInfo> getPropertiesFromClass(Type t)
         {
             foreach (var p in t.GetProperties())
                 if (p.GetCustomAttributes(typeof(DBProperty), false).Length > 0)
                     yield return p;
         }
-        private IEnumerable<PropertyInfo> getForeignersFromClass(Type t)
+        public IEnumerable<PropertyInfo> getForeignersFromClass(Type t)
         {
             foreach (var p in t.GetProperties())
                 if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
                     yield return p;
         }
-
-        
-
-
     }
 }

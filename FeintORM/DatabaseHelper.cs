@@ -11,7 +11,7 @@ namespace Feint.FeintORM
     {
         void Connect(String name, String user, String password, String host, int port);
       //  DataTable Select(string table, List<WhereComponent> where);
-        DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount);
+        DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount,string orderBy,bool ascending);
         long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins);
         Int64 Insert(string table, List<DBPair> what);
         void Update(string table, List<DBPair> what, Int64 id);

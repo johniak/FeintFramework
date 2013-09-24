@@ -47,6 +47,7 @@ namespace Site.Controlers
         public static Response DashboardDisplay(Request request,int? projectId, String global)
         {
 
+           
             User loggedUser = User.GetLoggedUser(request.Session);
             if (loggedUser == null)
                 return Response.Redirect("/login/");

@@ -17,7 +17,7 @@ namespace FeintSDK
 
 
 
-        public static T FromContent<T>(Dictionary<String, String> content) where T : Form
+        public static T FromFormData<T>(Dictionary<String, String> content) where T : Form
         {
             T instance = (T)Activator.CreateInstance(typeof(T));
             var fields = getFields(typeof(T));

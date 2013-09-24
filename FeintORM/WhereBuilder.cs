@@ -18,6 +18,10 @@ namespace Feint.FeintORM
         List<JoinInfo> Foregins = new List<JoinInfo>();
         long limitStart=-1;
         long limitCount=-1;
+        string orderBy;
+        bool ascending;
+
+
         class JoinInfo
         {
             public DBJoinInformation DBJoin { get; set; }
@@ -180,6 +184,55 @@ namespace Feint.FeintORM
         }
 
         /// <summary>
+        /// Convert paramters from object moddel to database relation create joins
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        private void convertOrderParameter(ref string column)
+        {
+            if (column.Contains("."))
+            {
+                var columns = column.Split('.');
+                Type type = typeof(T);
+                string lastAlias = "";
+                for (int i = 0; i < columns.Length - 1; i++)
+                {
+                    String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).Name;
+
+                    int id = joins.Count;
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
+                 //   dynamic d = value;
+                    lastAlias = columns[i] + id;
+                    type = type.GetProperty(columns[i]).PropertyType.GetGenericArguments()[0];
+                }
+                if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                {
+                    int id = joins.Count;
+                    var col = type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name;
+
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                 //   dynamic d = ((dynamic)value).Value;
+                    column = columns.Last() + id + ".Id";
+
+                 //   value = d.Id;
+                }
+                else
+                    column = joins[joins.Count - 1].Alias + "." + columns[columns.Length - 1];
+            }
+            else
+            {
+                if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                {
+                    int id = joins.Count;
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
+               //     dynamic d = value;
+                    column = column + id + ".Id";
+                 //   value = d.Id;
+                }
+            }
+        }
+
+        /// <summary>
         /// Execute query and fill object
         /// iterate by all properties of model class and assign values from rows
         /// implements lazy forgins keys
@@ -191,9 +244,9 @@ namespace Feint.FeintORM
             Stopwatch timer = new Stopwatch();
             DataTable table;
             if (joins.Count == 0)
-                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList,null,limitStart,limitCount);
+                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList,null,limitStart,limitCount,orderBy,ascending);
             else
-                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins,limitStart,limitCount);
+                table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins, limitStart, limitCount, orderBy, ascending);
             timer.Start();
             var pr = getPropertiesFromClass(typeof(T)); 
             var fr = getForeignersFromClass(typeof(T));
@@ -258,6 +311,15 @@ namespace Feint.FeintORM
                 count = FeintORM.GetInstance().Helper.Count(FeintORM.GetInstance().Prefix + typeof(T).Name, whereList, joins);
             return count;
         }
+
+        public WhereBuilder<T> OrderBy(string collumn, bool ascending)
+        {
+            convertOrderParameter(ref collumn);
+            this.orderBy = collumn;
+            this.ascending = ascending;
+            return this;
+        }
+
         PropertyInfo getProperty(PropertyInfo[] pi, String name)
         {
             foreach (var p in pi)
@@ -278,7 +340,7 @@ namespace Feint.FeintORM
                 return null;
             List<WhereComponent> whereList = new List<WhereComponent>();
             whereList.Add(new WhereComponent() { column = "Id", value = id.ToString(), operatorType = DBQueryOperators.Equals });
-            var table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + t.Name, whereList,null,limitStart,limitCount);
+            var table = FeintORM.GetInstance().Helper.Select(FeintORM.GetInstance().Prefix + t.Name, whereList, null, limitStart, limitCount, orderBy, ascending);
             List<dynamic> tets = new List<dynamic>();
             foreach (DataRow row in table.Rows)
             {

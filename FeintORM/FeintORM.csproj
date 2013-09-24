@@ -56,10 +56,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Column.cs" />
+    <Compile Include="WhereBuilderDynamic.cs" />
     <Compile Include="DatabaseHelper.cs" />
     <Compile Include="DBSetting.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="PostgreSQLDatabaseHelper.cs" />
+    <Compile Include="QueryBuilderDynamic.cs" />
     <Compile Include="SQLiteDatabaseHelper.cs" />
     <Compile Include="DBForeignKey.cs" />
     <Compile Include="DBJoinInformation.cs" />

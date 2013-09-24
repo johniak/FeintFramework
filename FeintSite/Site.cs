@@ -20,7 +20,7 @@ namespace Site
             Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
             Settings.DebugMode = false;
 
-            Settings.Modules.Add("Api");
+            Settings.Modules.Add("AdminPanel");
 
 
             Settings.Urls.Add(new Url(@"^/$", Controlers.Application.Index));

@@ -64,10 +64,10 @@ namespace Feint.FeintORM
             return dataSet.Tables[0];
         }
 
-        public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount)
+        public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount,string orderBy,bool ascending)
         {
             StringBuilder builder = new StringBuilder();
-            string query = "SELECT * from " + System.Security.SecurityElement.Escape(table) + "";
+            string query = "SELECT * FROM " + System.Security.SecurityElement.Escape(table) + "";
             if (joins != null)
             {
                 foreach (var join in joins)
@@ -87,6 +87,10 @@ namespace Feint.FeintORM
                     }
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
                 }
+            }
+            if (orderBy != null)
+            {
+                query += "  ORDER BY " + orderBy + (ascending?" ASC":" DESC");
             }
             if (limitStart != -1 && limitCount != -1)
             {

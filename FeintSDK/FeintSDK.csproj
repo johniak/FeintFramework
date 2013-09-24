@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AOPAttribute.cs" />
     <Compile Include="DotInclude.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="Log.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Session.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Url.cs" />
+    <Compile Include="UserModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

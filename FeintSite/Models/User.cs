@@ -11,14 +11,18 @@ using System.Security.Cryptography;
 
 namespace Site.Models
 {
+    [UserModel]
     public class User : DBModel, ILiquidizable
     {
+        [UserUsername(Label = "Username")]
         [DBProperty(Unique=true)]
         public String Username { get; set; }
 
+        [UserPassword]
         [DBProperty(AllowNull=false)]
         public String Password { get; set; }
-
+        
+        
         [DBProperty(Unique=true)]
         public String Mail { get; set; }
 
