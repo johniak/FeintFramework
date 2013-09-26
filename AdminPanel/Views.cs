@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Feint.FeintORM;
 using System.Reflection;
 using System.Security.Cryptography;
+using Newtonsoft.Json;
 namespace AdminPanel
 {
     class Views
@@ -18,7 +19,7 @@ namespace AdminPanel
         static PropertyInfo passwordProperty;
         static string usernameLabel;
         static string passwordLabel;
-        static List<string> modelNames= new List<string>();
+        static List<string> modelNames = new List<string>();
         public static Response Login(Request request)
         {
             init();
@@ -39,7 +40,7 @@ namespace AdminPanel
                     return Response.Redirect("/admin/dashboard/");
                 }
             }
-            return new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) }));;
+            return new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) })); ;
         }
 
         [AdminAuth]
@@ -56,7 +57,25 @@ namespace AdminPanel
             init();
             var model = request.variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
-            List<DBModel> m= DBModel.Find(t).Where().Execute();
+            List<List<String>> table = new List<List<string>>();
+            List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+            var lsh = new List<String>();
+            foreach (var pi in pis)
+            {
+                lsh.Add(pi.Name);
+            }
+            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model }));
+            return response;
+        }
+
+
+        [AdminAuth]
+        public static Response ModelJson(Request request)
+        {
+            init();
+            var model = request.variables["model"].Value;
+            Type t = modelsTypes[modelNames.IndexOf(model)];
+            List<DBModel> m = DBModel.Find(t).Where().Execute();
             List<List<String>> table = new List<List<string>>();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
             var lsh = new List<String>();
@@ -67,19 +86,15 @@ namespace AdminPanel
             table.Add(lsh);
             foreach (var r in m)
             {
-                var ls=new List<String>();
+                var ls = new List<String>();
                 foreach (var pi in pis)
                 {
                     lsh.Add(pi.GetValue(r).ToString());
                 }
                 table.Add(ls);
             }
-            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", models = modelNames,table=table }));
-            return response;
+            return new Response(JsonConvert.SerializeObject(m));
         }
-            
-
-
 
 
         static bool isUserModel(Type t)
@@ -89,9 +104,9 @@ namespace AdminPanel
                 return true;
             return false;
         }
-        static PropertyInfo getUsernameProperty(Type t,out string label)
+        static PropertyInfo getUsernameProperty(Type t, out string label)
         {
-            
+
             var pis = t.GetProperties();
             foreach (var pi in pis)
             {

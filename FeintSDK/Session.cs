@@ -41,7 +41,8 @@ namespace FeintSDK
         }
         public string Start(string key)
         {
-            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand("SELECT * from 'key' where key='" + System.Security.SecurityElement.Escape(key) + "'", connection));
+            string query ="SELECT * from 'key' where key='" + System.Security.SecurityElement.Escape(key) + "'";
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
@@ -77,7 +78,8 @@ namespace FeintSDK
         }
         public string GetProperty(string name)
         {
-            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand("SELECT * FROM 'property' WHERE PropertyToKey='" + this.id + "' and name='" + System.Security.SecurityElement.Escape(name) + "'", connection));
+            string query ="SELECT * FROM 'property' WHERE PropertyToKey='" + this.id + "' and name='" + System.Security.SecurityElement.Escape(name) + "'";
+            SQLiteDataAdapter adapter = new SQLiteDataAdapter(new SQLiteCommand(query, connection));
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
