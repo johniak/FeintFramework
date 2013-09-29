@@ -121,6 +121,19 @@ namespace Feint.FeintORM
             return this;
         }
 
+        /// <summary>
+        /// Like paramteters
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public WhereBuilderDynamic Like(string column, object value)
+        {
+            convertParameters(ref column, ref value);
+            whereList.Add(new WhereComponent() { column = column, value = value.ToString(), operatorType = DBQueryOperators.Like });
+            return this;
+        }
+
         public WhereBuilderDynamic Limit(long count)
         {
             limitStart = -1;

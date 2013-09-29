@@ -25,6 +25,7 @@ namespace Feint.FeintORM
             queryOperators.Add(DBQueryOperators.GreaterOrEquals, ">=");
             queryOperators.Add(DBQueryOperators.Or, "OR");
             queryOperators.Add(DBQueryOperators.And, "AND");
+            queryOperators.Add(DBQueryOperators.Like, "LIKE");
         }
 
         public void Connect(String name, String user, String password, String host, int port)
@@ -85,7 +86,7 @@ namespace Feint.FeintORM
                         query += " " + queryOperators[w.operatorType] + " ";
                         continue;
                     }
-                    query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
+                    query += "" + Esc(w.column) + " " + queryOperators[w.operatorType] + " '" + Esc(w.value) + "'";
                 }
             }
             if (orderBy != null)
@@ -94,7 +95,7 @@ namespace Feint.FeintORM
             }
             if (limitStart != -1 && limitCount != -1)
             {
-                query += " LIMIT " +limitStart+","+ limitCount;
+                query += " LIMIT " + limitCount + " OFFSET " + limitStart;
             }
             else if (limitCount != -1)
             {

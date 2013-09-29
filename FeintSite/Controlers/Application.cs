@@ -13,7 +13,11 @@ namespace Site.Controlers
 
         public static Response Index(Request request)
         {
-            Log.D("Count: "+User.Find<User>().Where().Count());
+            //for (int i = 0; i < 1000; i++)
+            //{
+            //    new Models.SampleModel() { Message = "a" + (1000 - i), Priority=i%2}.Save();
+            //}
+            
             if (User.IsLogged(request.Session))
             {
                 return Response.Redirect("/dashboard/");

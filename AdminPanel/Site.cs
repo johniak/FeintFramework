@@ -17,8 +17,10 @@ namespace AdminPanel
             Settings.Urls.Add(new Url("^/admin/login/$", Views.Auth, RequestMethod.POST));
             Settings.Urls.Add(new Url("^/admin/dashboard/$", Views.Dashboard));
             Settings.Urls.Add(new Url("^/admin/$", Views.Dashboard));
-            Settings.Urls.Add(new Url("^/admin/model/(?<model>.*?)/json/$", Views.ModelJson, RequestMethod.GET));
-            Settings.Urls.Add(new Url("^/admin/model/(?<model>.*?)/$", Views.Model, RequestMethod.GET));
+            Settings.Urls.Add(new Url("^/admin/model/(?<model>.*?)/json/(?<startIndex>[0-9]+)/(?<count>[0-9]+)/(?<collumn>[^/]*)/(?<asc>true|false)/?((?<search>[^/]*)/)$", Views.ModelJson, RequestMethod.GET));
+            Settings.Urls.Add(new Url("^/admin/model/(?<model>.*?)/json/count/$", Views.ModelJsonCount, RequestMethod.GET));
+            Settings.Urls.Add(new Url("^/admin/model/(?<model>[^/]*?)/$", Views.Model, RequestMethod.GET));
+            Settings.Urls.Add(new Url("^/admin/model/(?<model>[^/]*?)/(?<id>[0-9]+)/$", Views.DeleteModel, RequestMethod.DELETE));
         }
     }
 }

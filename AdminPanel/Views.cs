@@ -60,6 +60,10 @@ namespace AdminPanel
             List<List<String>> table = new List<List<string>>();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
             var lsh = new List<String>();
+
+            var p = pis[pis.Count - 1];
+            pis.RemoveAt(pis.Count - 1);
+            pis.Insert(0, p);
             foreach (var pi in pis)
             {
                 lsh.Add(pi.Name);
@@ -67,35 +71,72 @@ namespace AdminPanel
             var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model }));
             return response;
         }
-
+        [AdminAuth]
+        public static Response DeleteModel(Request request)
+        {
+            init();
+            try
+            {
+                var model = request.variables["model"].Value;
+                Type t = modelsTypes[modelNames.IndexOf(model)];
+                DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0].Remove();
+                return new Response(JsonConvert.SerializeObject(true));
+            }
+            catch (Exception ex)
+            {
+                return new Response(JsonConvert.SerializeObject(false));
+            }
+        }
 
         [AdminAuth]
         public static Response ModelJson(Request request)
         {
             init();
+
             var model = request.variables["model"].Value;
+            var startIndex = long.Parse(request.variables["startIndex"].Value);
+            var count = long.Parse(request.variables["count"].Value);
+            var collumn = request.variables["collumn"].Value;
+            var asc = bool.Parse(request.variables["asc"].Value);
+            string search = request.variables["search"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
-            List<DBModel> m = DBModel.Find(t).Where().Execute();
-            List<List<String>> table = new List<List<string>>();
+            var where = DBModel.Find(t).Where();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
-            var lsh = new List<String>();
+            int i = 0;
             foreach (var pi in pis)
             {
-                lsh.Add(pi.Name);
-            }
-            table.Add(lsh);
-            foreach (var r in m)
-            {
-                var ls = new List<String>();
-                foreach (var pi in pis)
+                if (pi.PropertyType == typeof(string))
                 {
-                    lsh.Add(pi.GetValue(r).ToString());
+
+                    where = where.Like(pi.Name, "%" + search + "%");
+                    if (isLikablePropertyAfter(pis,i))
+                        where = where.Or();
                 }
-                table.Add(ls);
+                i++;
             }
+            List<DBModel> m = where.Limit(startIndex,count).OrderBy(collumn,asc).Execute();
             return new Response(JsonConvert.SerializeObject(m));
         }
-
+        static bool isLikablePropertyAfter(List<PropertyInfo> lsh,int index){
+            
+            for (index++; index < lsh.Count; index++)
+            {
+                if (lsh[index].PropertyType == typeof(string))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        [AdminAuth]
+        public static Response ModelJsonCount(Request request)
+        {
+            init();
+            var model = request.variables["model"].Value;
+            Type t = modelsTypes[modelNames.IndexOf(model)];
+            var m = DBModel.Find(t).Where().Count();
+            return new Response(JsonConvert.SerializeObject(m));
+        }
 
         static bool isUserModel(Type t)
         {
