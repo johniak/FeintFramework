@@ -185,6 +185,7 @@ namespace Feint.FeintORM
         {
             string query = "DELETE FROM " + Esc(table) + " WHERE Id= '" + Esc(id.ToString()) + "'";
             var command = new NpgsqlCommand(query, connection);
+            Log.D(query);
             command.ExecuteNonQuery();
         }
 

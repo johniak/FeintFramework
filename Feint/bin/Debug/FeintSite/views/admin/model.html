@@ -68,9 +68,11 @@
 
 <div class="container">
     <div class="row">
+
+
         <div class="span12 columns">
 
-            <div style="height:400px;width:100%;margin-bottom:20px;">
+            <div style="height:600px;width:100%;margin-bottom:20px;">
                 <div class="fuelux datagrid-example">
                     <div style="height:400px;width:100%;margin-bottom:20px;">
                         <table id="MyGrid" class="table table-bordered datagrid">
@@ -87,6 +89,7 @@
                                         </div>
                                     </div>
                                     <div class="datagrid-header-right">
+                                        <button id="add-row" class="btn btn-success">Add</button>
                                     </div>
                                 </th>
                             </tr>
@@ -163,17 +166,37 @@
     </div>
 </div>
 
-<div id="remove-modal" class="modal hide fade">
+<div id="delete-modal" class="modal hide fade">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>Edit</h3>
+        <h3>Do you want to delete row?</h3>
     </div>
     <div class="modal-body">
 
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn">Close</a>
-        <a href="#" class="btn btn-primary">Save changes</a>
+        <a href="#" data-dismiss="modal" class="btn">Cancel</a>
+        <a href="#" id="confirm-delete" class="btn btn-danger">Delete Row</a>
+    </div>
+</div>
+
+<div id="add-modal" class="modal hide fade">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>Add new row</h3>
+    </div>
+    <div class="modal-body">
+        <table>
+        <form>
+                {%for f in form%}
+                {{f}}
+                {%endfor%}
+        </form>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn">Cancel</a>
+        <a href="#" id="confirm-add" class="btn btn-primary">Add Row</a>
     </div>
 </div>
 
@@ -185,7 +208,9 @@
 <script src="/static/js/admin.js"></script>
 <script src="/static/loader.min.js" type="text/javascript"></script>
 <script  type="text/javascript">
-
+    var id=-1;
+    var grid;
+    var model='{{model}}';
     $(function () {
 
         var dataSource = new NestedAjaxDataSource({
@@ -209,15 +234,28 @@
         delay : 0,
                 formatter: function (items) {
             $.each(items, function (index, item) {
-                item.Editable = '<div style=" float: right;" class="btn-group"><a id="editGroup" data-id='+item.Id+' class="btn btn-info">Edit</a><a id="editGroup"  data-id='+item.Id+' class="btn btn-danger">Delete</a></div>';
+                item.Editable = '<div style=" float: right;" class="btn-group"><a  data-id='+item.Id+' class="edit-btn btn btn-info">Edit</a><a id="deleteGroup"  data-id='+item.Id+' class="delete-btn btn btn-danger">Delete</a></div>';
             });
         }
-    });
 
-    $('#MyGrid').datagrid({
+    });
+    $('#confirm-delete').click(function(){
+        deleteRow();
+    });
+    grid= $('#MyGrid').datagrid({
         dataSource: dataSource,
         stretchHeight: true
     });
+    grid.on('loaded', function() {
+        $(".delete-btn").click(function(){
+            id=$(this).attr("data-id");
+            $('#delete-modal').modal('show');
+        });
+    });
+    $('#add-row').click(function(){
+
+        $('#add-modal').modal('show');
+    }) ;
     });
 </script>
 

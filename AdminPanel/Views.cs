@@ -59,16 +59,38 @@ namespace AdminPanel
             Type t = modelsTypes[modelNames.IndexOf(model)];
             List<List<String>> table = new List<List<string>>();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+            List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
             var lsh = new List<String>();
 
             var p = pis[pis.Count - 1];
             pis.RemoveAt(pis.Count - 1);
             pis.Insert(0, p);
+            List<String> forms = new List<string>();
             foreach (var pi in pis)
             {
+                if (pi.Name != "Id")
+                {
+                    if (pi.PropertyType == typeof(string))
+                    {
+                        forms.Add("<tr><td><p><label style\"text-align:right;\">" + pi.Name + ": </label>" + "</td><td><input  type=\"text\" name=" + pi.Name + "/></td>" + "</p></tr>");
+                    }
+                    else if (pi.PropertyType == typeof(int) || pi.PropertyType == typeof(long))
+                    {
+                        forms.Add("<tr><td><p><label>" + pi.Name + ": </label>" + "</td><td><input type=\"text\" name=" + pi.Name + "/></td>" + "</p></tr>");
+                    } if (pi.PropertyType == typeof(DateTime) )
+                    {
+                        forms.Add("<tr><td><p><label>" + pi.Name + ": </label>" + "</td><td><input type=\"date\" name=" + pi.Name + "/></td>" + "</p></tr>");
+                    }
+                }
                 lsh.Add(pi.Name);
             }
-            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model }));
+
+
+            foreach (var f in fis)
+            {
+                forms.Add("<tr><td><p><label>" + f.Name + " Id: </label>" + "</td><td><input type=\"text\" name=" + f.Name + "/></td>" + "</p></tr>");
+            }
+            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model, form = forms }));
             return response;
         }
         [AdminAuth]
@@ -79,7 +101,8 @@ namespace AdminPanel
             {
                 var model = request.variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0].Remove();
+                var dbm = DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
+                dbm.Remove();
                 return new Response(JsonConvert.SerializeObject(true));
             }
             catch (Exception ex)
@@ -87,6 +110,14 @@ namespace AdminPanel
                 return new Response(JsonConvert.SerializeObject(false));
             }
         }
+
+        //[AdminAuth]
+        //public static Response AddModel(Request request)
+        //{
+        //    var model = request.variables["model"].Value;
+        //    Type t = modelsTypes[modelNames.IndexOf(model)];
+            
+        //}
 
         [AdminAuth]
         public static Response ModelJson(Request request)
@@ -109,16 +140,17 @@ namespace AdminPanel
                 {
 
                     where = where.Like(pi.Name, "%" + search + "%");
-                    if (isLikablePropertyAfter(pis,i))
+                    if (isLikablePropertyAfter(pis, i))
                         where = where.Or();
                 }
                 i++;
             }
-            List<DBModel> m = where.Limit(startIndex,count).OrderBy(collumn,asc).Execute();
+            List<DBModel> m = where.Limit(startIndex, count).OrderBy(collumn, asc).Execute();
             return new Response(JsonConvert.SerializeObject(m));
         }
-        static bool isLikablePropertyAfter(List<PropertyInfo> lsh,int index){
-            
+        static bool isLikablePropertyAfter(List<PropertyInfo> lsh, int index)
+        {
+
             for (index++; index < lsh.Count; index++)
             {
                 if (lsh[index].PropertyType == typeof(string))

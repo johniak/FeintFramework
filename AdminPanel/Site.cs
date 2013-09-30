@@ -21,6 +21,7 @@ namespace AdminPanel
             Settings.Urls.Add(new Url("^/admin/model/(?<model>.*?)/json/count/$", Views.ModelJsonCount, RequestMethod.GET));
             Settings.Urls.Add(new Url("^/admin/model/(?<model>[^/]*?)/$", Views.Model, RequestMethod.GET));
             Settings.Urls.Add(new Url("^/admin/model/(?<model>[^/]*?)/(?<id>[0-9]+)/$", Views.DeleteModel, RequestMethod.DELETE));
+            Settings.Urls.Add(new Url("^/admin/model/(?<model>[^/]*?)/$", Views.Model, RequestMethod.POST));
         }
     }
 }

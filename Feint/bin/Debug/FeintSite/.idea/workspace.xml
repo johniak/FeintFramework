@@ -4,8 +4,8 @@
     <list default="true" id="8fec843d-4c77-48da-9751-043a62d32963" name="Default" comment="" />
     <ignored path="FeintSite.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/model.html" changelist="8fec843d-4c77-48da-9751-043a62d32963" time="1380390784814" ignored="false" />
-    <file path="/admin.js" changelist="8fec843d-4c77-48da-9751-043a62d32963" time="1380376122141" ignored="false" />
+    <file path="/model.html" changelist="8fec843d-4c77-48da-9751-043a62d32963" time="1380576170240" ignored="false" />
+    <file path="/admin.js" changelist="8fec843d-4c77-48da-9751-043a62d32963" time="1380572462805" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -28,13 +28,13 @@
       <file leaf-file-name="model.html" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/views/admin/model.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="187" column="8" selection-start="7806" selection-end="7806" vertical-scroll-proportion="0.1235012">
+            <state line="185" column="23" selection-start="7801" selection-end="7801" vertical-scroll-proportion="0.470024">
               <folding>
                 <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#1;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <marker date="1380390785735" expanded="true" signature="8508:8522" placeholder="..." />
+                <marker date="1380576449984" expanded="true" signature="9315:9329" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -43,7 +43,7 @@
       <file leaf-file-name="admin.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/static/js/admin.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="74" column="38" selection-start="2721" selection-end="2721" vertical-scroll-proportion="0.0">
+            <state line="98" column="42" selection-start="3307" selection-end="3307" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -295,7 +295,7 @@
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1380390785735" expanded="true" signature="8508:8522" placeholder="..." />
+            <marker date="1380576449984" expanded="true" signature="9315:9329" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -315,7 +315,7 @@
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1380390785735" expanded="true" signature="8508:8522" placeholder="..." />
+            <marker date="1380576449984" expanded="true" signature="9315:9329" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -328,7 +328,7 @@
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1380390785735" expanded="true" signature="8508:8522" placeholder="..." />
+            <marker date="1380576449984" expanded="true" signature="9315:9329" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -342,20 +342,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/static/js/admin.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="74" column="38" selection-start="2721" selection-end="2721" vertical-scroll-proportion="0.0">
+        <state line="98" column="42" selection-start="3307" selection-end="3307" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/views/admin/model.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="187" column="8" selection-start="7806" selection-end="7806" vertical-scroll-proportion="0.1235012">
+        <state line="185" column="23" selection-start="7801" selection-end="7801" vertical-scroll-proportion="0.470024">
           <folding>
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#1;n#th#0;n#tr#0;n#tfoot#0;n#table#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#0;n#div#1;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <marker date="1380390785735" expanded="true" signature="8508:8522" placeholder="..." />
+            <marker date="1380576449984" expanded="true" signature="9315:9329" placeholder="..." />
           </folding>
         </state>
       </provider>

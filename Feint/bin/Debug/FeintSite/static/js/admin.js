@@ -88,3 +88,14 @@
 
     return NestedAjaxDataSource;
 }));
+
+function deleteRow(){
+    $.ajax('/admin/model/'+model+'/'+id+'/', {
+        dataType: 'json',
+        async: false,
+        type: 'DELETE'
+    }).done(function (json) {
+            $('#MyGrid').datagrid('reload');
+            $('#delete-modal').modal('hide');
+        });
+}

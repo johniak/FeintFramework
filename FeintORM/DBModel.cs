@@ -216,7 +216,7 @@ namespace Feint.FeintORM
             if (Id == 0)
                 return;
             FeintORM orm = FeintORM.GetInstance();
-            orm.Helper.RemoveFromTable(this.GetType().Name, Id);
+            orm.Helper.RemoveFromTable(FeintORM.GetInstance().Prefix+this.GetType().Name, Id);
         }
 		public static T Ref<T>(long id)
 		{
