@@ -99,3 +99,15 @@ function deleteRow(){
             $('#delete-modal').modal('hide');
         });
 }
+
+function addRow(){
+    $.ajax('/admin/model/'+model+'/', {
+        dataType: 'json',
+        async: false,
+        type: 'POST',
+        data: $('#add-form').serialize()
+    }).done(function (json) {
+            $('#MyGrid').datagrid('reload');
+            $('#add-modal').modal('hide');
+        });
+}

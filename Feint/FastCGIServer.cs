@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
+
 
 namespace Feint
 {
@@ -72,7 +74,7 @@ namespace Feint
                     var postTabs = text.Split('&');
                     foreach (var p in postTabs)
                     {
-                        req.FormData.Add(p.Split('=')[0], p.Split('=')[1]);
+                        req.FormData.Add(HttpUtility.UrlDecode(p.Split('=')[0]).Trim(), HttpUtility.UrlDecode(p.Split('=')[1]).Trim());
                     }
                 }
                 else
@@ -87,12 +89,12 @@ namespace Feint
                         if (postTab[i].StartsWith("Content-Disposition: form-data;"))
                         {
 
-                            postName = postTab[i].Substring(38, postTab[i].LastIndexOf("\"") - 38);
+                            postName = HttpUtility.UrlDecode(postTab[i].Substring(38, postTab[i].LastIndexOf("\"") - 38)).Trim();
                             continue;
                         }
                         if (postTab[i].Length > 0)
                         {
-                            req.FormData.Add(postName, postTab[i]);
+                            req.FormData.Add(postName, HttpUtility.UrlDecode(postTab[i]).Trim());
                         }
 
                     }

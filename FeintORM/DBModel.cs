@@ -57,6 +57,10 @@ namespace Feint.FeintORM
                 {
                     property.SetValue(obj, int.Parse(p.Value));
                 }
+                else if (property.PropertyType == typeof(long))
+                {
+                    property.SetValue(obj, long.Parse(p.Value));
+                }
                 else if (property.PropertyType == typeof(float))
                 {
                     property.SetValue(obj, float.Parse(p.Value));
@@ -222,6 +226,10 @@ namespace Feint.FeintORM
 		{
 			return Find<T>().Where().Eq("Id",id).Execute()[0];
 		}
+        public static DBModel Ref(long id,Type t)
+        {
+            return Find(t).Where().Eq("Id", id).Execute()[0];
+        }
         public static Assembly GetAssemblyNameContainingType(Type type)
         {
              var v=AppDomain.CurrentDomain.GetAssemblies();

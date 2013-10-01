@@ -40,6 +40,7 @@ namespace Feint.FeintORM
             ret._value=d;
             return ret;
         }
+        
         public static implicit operator T(DBForeignKey<T> d)
         {
             return d.Value;
