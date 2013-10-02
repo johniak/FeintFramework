@@ -159,11 +159,17 @@
         <h3>Edit</h3>
     </div>
     <div class="modal-body">
-
+        <form id="edit-form">
+            <table>
+                {%for f in form%}
+                {{f}}
+                {%endfor%}
+            </table>
+        </form>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn">Close</a>
-        <a href="#" class="btn btn-primary">Save changes</a>
+        <a href="#" data-dismiss="modal" class="btn">Close</a>
+        <a href="#" id="confirm-edit"  class="btn btn-primary">Save changes</a>
     </div>
 </div>
 
@@ -213,6 +219,7 @@
     var id=-1;
     var grid;
     var model='{{model}}';
+
     $(function () {
 
         var dataSource = new NestedAjaxDataSource({
@@ -236,6 +243,11 @@
         delay : 0,
                 formatter: function (items) {
             $.each(items, function (index, item) {
+                for(var p in item){
+                    if(item[p].hasOwnProperty("Representative"))
+                        item[p]=item[p].Representative;
+                }
+
                 item.Editable = '<div style=" float: right;" class="btn-group"><a  data-id='+item.Id+' class="edit-btn btn btn-info">Edit</a><a id="deleteGroup"  data-id='+item.Id+' class="delete-btn btn btn-danger">Delete</a></div>';
             });
         }
@@ -247,6 +259,10 @@
     $('#confirm-add').click(function(){
         addRow();
     });
+    $('#confirm-edit').click(function(){
+        editRow();
+    });
+
     $('.datetime').datetimepicker({
         language: 'en-US'
     });
@@ -259,11 +275,28 @@
             id=$(this).attr("data-id");
             $('#delete-modal').modal('show');
         });
+        $(".edit-btn").click(function(){
+            id=$(this).attr("data-id");
+            $.ajax('/admin/model/'+model+'/'+id+'/', {
+                dataType: 'json',
+                async: false,
+                type: 'GET'
+            }).done(function (json) {
+                      for(var p in json){
+                          if(json[p].hasOwnProperty("Representative"))
+                              $("input[name='"+p+"']").attr('value',json[p].Id);
+                          else
+                            $("input[name='"+p+"']").attr('value',json[p]);
+                      }
+             });
+            $('#edit-modal').modal('show');
+        });
     });
     $('#add-row').click(function(){
-
+        $('#add-form input').val("");
         $('#add-modal').modal('show');
     }) ;
+
     });
 </script>
 

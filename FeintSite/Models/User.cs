@@ -106,5 +106,9 @@ namespace Site.Models
         {
             return new { Id, Username, Password, };
         }
+        public override string ToString()
+        {
+            return Username;
+        }
     }
 }

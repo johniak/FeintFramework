@@ -111,3 +111,14 @@ function addRow(){
             $('#add-modal').modal('hide');
         });
 }
+function editRow(){
+    $.ajax('/admin/model/'+model+'/'+id+'/', {
+        dataType: 'json',
+        async: false,
+        type: 'PUT',
+        data: $('#edit-form').serialize()
+    }).done(function (json) {
+            $('#MyGrid').datagrid('reload');
+            $('#edit-modal').modal('hide');
+        });
+}

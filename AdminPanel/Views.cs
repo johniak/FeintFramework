@@ -79,7 +79,7 @@ namespace AdminPanel
                         forms.Add("<tr><td><p><label>" + pi.Name + ": </label>" + "</td><td><input type=\"text\" name=\"" + pi.Name + "\"/></td>" + "</p></tr>");
                     } if (pi.PropertyType == typeof(DateTime))
                     {
-                        forms.Add("<tr><td>"+pi.Name +": </td><td><div class=\"input-append date datetime\"><input data-format=\"dd/MM/yyyy hh:mm:ss\" type=\"text\" name=\"" + pi.Name + "\"></input><span class=\"add-on\"><i data-time-icon=\"icon-time\" data-date-icon=\"icon-calendar\"></i></span></div></p></td></tr>");
+                        forms.Add("<tr><td>" + pi.Name + ": </td><td><div class=\"input-append date datetime\"><input data-format=\"dd/MM/yyyy hh:mm:ss\" type=\"text\" name=\"" + pi.Name + "\"></input><span class=\"add-on\"><i data-time-icon=\"icon-time\" data-date-icon=\"icon-calendar\"></i></span></div></p></td></tr>");
                     }
                 }
                 lsh.Add(pi.Name);
@@ -89,6 +89,7 @@ namespace AdminPanel
             foreach (var f in fis)
             {
                 forms.Add("<tr><td><p><label>" + f.Name + " Id: </label>" + "</td><td><input type=\"text\" name=\"" + f.Name + "\"/></td>" + "</p></tr>");
+                lsh.Add(f.Name);
             }
             var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model, form = forms }));
             return response;
@@ -101,7 +102,7 @@ namespace AdminPanel
             {
                 var model = request.variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value),t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
+                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
                 dbm.Remove();
                 return new Response(JsonConvert.SerializeObject(true));
             }
@@ -153,8 +154,8 @@ namespace AdminPanel
                 foreach (var f in fis)
                 {
                     int id = int.Parse(request.FormData[f.Name]);
-                    var foreginType= typeof(DBForeignKey<>).MakeGenericType(f.PropertyType.GetGenericArguments()[0]);
-                    dynamic fobj = Activator.CreateInstance(foreginType,true);
+                    var foreginType = typeof(DBForeignKey<>).MakeGenericType(f.PropertyType.GetGenericArguments()[0]);
+                    dynamic fobj = Activator.CreateInstance(foreginType, true);
                     PropertyInfo pi = foreginType.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
                     pi.SetValue(fobj, id);
                     f.SetValue(obj, fobj);
@@ -197,6 +198,22 @@ namespace AdminPanel
             List<DBModel> m = where.Limit(startIndex, count).OrderBy(collumn, asc).Execute();
             return new Response(JsonConvert.SerializeObject(m));
         }
+        [AdminAuth]
+        public static Response ModelRow(Request request)
+        {
+            try
+            {
+                var model = request.variables["model"].Value;
+                Type t = modelsTypes[modelNames.IndexOf(model)];
+                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t);
+                return new Response(JsonConvert.SerializeObject(dbm));
+
+            }
+            catch (Exception ex)
+            {
+                return new Response(JsonConvert.SerializeObject(false));
+            }
+        }
         static bool isLikablePropertyAfter(List<PropertyInfo> lsh, int index)
         {
 
@@ -209,6 +226,7 @@ namespace AdminPanel
             }
             return false;
         }
+
         [AdminAuth]
         public static Response ModelJsonCount(Request request)
         {
@@ -217,6 +235,67 @@ namespace AdminPanel
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var m = DBModel.Find(t).Where().Count();
             return new Response(JsonConvert.SerializeObject(m));
+        }
+
+        [AdminAuth]
+        public static Response EditRow(Request request)
+        {
+            init();
+         //   try
+         //   {
+                var model = request.variables["model"].Value;
+                var id = long.Parse(request.variables["id"].Value);
+                Type t = modelsTypes[modelNames.IndexOf(model)];
+
+
+                List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+                List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
+                DBModel obj = DBModel.Ref(id, t);
+                foreach (var p in pis)
+                {
+                    if (p.Name == "Id")
+                        continue;
+                    if (p.PropertyType == typeof(string))
+                    {
+                        p.SetValue(obj, request.FormData[p.Name]);
+                    }
+                    else if (p.PropertyType == typeof(int))
+                    {
+                        p.SetValue(obj, int.Parse(request.FormData[p.Name]));
+                    }
+                    else if (p.PropertyType == typeof(long))
+                    {
+                        p.SetValue(obj, long.Parse(request.FormData[p.Name]));
+                    }
+                    else if (p.PropertyType == typeof(float))
+                    {
+                        p.SetValue(obj, float.Parse(request.FormData[p.Name]));
+                    }
+                    else if (p.PropertyType == typeof(double))
+                    {
+                        p.SetValue(obj, double.Parse(request.FormData[p.Name]));
+                    }
+                    else if (p.PropertyType == typeof(DateTime))
+                    {
+                        p.SetValue(obj, DateTime.ParseExact(request.FormData[p.Name], "dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
+                    }
+                }
+                foreach (var f in fis)
+                {
+                    int idp = int.Parse(request.FormData[f.Name]);
+                    var foreginType = typeof(DBForeignKey<>).MakeGenericType(f.PropertyType.GetGenericArguments()[0]);
+                    dynamic fobj = Activator.CreateInstance(foreginType, true);
+                    PropertyInfo pi = foreginType.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
+                    pi.SetValue(fobj, idp);
+                    f.SetValue(obj, fobj);
+                }
+                obj.Save();
+                return new Response(JsonConvert.SerializeObject(obj));
+            //}
+            //catch (Exception ex)
+            //{
+            //    return new Response(JsonConvert.SerializeObject(false));
+            //}
         }
 
         static bool isUserModel(Type t)

@@ -30,6 +30,8 @@ namespace Feint.FeintORM
         private T _value;
 		public Int64 Id{ get; private set; }
 
+        public String Representative { get { return Value.ToString(); } }
+
         private DBForeignKey()
         {
           
@@ -45,5 +47,6 @@ namespace Feint.FeintORM
         {
             return d.Value;
         }
+        
     }
 }

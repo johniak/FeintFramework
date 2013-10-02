@@ -203,12 +203,15 @@ namespace Feint.FeintORM
             {
                 if (p.PropertyType.IsGenericType && p.PropertyType.GetGenericTypeDefinition() == typeof(DBForeignKey<>))
                 {
-                    var fmodel = (DBModel)p.GetValue(this);
+                    var fmodel = (DBModel)((dynamic)p.GetValue(this)).Value;
                     fmodel.Save();
                     paramsDictionary.Add(new DBPair() { Collumn = "fk_" + p.Name, Value = fmodel.Id.ToString() });
                 }
-                if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
+                if (p.PropertyType == typeof(DateTime))
+                    paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(this) == null ? "" : ((long)(((DateTime)p.GetValue(this)) - new DateTime(1970, 1, 1)).TotalMilliseconds).ToString() });
+                else if (p.GetCustomAttributes(typeof(DBProperty)).ToList<Attribute>().Count != 0 && p.Name != "Id")
                     paramsDictionary.Add(new DBPair() { Collumn = p.Name, Value = p.GetValue(this) == null ? "" : p.GetValue(this).ToString() });
+               
 
             }
             orm.Helper.Update(orm.Prefix + this.GetType().Name, paramsDictionary, this.Id);
