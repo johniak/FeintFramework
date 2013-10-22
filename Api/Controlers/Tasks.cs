@@ -10,200 +10,128 @@ using Newtonsoft.Json;
 
 namespace Api.Controlers
 {
-	public class Tasks
-	{	
-		public static Response AddAll(Request request) {
-			User user = User.GetLoggedUser (request.Session);
-			if (user == null)
-				return Response.Redirect("/login/");
-			return add (request, user, Project.Find<Project>().Where().Execute()[0]);
-		}
+    public class Tasks
+    {
+        public static Response AddAll(Request request)
+        {
+            User user = User.GetLoggedUser(request.Session);
+            if (user == null)
+                return Response.Redirect("/login/");
+            return add(request, user, Project.Find<Project>().Where().Execute()[0]);
+        }
 
 
-		public static Response Add(Request request) {
-			User user = User.GetLoggedUser (request.Session);
-			if (user == null)
-				return Response.Redirect("/login/");
-			var project = Project.Ref<Project> (int.Parse(request.FormData ["project"])); //Find<Project> ().Where ().Eq ("Id", request.FormData ["project"]).Execute()[0];
-			if (!project.isOwnerOfProject(user))
-			{
-				return null;
-			}
+        public static Response Add(Request request)
+        {
+            User user = User.GetLoggedUser(request.Session);
+            if (user == null)
+                return Response.Redirect("/login/");
+            var project = Project.Ref<Project>(int.Parse(request.FormData["project"])); //Find<Project> ().Where ().Eq ("Id", request.FormData ["project"]).Execute()[0];
+            if (!project.isOwnerOfProject(user))
+            {
+                return null;
+            }
 
-			return add (request, user, project);
-		}
+            return add(request, user, project);
+        }
 
-		private static Response add (Request request, User user, Project project)
-		{
-			int priority = int.Parse (request.FormData ["priority"]);
-			String message = request.FormData ["message"];
-			int status = int.Parse (request.FormData ["status"]);
-			DateTime deadline = DateTime.ParseExact (request.FormData ["deadline"], "dd/MM/yyyy", null);
-			var projectId = Project.Find<Project>().Where().Eq("Name",request.FormData ["project_name"]);
-			DateRegExpr dateRX = new DateRegExpr (message);
-			if (dateRX.Success) {
-				message = dateRX.Message;
-				deadline = dateRX.Date;
-			}
-			PriorityRegExpr priorityRX = new PriorityRegExpr (message);
-			if (priorityRX.Success) {
-				message = priorityRX.Message;
-				priority = priorityRX.Priority;
-			}
-			Task task;
-			try {
-				task = new Task () {
-					Owner = user,
-					ProjectToTask = project,
-					Priority = priority,
-					Message = message,
-					Status = status,
-					Updated = DateTime.Now,
-					Created = DateTime.Now,
-					Deadline = deadline
-				};
-				task.Save ();
-				return new Response (JsonConvert.SerializeObject (new TaskSafe (task.Id, task.ProjectToTask.Value.Id, task.Priority, task.Message, task.Status, task.Deadline.ToString ("dd/MM/yyyy"), task.ProjectToTask.Value.Name)));
-			}
-			catch (Exception e) {
-				return new Response (JsonConvert.SerializeObject (false));
-			}
-		}
+        private static Response add(Request request, User user, Project project)
+        {
+            int priority = int.Parse(request.FormData["priority"]);
+            String message = request.FormData["message"];
+            int status = int.Parse(request.FormData["status"]);
+            DateTime deadline = DateTime.ParseExact(request.FormData["deadline"], "dd/MM/yyyy", null);
+            var projectId = Project.Find<Project>().Where().Eq("Name", request.FormData["project_name"]);
+            DateRegExpr dateRX = new DateRegExpr(message);
+            if (dateRX.Success)
+            {
+                message = dateRX.Message;
+                deadline = dateRX.Date;
+            }
+            PriorityRegExpr priorityRX = new PriorityRegExpr(message);
+            if (priorityRX.Success)
+            {
+                message = priorityRX.Message;
+                priority = priorityRX.Priority;
+            }
+            Task task;
+            try
+            {
+                task = new Task()
+                {
+                    Owner = user,
+                    ProjectToTask = project,
+                    Priority = priority,
+                    Message = message,
+                    Status = status,
+                    Updated = DateTime.Now,
+                    Created = DateTime.Now,
+                    Deadline = deadline
+                };
+                task.Save();
+                return new Response(JsonConvert.SerializeObject(task.ToTaskSafe()));
+            }
+            catch (Exception e)
+            {
+                return new Response(JsonConvert.SerializeObject(false));
+            }
+        }
 
-//		public static Result updateAll(Long task) {
-//			User user = Secured.getUser();
-//			Long project_home = Project.getAllProjectsByUserId(user.id).get(0).id;
-//			return update(project_home, task);
-//		}
-//
-//		public static Result update(Long project,Long task) {
-//			User user = Secured.getUser();
-//			if (!Secured.isOwnerOfProject(project, user.id)) {
-//				return forbidden();
-//			}
-//			Form<TaskForm> taskForm = form(TaskForm.class).bindFromRequest();
-//			if (taskForm.hasErrors()) {
-//				return badRequest();
-//			}
-//
-//			// process task message
-//			String message = taskForm.get().message;
-//			String deadline = taskForm.get().deadline;
-//			int priority = taskForm.get().priority;
-//			Integer projectNew = taskForm.get().project;
-//
-//			DateRegExpr dateRX = new DateRegExpr(message);
-//			if(dateRX.found()) {
-//				message = dateRX.getMessage();
-//				deadline = dateRX.getDate();
-//			}
-//
-//			PriorityRegExpr priorityRX = new PriorityRegExpr(message);
-//			if(priorityRX.found()) {
-//				message = priorityRX.getMessage();
-//				priority = priorityRX.getPriority();
-//			}
-//
-//			Task taskR;
-//			try {
-//				taskR = Task.find.ref(task);
-//				taskR.message=message;
-//				taskR.deadline=new SimpleDateFormat("dd/MM/yyyy").parse(deadline);
-//				taskR.priority=priority;
-//				taskR.status=taskForm.get().status;
-//				taskR.updated=new Date();
-//
-//				if ( projectNew != null ) {
-//					taskR.project=Project.find.ref(Long.valueOf(projectNew));
-//				}
-//				taskR.save();
-//
-//				JsonNode result = Json.toJson(new TaskSafe(taskR.id, taskR.project.id, taskR.priority, taskR.message, taskR.status,new SimpleDateFormat("dd/MM/yyyy").format(taskR.deadline), taskR.project.name));
-//				return ok(result);
-//			} catch (ParseException e) {
-//				JsonNode result = Json.toJson(Boolean.FALSE);
-//				return ok(result);
-//			}
-//		}
-//
-//		public static Result deleteAll(Long task) {
-//			User user = Secured.getUser();
-//			Long project_home = Project.getAllProjectsByUserId(user.id).get(0).id;
-//			return delete(project_home, task);
-//		}
-//
-//		public static Result delete(Long project,Long task) {
-//			Task taskR = Task.find.ref(task);
-//			taskR.delete();
-//			JsonNode result = Json.toJson(Boolean.TRUE);
-//			return ok(result);
-//		}
-//
-//		public static Result getWeek() {
-//			User user = Secured.getUser();
-//			// today    
-//			Calendar date = new GregorianCalendar();
-//			// reset hour, minutes, seconds and millis
-//			date.set(Calendar.HOUR_OF_DAY, 0);
-//			date.set(Calendar.MINUTE, 0);
-//			date.set(Calendar.SECOND, 0);
-//			date.set(Calendar.MILLISECOND, 0);
-//			Date now = date.getTime();
-//			// next day
-//			date.add(Calendar.DAY_OF_MONTH, 7);
-//			Date week = date.getTime();
-//
-//			List<Task> tasks= Task.find.where().eq("user.id", user.id).findList();
-//
-//			List<TaskSafe> tasksSafe= new ArrayList<TaskSafe>();
-//			for(Task t : tasks){
-//				if(t.deadline.compareTo(now) >= 0 && t.deadline.compareTo(week) <= 0) {
-//					tasksSafe.add(new TaskSafe(t.id, t.project.id, t.priority, t.message, t.status, new SimpleDateFormat("dd/MM/yyyy").format(t.deadline), t.project.name));
-//				}
-//			}
-//			JsonNode result = Json.toJson(tasksSafe);
-//			return ok(result);
-//		}
-//
-		public static Response GetAll(Request request) {
-			User user = User.GetLoggedUser (request.Session);
-			if (user == null)
-				return Response.Redirect("/login/");
+        public static Response updateTask(Request request)
+        {
+            int task;
+            int project;
+            if (!int.TryParse(request.variables["task"].Value, out task))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            if (!int.TryParse(request.variables["project"].Value, out project))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            var form = Form.FromFormData<TaskForm>(request.FormData);
+            if (!form.IsValid)
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            Task taskModel = Task.Ref<Task>(task);
+            if (taskModel == null)
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            if (taskModel.Owner.Id != User.GetLoggedUser(request.Session).Id)
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
+            taskModel.ProjectToTask.Value.Id = form.project;
+            taskModel.ProjectToTask.Value.Save();
+            taskModel.Priority = form.priority;
+            taskModel.Message = form.message;
+            taskModel.Status = form.status;
+            taskModel.Deadline = form.deadline;
+            taskModel.Updated = DateTime.Now;
+            taskModel.Save();
+            return new Response(JsonConvert.SerializeObject(taskModel.ToTaskSafe()));
+        }
 
-			List<Task> tasks = Task.getUserTask (user);
+        public static Response DeleteTask(Request request)
+        {
+            int taskID;
+            if (!int.TryParse(request.variables["task"].Value, out taskID))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            var task = Task.Ref<Task>(taskID);
+            if (task == null)
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            task.Remove();
+            return new Response(JsonConvert.SerializeObject(true));
+        }
 
-			List<TaskSafe> tasksSafe= new List<TaskSafe>();
-			foreach(Task t in tasks){
-				tasksSafe.Add(new TaskSafe(t.Id, t.ProjectToTask.Id, t.Priority, t.Message, t.Status,t.Deadline.ToString("dd/MM/yyyy"), t.ProjectToTask.Value.Name));
-			}
-			return new Response (JsonConvert.SerializeObject (tasksSafe));
-		}
-//
-//		public static Result getByProject(Long project) {
-//			User user = Secured.getUser();
-//			if (!Secured.isOwnerOfProject(project, user.id)) {
-//				return forbidden();
-//			}
-//			List<Task> tasks= Task.findByProject(project);
-//			List<TaskSafe> tasksSafe= new ArrayList<TaskSafe>();
-//			for(Task t : tasks){
-//				tasksSafe.add(new TaskSafe(t.id, t.project.id, t.priority, t.message, t.status,new SimpleDateFormat("dd/MM/yyyy").format(t.deadline), t.project.name));
-//			}
-//			JsonNode result = Json.toJson(tasksSafe);
-//			return ok(result);
-//		}
-//
-//		public static Result getByUser() {
-//			User user = Secured.getUser();
-//			List<Task> tasks= Task.findByUser(user.id);
-//			List<TaskSafe> tasksSafe= new ArrayList<TaskSafe>();
-//			for(Task t : tasks){
-//				tasksSafe.add(new TaskSafe(t.id, t.project.id, t.priority, t.message, t.status,new SimpleDateFormat("dd/MM/yyyy").format(t.deadline), t.project.name));
-//			}
-//			JsonNode result = Json.toJson(tasksSafe);
-//			return ok(result);
-//		}
+        public static Response GetAll(Request request)
+        {
+            User user = User.GetLoggedUser(request.Session);
+            if (user == null)
+                return Response.Redirect("/login/");
 
-	}
+            List<Task> tasks = Task.getUserTask(user);
+
+            List<TaskSafe> tasksSafe = new List<TaskSafe>();
+            foreach (Task t in tasks)
+            {
+                tasksSafe.Add(t.ToTaskSafe());
+            }
+            return new Response(JsonConvert.SerializeObject(tasksSafe));
+        }
+
+    }
 }
 

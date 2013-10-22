@@ -41,6 +41,10 @@ namespace Site.Models
         public static List<Task> getUserTask(User u){
             return Find<Task>().Where().Eq("Owner", u).Execute();
         }
+        public TaskSafe ToTaskSafe()
+        {
+           return new TaskSafe(this.Id, this.ProjectToTask.Value.Id, this.Priority, this.Message, this.Status, this.Deadline.ToString("dd/MM/yyyy"), this.ProjectToTask.Value.Name);
+        }
     }
 	public  class TaskSafe 
 	{
