@@ -21,7 +21,7 @@ namespace Site
             Settings.DebugMode = false;
 
             Settings.Modules.Add("AdminPanel");
-
+            Settings.Modules.Add("Api");
 
             Settings.Urls.Add(new Url(@"^/$", Controlers.Application.Index));
             Settings.Urls.Add(new Url(@"^/dashboard/$", Controlers.Application.Dashboard));

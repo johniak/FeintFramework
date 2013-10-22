@@ -32,6 +32,8 @@ namespace Site.Models
         [DBProperty]
         public DateTime Updated { get; set; }
 
+        public const   string LOGGED_IN_KEY = "isLogged";
+        public  const string LOGGED_IN_USER_ID_KEY = "username";
 
         public static bool SignIn(String username, String password)
         {
@@ -67,21 +69,21 @@ namespace Site.Models
         }
         public static bool IsLogged(Session session)
         {
-            var logString = session.GetProperty("isLogged");
+            var logString = session.GetProperty(LOGGED_IN_KEY);
             if (logString == true.ToString())
                 return true;
             return false;
         }
         public static User GetLoggedUser(Session session)
         {
-            var logString = session.GetProperty("isLogged");
+            var logString = session.GetProperty(LOGGED_IN_KEY);
             if (logString == true.ToString())
             {
-                var users = Find<User>().Where().Eq("Username", session.GetProperty("username")).Execute();
-                if (users.Count != 1)
+                var user = Ref<User>(int.Parse(session.GetProperty(LOGGED_IN_USER_ID_KEY)));
+                if (user != null)
                     return null;
                 else
-                    return users[0];
+                    return user;
             }
             else
             {

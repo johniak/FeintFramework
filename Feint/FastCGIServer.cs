@@ -193,11 +193,13 @@ namespace Feint
                 //System.IO.Stream output = response.OutputStream;
                 //output.Write(res.Data, 0, res.Data.Length);
                 //output.Close();
+                response.ResponseStatus =res.Status;
                 response.Put(res.Data);
             }
             else
             {
                 //FeintSDK.
+                response.ResponseStatus = 404;
                 response.PutStr("<HTML><BODY>404!!!</BODY></HTML>");
                 //string responseString = "<HTML><BODY>404!!!</BODY></HTML>";
                 //byte[] buffer = System.Text.Encoding.GetEncoding(1252).GetBytes(responseString);

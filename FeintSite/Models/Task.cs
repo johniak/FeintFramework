@@ -30,11 +30,11 @@ namespace Site.Models
         [DBProperty]
         public DateTime Deadline { get; set; }
 
-        enum TaskPriority
+        public enum TaskPriority
         {
             Low=0,Normal=1,High=2
         }
-        enum TaskStatus
+        public enum TaskStatus
         {
             Done=1, Waiting=0
         }

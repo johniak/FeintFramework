@@ -13,7 +13,7 @@ namespace Api
         public static void Main()
         {
             //Settings.Urls.Add(new Url(@"^/tasks/$", Views.Index, RequestMethod.GET));
-            Settings.Urls.Add(new Url(@"^/projects/all/tasks$", Controlers.Tasks.GetAll, RequestMethod.GET));
+            //Settings.Urls.Add(new Url(@"^/projects/all/tasks$", Controlers.Tasks.GetAll, RequestMethod.GET));
             //Settings.Urls.Add(new Url(@"^/projects/week/tasks/$", Views.Index, RequestMethod.GET));
             //Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/tasks/$", Views.Index, RequestMethod.GET));
             //Settings.Urls.Add(new Url(@"^/projects/all/tasks$", Controlers.Tasks.AddAll, RequestMethod.POST));
@@ -30,6 +30,7 @@ namespace Api
             //Settings.Urls.Add(new Url(@"^/projects/$", Views.Index, RequestMethod.GET));
             //Settings.Urls.Add(new Url(@"^/projects/$", Views.Index, RequestMethod.POST));
             //Settings.Urls.Add(new Url(@"^/projects/(?<project>[0-9]*?)/$", Views.Index, RequestMethod.DELETE));
+            
         }
     }
 }

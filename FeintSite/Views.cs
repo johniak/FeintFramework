@@ -58,8 +58,8 @@ namespace Site
 
             if (!User.SignIn(request.FormData["username"], request.FormData["password"]))
                 return new Response("index.html", Hash.FromAnonymousObject(new { loginMessage = "Bad username or password." }));
-            request.Session.SetProperty("isLogged", true.ToString());
-            request.Session.SetProperty("userId", request.FormData["username"]);
+            request.Session.SetProperty(User.LOGGED_IN_KEY, true.ToString());
+            request.Session.SetProperty(User.LOGGED_IN_USER_ID_KEY, User.Find<User>().Where().Eq("Username", request.FormData["username"]).Execute()[0].Id.ToString());
             return Response.Redirect("/");
 
         }

@@ -86,7 +86,7 @@ namespace FeintSDK
             MaxLenght = -1;
         }
 
-        
+
         public override bool IsValid(object o)
         {
             if (o == null && Requierd)
@@ -110,6 +110,19 @@ namespace FeintSDK
         public override dynamic GetValue(object o)
         {
             return o.ToString();
+        }
+    }
+
+    public class EmailField : CharField
+    {
+        public EmailField()
+            : base()
+        {
+            RegexPattern =
+   @"^([0-9a-zA-Z]" + //Start with a digit or alphabate
+   @"([\+\-_\.][0-9a-zA-Z]+)*" + // No continues or ending +-_. chars in email
+   @")+" +
+   @"@(([0-9a-zA-Z][-\w]*[0-9a-zA-Z]*\.)+[a-zA-Z0-9]{2,17})$";
         }
     }
 
