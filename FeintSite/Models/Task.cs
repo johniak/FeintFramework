@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Site.Models
 {
@@ -41,9 +40,23 @@ namespace Site.Models
         public static List<Task> getUserTask(User u){
             return Find<Task>().Where().Eq("Owner", u).Execute();
         }
+        public static List<Task> getUserTaskToProject(User u,int project)
+        {
+            return Find<Task>().Where().Eq("Owner", u).And().Eq("ProjectToTask.Id",project).Execute();
+        }
         public TaskSafe ToTaskSafe()
         {
            return new TaskSafe(this.Id, this.ProjectToTask.Value.Id, this.Priority, this.Message, this.Status, this.Deadline.ToString("dd/MM/yyyy"), this.ProjectToTask.Value.Name);
+        }
+
+        public static List<TaskSafe> ToTasksSafe(List<Task> tasks)
+        {
+            List<TaskSafe> tasksSafe = new List<TaskSafe>();
+            foreach (Task t in tasks)
+            {
+                tasksSafe.Add(t.ToTaskSafe());
+            }
+            return tasksSafe;
         }
     }
 	public  class TaskSafe 

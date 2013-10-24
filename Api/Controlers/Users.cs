@@ -12,9 +12,8 @@ namespace Api.Controlers
     class Users
     {
         [ApiAuth]
-        public static Response updateUser(Request request)
+        public static Response UpdateUser(Request request)
         {
-
             UpdateUserForm form = Form.FromFormData<UpdateUserForm>(request.FormData);
             if (!form.IsValid)
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) {Status=400};
@@ -23,7 +22,6 @@ namespace Api.Controlers
                 return new Response(JsonConvert.SerializeObject(Errors.WrongConfirmationPassword)) { Status = 403 };
             if (form.password != form.retypePassword)
                 return new Response(JsonConvert.SerializeObject(Errors.PaswordsAreNotTheSame)) { Status = 400 };
-
             user.Mail = form.email;
             user.Password = User.MD5Hash(form.password);
             user.Save();

@@ -73,8 +73,9 @@ namespace Site.Controlers
             var status = User.SignIn(username, password);
             if (status)
             {
-                request.Session.SetProperty("isLogged", true.ToString());
-                request.Session.SetProperty("username", request.FormData["username"]);
+                User u = User.Find<User>().Where().Eq("Username", username).Execute()[0];
+                request.Session.SetProperty(User.LOGGED_IN_KEY, true.ToString());
+                request.Session.SetProperty(User.LOGGED_IN_USER_ID_KEY, u.Id.ToString());
                 return Response.Redirect("/dashboard/#message/success/Welcome " + username);
             }
             return new Response("login.html", Hash.FromAnonymousObject(new {hasError=true,errorMessage= "Wrong username or password"}));

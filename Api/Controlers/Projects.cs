@@ -12,7 +12,7 @@ namespace Api.Controlers
     class Projects
     {
         [ApiAuth]
-        public static Response addProject(Request request)
+        public static Response AddProject(Request request)
         {
             var form = Form.FromFormData<ProjectForm>(request.FormData);
             if (!form.IsValid)
@@ -23,13 +23,13 @@ namespace Api.Controlers
         }
 
         [ApiAuth]
-        public static Response getAllProjects(Request request)
+        public static Response GetAllProjects(Request request)
         {
             return new Response(JsonConvert.SerializeObject(Project.getUserProjectsDisplays(User.GetLoggedUser(request.Session))));
         }
 
         [ApiAuth]
-        public static Response deleteProject(Request request)
+        public static Response DeleteProject(Request request)
         {
             int projectId;
             if (!int.TryParse(request.variables["project"].Value, out projectId))

@@ -12,6 +12,7 @@ namespace Api.Controlers
 {
     public class Tasks
     {
+        [ApiAuth]
         public static Response AddAll(Request request)
         {
             User user = User.GetLoggedUser(request.Session);
@@ -20,21 +21,21 @@ namespace Api.Controlers
             return add(request, user, Project.Find<Project>().Where().Execute()[0]);
         }
 
-
+        [ApiAuth]
         public static Response Add(Request request)
         {
+            int projectId;
+            if (!int.TryParse(request.variables["project"].Value, out projectId))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             User user = User.GetLoggedUser(request.Session);
-            if (user == null)
-                return Response.Redirect("/login/");
-            var project = Project.Ref<Project>(int.Parse(request.FormData["project"])); //Find<Project> ().Where ().Eq ("Id", request.FormData ["project"]).Execute()[0];
+            var project = Project.Ref<Project>(projectId);
             if (!project.isOwnerOfProject(user))
-            {
-                return null;
-            }
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
 
             return add(request, user, project);
         }
 
+        [ApiAuth]
         private static Response add(Request request, User user, Project project)
         {
             int priority = int.Parse(request.FormData["priority"]);
@@ -77,7 +78,18 @@ namespace Api.Controlers
             }
         }
 
-        public static Response updateTask(Request request)
+        [ApiAuth]
+        public static Response UpdateAllTask(Request request)
+        {
+            int task;
+            int project=0;
+            if (!int.TryParse(request.variables["task"].Value, out task))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            return updateTask(request, task, project);
+        }
+
+        [ApiAuth]
+        public static Response UpdateTask(Request request)
         {
             int task;
             int project;
@@ -85,6 +97,11 @@ namespace Api.Controlers
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             if (!int.TryParse(request.variables["project"].Value, out project))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            return updateTask(request, task, project);
+        }
+
+        private static Response updateTask(Request request,int task,int project)
+        {
             var form = Form.FromFormData<TaskForm>(request.FormData);
             if (!form.IsValid)
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
@@ -104,33 +121,42 @@ namespace Api.Controlers
             return new Response(JsonConvert.SerializeObject(taskModel.ToTaskSafe()));
         }
 
+        [ApiAuth]
         public static Response DeleteTask(Request request)
         {
-            int taskID;
-            if (!int.TryParse(request.variables["task"].Value, out taskID))
+            int taskId;
+            if (!int.TryParse(request.variables["task"].Value, out taskId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
-            var task = Task.Ref<Task>(taskID);
+            var task = Task.Ref<Task>(taskId);
             if (task == null)
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            if (task.Owner.Id != User.GetLoggedUser(request.Session).Id)
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
             task.Remove();
             return new Response(JsonConvert.SerializeObject(true));
         }
 
-        public static Response GetAll(Request request)
+        [ApiAuth]
+        public static Response GetAllTasks(Request request)
         {
             User user = User.GetLoggedUser(request.Session);
             if (user == null)
                 return Response.Redirect("/login/");
-
             List<Task> tasks = Task.getUserTask(user);
-
-            List<TaskSafe> tasksSafe = new List<TaskSafe>();
-            foreach (Task t in tasks)
-            {
-                tasksSafe.Add(t.ToTaskSafe());
-            }
-            return new Response(JsonConvert.SerializeObject(tasksSafe));
+            return new Response(JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
         }
+
+        [ApiAuth]
+        public static Response GetProjectTasks(Request request)
+        {
+            int projectId;
+            if (!int.TryParse(request.variables["project"].Value, out projectId))
+                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+            var user = User.GetLoggedUser(request.Session);
+            var tasks = Task.getUserTaskToProject(user, projectId);
+            return new Response(JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
+        }
+
 
     }
 }
