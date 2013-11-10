@@ -30,7 +30,7 @@ namespace Api.Util
 				}else if("!!!".Equals(inputPattern)) {
 					Priority = 2;
 				}
-				Regex.Replace (input, REGEX, "");
+				Message= Regex.Replace (input, REGEX, "");
 			}
 		}
 	}

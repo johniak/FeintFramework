@@ -85,16 +85,16 @@ namespace FeintSDK
             adapter.Fill(dataSet);
 
             var count = dataSet.Tables[0].Rows.Count;
-            if (count != 1)
+            if (count > 0)
+                return dataSet.Tables[0].Rows[count - 1]["value"].ToString();
+            else
                 return null;
-
-            return dataSet.Tables[0].Rows[0]["value"].ToString();
         }
         public void SetProperty(string name, string value)
         {
             string cmdString = "INSERT INTO 'main'.'Property' ('name','value','PropertyToKey') VALUES ('" + System.Security.SecurityElement.Escape(name) + "','" + System.Security.SecurityElement.Escape(value) + "','" + id + "')";
             var command = new SQLiteCommand(cmdString, connection);
-            command.ExecuteNonQuery();
+            int res= command.ExecuteNonQuery();
         }
         public void UnsetProperty(String name)
         {

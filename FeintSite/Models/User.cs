@@ -32,7 +32,7 @@ namespace Site.Models
         [DBProperty]
         public DateTime Updated { get; set; }
 
-        public const   string LOGGED_IN_KEY = "isLogged";
+        public const   string LOGGED_IN_KEY = "is_logged";
         public  const string LOGGED_IN_USER_ID_KEY = "username";
 
         public static bool SignIn(String username, String password)
@@ -80,7 +80,7 @@ namespace Site.Models
             if (logString == true.ToString())
             {
                 var user = Ref<User>(int.Parse(session.GetProperty(LOGGED_IN_USER_ID_KEY)));
-                if (user != null)
+                if (user == null)
                     return null;
                 else
                     return user;

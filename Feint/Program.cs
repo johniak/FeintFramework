@@ -31,7 +31,7 @@ namespace Feint
             orm.CreateTablesFromModel();
             if (Settings.DebugMode)
             {
-                DebugServer server = new DebugServer("http://*:8000/");
+                DebugServer server = new DebugServer("http://127.0.0.1:8000/");
             }
             else
             {

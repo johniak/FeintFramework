@@ -13,11 +13,6 @@ namespace Site.Controlers
 
         public static Response Index(Request request)
         {
-            //for (int i = 0; i < 1000; i++)
-            //{
-            //    new Models.SampleModel() { Message = "a" + (1000 - i), Priority=i%2}.Save();
-            //}
-            
             if (User.IsLogged(request.Session))
             {
                 return Response.Redirect("/dashboard/");
@@ -25,7 +20,7 @@ namespace Site.Controlers
             var response = new Response("index.html", Hash.FromAnonymousObject(new {  }));
             return response;
         }
-
+        [Auth]
         public static Response Dashboard(Request request)
         {
 			return DashboardDisplay(request,null,"all");
@@ -38,7 +33,7 @@ namespace Site.Controlers
 
         public static Response DashboardProject(Request request)
         {
-            return null;
+            return DashboardDisplay(request,int.Parse(request.variables["project"].Value),"project");
         }
 
         /// <summary>
@@ -50,11 +45,7 @@ namespace Site.Controlers
         /// <returns></returns>
         public static Response DashboardDisplay(Request request,int? projectId, String global)
         {
-
-           
             User loggedUser = User.GetLoggedUser(request.Session);
-            if (loggedUser == null)
-                return Response.Redirect("/login/");
 			List<ProjectDisplay> projects = Project.getUserProjectsDisplays (loggedUser);
 			var response = new Response("dashboard.html", Hash.FromAnonymousObject(new { projects=projects,selectedProject=projectId,user=loggedUser,type=global }));
 			return response;
@@ -76,14 +67,17 @@ namespace Site.Controlers
                 User u = User.Find<User>().Where().Eq("Username", username).Execute()[0];
                 request.Session.SetProperty(User.LOGGED_IN_KEY, true.ToString());
                 request.Session.SetProperty(User.LOGGED_IN_USER_ID_KEY, u.Id.ToString());
+                var prop = request.Session.GetProperty(User.LOGGED_IN_USER_ID_KEY);
                 return Response.Redirect("/dashboard/#message/success/Welcome " + username);
             }
             return new Response("login.html", Hash.FromAnonymousObject(new {hasError=true,errorMessage= "Wrong username or password"}));
         }
 
+        [Auth]
         public static Response Logout(Request request)
         {
-            return null;
+            request.Session.UnsetProperty(User.LOGGED_IN_KEY);
+            return Response.Redirect("/login/");
         }
 
         public static Response Register(Request request)
@@ -120,7 +114,7 @@ namespace Site.Controlers
             }
             return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Unexpected error." }));
         }
-
+        [Auth]
         public static Response UpdateUser(Request request)
         {
             return null;
@@ -128,12 +122,12 @@ namespace Site.Controlers
 
         public static Response Mobile(Request request)
         {
-            return null;
+            return new Response("mobile.html", Hash.FromAnonymousObject(new { }));
         }
 
         public static Response Usage(Request request)
         {
-            return null;
+            return new Response("usage.html",Hash.FromAnonymousObject(new {}));
         }
     }
 }

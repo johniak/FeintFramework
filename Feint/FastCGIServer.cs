@@ -1,5 +1,7 @@
 ﻿using FastCGI;
 using FeintORM;
+using HttpUtils;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -29,37 +31,7 @@ namespace Feint
         void HandleRequest(Request request, Response response)
         {
             Log.E(request.RequestURI.Value);
-            //            // receive HTTP content
-            //            byte[] content = request.Stdin.GetContents();
 
-            //            // access server variables
-            //            string serverSoftware = request.ServerSoftware.GetValueOrDefault();
-            //            string method = request.RequestMethod.Value;
-
-            //            // access HTTP headers
-            //            string userAgent = request.Headers[RequestHeader.HttpUserAgent];
-            //            string cookieValue = request.GetCookieValue("Keks").GetValueOrDefault();
-
-            //            // set HTTP headers
-            //            response.SetHeader(ResponseHeader.HttpExpires,
-            //                               Response.ToHttpDate(DateTime.Now.AddDays(1.0)));
-            //            response.SetCookie(new Cookie("Keks", "yummy"));
-
-
-
-            //            // send HTTP content
-            //            response.PutStr(
-            //                @"<html>
-            //                   <body>
-            //                    <p>Chrome why?</p>
-            //                    <p>Server: " + serverSoftware + @"</p>
-            //                    <p>User Agent: " + userAgent + @"</p>
-            //                    <p>Received cookie value: " + cookieValue + @"</p>
-            //                    <p>Content length as read: " + content.Length + @"</P>
-            //                    <p>Request method: " + method + @"</p>
-            //                   </body>
-            //                  </html>"
-            //                );
             FeintSDK.Response res = null;
             FeintSDK.Request req = new FeintSDK.Request(request.RequestURI.Value);
             req.Method = request.RequestMethod.Value;
@@ -69,17 +41,17 @@ namespace Feint
             text = System.Text.Encoding.UTF8.GetString(request.Stdin.GetContents());
             if (text.Length > 0)
             {
-                if (!text.Contains("WebKitFormBoundary"))
+                if (request.ContentType.Value.MediaType == "application/json")
                 {
-                    var postTabs = text.Split('&');
-                    foreach (var p in postTabs)
-                    {
-                        req.FormData.Add(HttpUtility.UrlDecode(p.Split('=')[0]).Trim(), HttpUtility.UrlDecode(p.Split('=')[1]).Trim());
-                    }
+                    req.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+                }
+                else if (!request.ContentType.Value.MediaType.StartsWith("multipart/form-data"))
+                {
+                    req.FormData = new Dictionary<string, string>(parseContent(text));
                 }
                 else
                 {
-
+                    req.FormData = new Dictionary<string, string>();
                     string[] postTab = text.Replace("\r", "").Split('\n');
                     String postName = "";
                     for (int i = 0; i < postTab.Length; i++)
@@ -165,6 +137,10 @@ namespace Feint
                         if (res == null)
                         {
                             res = FeintSDK.Settings.Urls[i].View(req);
+                            if (res.MimeType != null)
+                            {
+                                response.SetHeader(ResponseHeader.HttpContentType, res.MimeType + "; charset=utf-8");
+                            }
                         }
                         var redirect = res.GetType().GetField("redirectUrl",
                          BindingFlags.NonPublic |
@@ -824,5 +800,48 @@ namespace Feint
 
             return _mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
         }
+        IDictionary<String, String> parseContent(String content)
+        {
+
+            using (Stream data = GenerateStreamFromString(content))
+            {
+
+                if (content.StartsWith("multipart/form-data"))
+                {
+                    HttpMultipartParser parser = new HttpMultipartParser(data, "image");
+                    if (parser.Success)
+                    {
+                        return parser.Parameters;
+                    }
+                    else
+                    {
+                        return new Dictionary<String, String>();
+                    }
+                }
+                else
+                {
+                    HttpContentParser parser = new HttpContentParser(data);
+                    if (parser.Success)
+                    {
+                        return parser.Parameters;
+                    }
+                    else
+                    {
+                        return new Dictionary<String, String>();
+                    }
+                }
+            }
+        }
+
+        public Stream GenerateStreamFromString(string s)
+        {
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
     }
+
 }

@@ -153,8 +153,8 @@
         <label class="control-label" for="date">Project</label>
         <div class="controls">
         <select id="project" class="selectpicker show-menu-arrow span11">
-        {%for project in projects%}
-           <option value="{{project.id}}">{{project.name}}</option>
+        {% for project in projects %}
+           <option value="{{project.Id}}">{{project.Name}}</option>
         {%endfor%}
         </select>
         </div>

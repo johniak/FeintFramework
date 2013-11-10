@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Api.Controlers
 {
@@ -19,7 +18,7 @@ namespace Api.Controlers
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             Project project = new Project() { Name = form.name, Owner = User.GetLoggedUser(request.Session) };
             project.Save();
-            return new Response(JsonConvert.SerializeObject(new ProjectDisplay(project.Id,project.Name,project.Owner.Id)));
+            return new Response(JsonConvert.SerializeObject(new { id = project.Id, name = project.Name, user = project.Owner.Id })) { MimeType="application/json"};
         }
 
         [ApiAuth]
@@ -34,6 +33,12 @@ namespace Api.Controlers
             int projectId;
             if (!int.TryParse(request.variables["project"].Value, out projectId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+
+            var tasks = Task.getUserTaskToProject(User.GetLoggedUser(request.Session), projectId);
+            foreach (var t in tasks)
+            {
+                t.Remove();
+            }
             Project.Ref<Project>(projectId).Remove();
             return new Response(JsonConvert.SerializeObject(true));
         }

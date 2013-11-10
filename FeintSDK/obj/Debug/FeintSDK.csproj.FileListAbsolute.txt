@@ -60,4 +60,4 @@ C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\fi\Npgsql.resources
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\fr\Npgsql.resources.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\ja\Npgsql.resources.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\zh-CN\Npgsql.resources.dll
-C:\Users\Johniak\Documents\FeintFramework\FeintSDK\bin\Debug\System.Data.SQLite.dll
+C:\Users\johniak\Documents\FeintFramework\FeintSDK\bin\Debug\System.Data.SQLite.dll

@@ -188,7 +188,8 @@ namespace Feint.FeintORM
                 if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
                 {
                     int id = joins.Count;
-					joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
+                    var table=FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name;
+                    joins.Add(new DBJoinInformation() { Table = table, Alias = column + id, LeftCollumn = FeintORM.GetInstance().Prefix + typeof(T).Name + "." + "fk_" + column, RightCollumn = "Id" });
                     dynamic d = value;
                     column = column + id + ".Id";
                     value = d.Id;

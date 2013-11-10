@@ -24,8 +24,9 @@ namespace Feint.FeintORM
             queryOperators.Add(DBQueryOperators.Greater, ">");
             queryOperators.Add(DBQueryOperators.LessOrEquals, "<=");
             queryOperators.Add(DBQueryOperators.GreaterOrEquals, ">=");
-            queryOperators.Add(DBQueryOperators.Or, "OR");
-            queryOperators.Add(DBQueryOperators.And, "AND");
+            queryOperators.Add(DBQueryOperators.Or, " OR ");
+            queryOperators.Add(DBQueryOperators.And, " AND ");
+            queryOperators.Add(DBQueryOperators.Like, " LIKE ");
         }
 
         /// <summary>

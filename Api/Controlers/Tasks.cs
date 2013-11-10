@@ -7,6 +7,7 @@ using System.Text;
 using Site.Models;
 using Api.Util;
 using Newtonsoft.Json;
+using System.Globalization;
 
 namespace Api.Controlers
 {
@@ -41,7 +42,7 @@ namespace Api.Controlers
             int priority = int.Parse(request.FormData["priority"]);
             String message = request.FormData["message"];
             int status = int.Parse(request.FormData["status"]);
-            DateTime deadline = DateTime.ParseExact(request.FormData["deadline"], "dd/MM/yyyy", null);
+            DateTime deadline = DateTime.ParseExact(request.FormData["deadline"], "dd/MM/yyyy", CultureInfo.InvariantCulture);
             var projectId = Project.Find<Project>().Where().Eq("Name", request.FormData["project_name"]);
             DateRegExpr dateRX = new DateRegExpr(message);
             if (dateRX.Success)
@@ -110,8 +111,7 @@ namespace Api.Controlers
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             if (taskModel.Owner.Id != User.GetLoggedUser(request.Session).Id)
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
-            taskModel.ProjectToTask.Value.Id = form.project;
-            taskModel.ProjectToTask.Value.Save();
+            taskModel.ProjectToTask=Project.Ref<Project>(form.project);
             taskModel.Priority = form.priority;
             taskModel.Message = form.message;
             taskModel.Status = form.status;

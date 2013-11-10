@@ -12,6 +12,7 @@ namespace FeintSDK
         public byte[] Data { get; set; }
         private string redirectUrl;
         public int Status { get; set; }
+        public string MimeType { get; set; }
         private Response()
         {
             Status = 200;

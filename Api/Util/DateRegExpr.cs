@@ -18,7 +18,7 @@ namespace Api.Util
 			Match m = Regex.Match(input,REGEX);
 			if( m.Success ) {
 				Success = true;
-				String inputPattern = m.Groups[0].Value;
+				String inputPattern = m.Groups[1].Value;
 				DateTime now =DateTime.Now;
 				int dayOfweek = -1;
 
