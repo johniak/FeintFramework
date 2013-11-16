@@ -855,7 +855,12 @@ namespace Feint
                     HttpContentParser parser = new HttpContentParser(data);
                     if (parser.Success)
                     {
-                        return parser.Parameters;
+                        Dictionary<string, string> decodedParameters = new Dictionary<string, string>();
+                        foreach (var p in parser.Parameters)
+                        {
+                            decodedParameters.Add(p.Key,HttpUtility.UrlDecode(p.Value));
+                        }
+                        return decodedParameters;
                     }
                     else
                     {
