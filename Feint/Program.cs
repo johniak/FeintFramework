@@ -19,15 +19,15 @@ namespace Feint
             Assembly assembly = Assembly.LoadFrom(@"Site.dll");
             getMainMethod(assembly).Invoke(null, null);
             modulesAsseblies.Add(assembly);
-            foreach (var str in Settings.Modules)
+            for (int i = 0; i < Settings.Modules.Count; i++)
             {
+                var str = Settings.Modules[i];
                 Assembly moduleAssembly = Assembly.LoadFrom(str + @".dll");
-
                 getMainMethod(moduleAssembly).Invoke(null, null);
                 modulesAsseblies.Add(moduleAssembly);
             }
 
-            FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings);
+            FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings, Settings.DebugMode);
             orm.CreateTablesFromModel();
             if (Settings.DebugMode)
             {

@@ -4,30 +4,32 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace FeintORM
 {
     public class Log
     {
-        [MethodImpl(MethodImplOptions.Synchronized)]
         public static void D(object o)
         {
-          
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine(o);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            if (Feint.FeintORM.FeintORM.Debug)
+                consoleLog(o, ConsoleColor.Cyan);
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
         public static void I(object o)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine(o);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            if (Feint.FeintORM.FeintORM.Debug)
+                consoleLog(o, ConsoleColor.DarkGreen);
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
         public static void E(object o)
         {
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            if (Feint.FeintORM.FeintORM.Debug)
+                consoleLog(o, ConsoleColor.DarkMagenta);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private static void consoleLog(object o, ConsoleColor c)
+        {
+            Console.ForegroundColor = c;
             Console.WriteLine(o);
             Console.ForegroundColor = ConsoleColor.Gray;
         }

@@ -19,14 +19,14 @@ namespace Api.Controlers
             User user = User.GetLoggedUser(request.Session);
             if (user == null)
                 return Response.Redirect("/login/");
-            return add(request, user, Project.Find<Project>().Where().Execute()[0]);
+            return add(request, user, Project.getUserProjects(user)[0]);
         }
 
         [ApiAuth]
         public static Response Add(Request request)
         {
             int projectId;
-            if (!int.TryParse(request.variables["project"].Value, out projectId))
+            if (!int.TryParse(request.Variables["project"].Value, out projectId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             User user = User.GetLoggedUser(request.Session);
             var project = Project.Ref<Project>(projectId);
@@ -84,7 +84,7 @@ namespace Api.Controlers
         {
             int task;
             int project=0;
-            if (!int.TryParse(request.variables["task"].Value, out task))
+            if (!int.TryParse(request.Variables["task"].Value, out task))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             return updateTask(request, task, project);
         }
@@ -94,9 +94,9 @@ namespace Api.Controlers
         {
             int task;
             int project;
-            if (!int.TryParse(request.variables["task"].Value, out task))
+            if (!int.TryParse(request.Variables["task"].Value, out task))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
-            if (!int.TryParse(request.variables["project"].Value, out project))
+            if (!int.TryParse(request.Variables["project"].Value, out project))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             return updateTask(request, task, project);
         }
@@ -125,7 +125,7 @@ namespace Api.Controlers
         public static Response DeleteTask(Request request)
         {
             int taskId;
-            if (!int.TryParse(request.variables["task"].Value, out taskId))
+            if (!int.TryParse(request.Variables["task"].Value, out taskId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             var task = Task.Ref<Task>(taskId);
             if (task == null)
@@ -150,7 +150,7 @@ namespace Api.Controlers
         public static Response GetProjectTasks(Request request)
         {
             int projectId;
-            if (!int.TryParse(request.variables["project"].Value, out projectId))
+            if (!int.TryParse(request.Variables["project"].Value, out projectId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             var user = User.GetLoggedUser(request.Session);
             var tasks = Task.getUserTaskToProject(user, projectId);

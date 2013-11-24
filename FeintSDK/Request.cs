@@ -13,7 +13,7 @@ namespace FeintSDK
         public String Method { get; set; }
         public Dictionary<String, String> FormData=new Dictionary<string,string>();
         public Session Session { get; set; }
-        public GroupCollection variables { get; private set; }
+        public GroupCollection Variables { get; private set; }
         public Request(String url)
         {
             this.Url = url;

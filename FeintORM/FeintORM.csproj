@@ -69,7 +69,6 @@
     <Compile Include="DBPair.cs" />
     <Compile Include="DBProperty.cs" />
     <Compile Include="DBQueryOperators.cs" />
-    <Compile Include="FeintModel.cs" />
     <Compile Include="FeintORM.cs" />
     <Compile Include="Foreign.cs" />
     <Compile Include="ORMNotUniqueException.cs" />

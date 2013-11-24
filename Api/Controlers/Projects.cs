@@ -31,7 +31,7 @@ namespace Api.Controlers
         public static Response DeleteProject(Request request)
         {
             int projectId;
-            if (!int.TryParse(request.variables["project"].Value, out projectId))
+            if (!int.TryParse(request.Variables["project"].Value, out projectId))
                 return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
 
             var tasks = Task.getUserTaskToProject(User.GetLoggedUser(request.Session), projectId);

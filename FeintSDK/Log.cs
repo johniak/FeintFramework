@@ -9,24 +9,29 @@ namespace FeintSDK
 {
     public class Log
     {
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
         public static void D(object o)
         {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine(o);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            if (Settings.DebugMode)
+                consoleLog(o, ConsoleColor.Cyan);
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
         public static void I(object o)
         {
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine(o);
-            Console.ForegroundColor = ConsoleColor.Gray;
+            if (Settings.DebugMode)
+                consoleLog(o, ConsoleColor.DarkGreen);
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+
         public static void E(object o)
         {
-            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            if (Settings.DebugMode)
+                consoleLog(o, ConsoleColor.DarkMagenta);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private static void consoleLog(object o, ConsoleColor c)
+        {
+            Console.ForegroundColor = c;
             Console.WriteLine(o);
             Console.ForegroundColor = ConsoleColor.Gray;
         }

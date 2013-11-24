@@ -42,6 +42,10 @@ namespace Site.Models
 		{
 			return this;
 		}
+        public override string ToString()
+        {
+            return Name+" "+Id;
+        }
 	}
 
 	public class ProjectDisplay: ILiquidizable

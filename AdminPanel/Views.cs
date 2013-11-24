@@ -56,7 +56,7 @@ namespace AdminPanel
         public static Response Model(Request request)
         {
             init();
-            var model = request.variables["model"].Value;
+            var model = request.Variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             List<List<String>> table = new List<List<string>>();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
@@ -101,9 +101,9 @@ namespace AdminPanel
             init();
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
+                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
                 dbm.Remove();
                 return new Response(JsonConvert.SerializeObject(true));
             }
@@ -118,7 +118,7 @@ namespace AdminPanel
         {
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
                 List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
                 List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
@@ -175,15 +175,16 @@ namespace AdminPanel
         {
             init();
 
-            var model = request.variables["model"].Value;
-            var startIndex = long.Parse(request.variables["startIndex"].Value);
-            var count = long.Parse(request.variables["count"].Value);
-            var collumn = request.variables["collumn"].Value;
-            var asc = bool.Parse(request.variables["asc"].Value);
-            string search = request.variables["search"].Value;
+            var model = request.Variables["model"].Value;
+            var startIndex = long.Parse(request.Variables["startIndex"].Value);
+            var count = long.Parse(request.Variables["count"].Value);
+            var collumn = request.Variables["collumn"].Value;
+            var asc = bool.Parse(request.Variables["asc"].Value);
+            string search = request.Variables["search"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var where = DBModel.Find(t).Where();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+            List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
             int i = 0;
             foreach (var pi in pis)
             {
@@ -214,6 +215,10 @@ namespace AdminPanel
                         dict.Add(pi.Name, (pi.GetValue(dbm)).ToString());
                     }
                 }
+                foreach (var fi in fis)
+                {
+                    dict.Add(fi.Name, ((dynamic)fi.GetValue(dbm)).Representative);
+                }
                 listOfDicts.Add(dict);
             }
             return new Response(JsonConvert.SerializeObject(listOfDicts));
@@ -223,9 +228,9 @@ namespace AdminPanel
         {
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t);
+                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t);
                 
                 Dictionary<string, string> dict = new Dictionary<string, string>();
                 List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
@@ -265,7 +270,7 @@ namespace AdminPanel
         public static Response ModelJsonCount(Request request)
         {
             init();
-            var model = request.variables["model"].Value;
+            var model = request.Variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var m = DBModel.Find(t).Where().Count();
             return new Response(JsonConvert.SerializeObject(m));
@@ -277,8 +282,8 @@ namespace AdminPanel
             init();
             //   try
             //   {
-            var model = request.variables["model"].Value;
-            var id = long.Parse(request.variables["id"].Value);
+            var model = request.Variables["model"].Value;
+            var id = long.Parse(request.Variables["id"].Value);
             Type t = modelsTypes[modelNames.IndexOf(model)];
 
 

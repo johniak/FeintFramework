@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,7 +65,7 @@ namespace Feint.FeintORM
             adapter.Fill(dataSet);
             return dataSet.Tables[0];
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount,string orderBy,bool ascending)
         {
             StringBuilder builder = new StringBuilder();
