@@ -392,7 +392,7 @@ namespace FeintTemplate
         /// </summary>
         /// <param name="str"></param>
         /// <param name="parameters"></param>
-        /// <returns>vraibable what user want</returns>
+        /// <returns>vraibable which user want</returns>
         object getVariable(string str, Dictionary<string, object> parameters)
         {
             if (Regex.IsMatch(str, @"^([a-zA-Z_][a-zA-Z0-9_-]*)([\.]([a-zA-Z_][a-zA-Z0-9_\-]*))*$"))

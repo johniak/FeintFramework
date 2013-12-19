@@ -40,7 +40,7 @@ namespace Feint.FeintORM
         {
             return System.Security.SecurityElement.Escape(text);
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public DataTable Select(string table, List<WhereComponent> where)
         {
             StringBuilder builder = new StringBuilder();
@@ -109,7 +109,7 @@ namespace Feint.FeintORM
             adapter.Fill(dataSet);
             return dataSet.Tables[0];
         }
-        
+       [MethodImpl(MethodImplOptions.Synchronized)] 
        public  long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
         {
             StringBuilder builder = new StringBuilder();
@@ -142,7 +142,7 @@ namespace Feint.FeintORM
             adapter.Fill(dataSet);
             return (long) dataSet.Tables[0].Rows[0].ItemArray[0];
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public Int64 Insert(string table, List<DBPair> what)
         {
             var commandString = "INSERT INTO " + Esc(table) + " ";
@@ -166,7 +166,7 @@ namespace Feint.FeintORM
 
             return (int)dataSet.Tables[0].Rows[0][0];
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void Update(string table, List<DBPair> what, Int64 id)
         {
             var commandString = "UPDATE " + Esc(table) + " SET ";
@@ -181,7 +181,7 @@ namespace Feint.FeintORM
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void RemoveFromTable(string table, Int64 id)
         {
             string query = "DELETE FROM " + Esc(table) + " WHERE Id= '" + Esc(id.ToString()) + "'";
@@ -190,6 +190,7 @@ namespace Feint.FeintORM
             command.ExecuteNonQuery();
         }
 
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void CreateTable(string table, List<Column> collumns)
         {
             var commandString = "CREATE TABLE IF NOT EXISTS '" + Esc(table) + "' (";
@@ -203,7 +204,7 @@ namespace Feint.FeintORM
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
-
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners)
         {
             var commandString = "CREATE TABLE IF NOT EXISTS " + Esc(table) + " (";
@@ -222,6 +223,7 @@ namespace Feint.FeintORM
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
         }
+
         private Foreign getForeginForCollumn(Column c, List<Foreign> foreigners)
         {
             foreach (var f in foreigners)
@@ -231,6 +233,7 @@ namespace Feint.FeintORM
             }
             return null;
         }
+
         public string columnToString(Column col)
         {
             string cmd = "" + col.Name + " ";
@@ -250,6 +253,7 @@ namespace Feint.FeintORM
                 cmd += "NOT NULL";
             return cmd;
         }
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public void CreateDatabase(String name)
         {
             string commandString = "CREATE DATABASE " + Esc(name);

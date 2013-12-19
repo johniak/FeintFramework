@@ -18,6 +18,7 @@ namespace Feint
         HttpListener listener;
         public DebugServer(String address)
         {
+            
             listener = new HttpListener();
             listener.Prefixes.Add(address);
             listener.Start();
@@ -134,7 +135,7 @@ namespace Feint
 
                         if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
                         {
-                            setNonPublicSetProperty(req, req.GetType(), "variables", match.Groups);
+                            setNonPublicSetProperty(req, req.GetType(), "Variables", match.Groups);
 
 
 

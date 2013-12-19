@@ -28,7 +28,7 @@ namespace FeintSDK
                 consoleLog(o, ConsoleColor.DarkMagenta);
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        
         private static void consoleLog(object o, ConsoleColor c)
         {
             Console.ForegroundColor = c;
