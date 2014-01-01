@@ -4,6 +4,7 @@ using HttpUtils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -18,6 +19,8 @@ namespace Feint
 {
     class FastCGIServer
     {
+        Dictionary<string, byte[]> staticCache;
+        bool first = true;
         public FastCGIServer(String address)
         {
             var splittedAddress = address.Split(':');
@@ -26,12 +29,13 @@ namespace Feint
             config.EndPoint = new IPEndPoint(IPAddress.Parse(splittedAddress[0]), short.Parse(splittedAddress[1]));
             config.OnError = Log.E;
             Log.I("FastCGI started at: " + address);
+            staticCache = new Dictionary<string,byte[]>();
             Server.Start(HandleRequest, config);
         }
         void HandleRequest(Request request, Response response)
         {
+            
             Log.E(request.RequestURI.Value);
-
             FeintSDK.Response res = null;
             FeintSDK.Request req = new FeintSDK.Request(request.RequestURI.Value);
             req.Method = request.RequestMethod.Value;
@@ -39,6 +43,64 @@ namespace Feint
             string text = null;
 
             text = System.Text.Encoding.UTF8.GetString(request.Stdin.GetContents());
+            ParseContent(request, req, text);
+
+            if (req.Url.StartsWith("/" + FeintSDK.Settings.StaticFolder))
+            {
+
+                res = GetStatic(response, res, req);
+            }
+            else
+            {
+                FeintSDK.RequestMethod actualMethod = FeintSDK.RequestMethod.POST;
+                switch (request.RequestMethod.Value)
+                {
+                    case "GET":
+                        actualMethod = FeintSDK.RequestMethod.GET;
+                        break;
+                    case "POST":
+                        actualMethod = FeintSDK.RequestMethod.POST;
+                        break;
+                    case "PUT":
+                        actualMethod = FeintSDK.RequestMethod.PUT;
+                        break;
+                    case "DELETE":
+                        actualMethod = FeintSDK.RequestMethod.DELETE;
+                        break;
+                }
+
+                if (!req.Url.EndsWith("/"))
+                    req.Url += "/";
+                FeintSDK.Url urlApp = UrlDispatcher(req, actualMethod);
+                if (urlApp != null)
+                {
+                    setSesion(request, response, req);
+                    res = RunApplication(response, res, req, urlApp);
+                    var redirect = res.GetType().GetField("redirectUrl",
+                     BindingFlags.NonPublic |
+                     BindingFlags.Instance);
+                    String url = (String)redirect.GetValue(res);
+                    if (url != null)
+                    {
+                        response.SeeOtherRedirect(url);
+                        return;
+                    }
+                }
+            }
+            if (res != null)
+            {
+                response.ResponseStatus =res.Status;
+                response.Put(res.Data);
+            }
+            else
+            {
+                response.ResponseStatus = 404;
+                response.PutStr("<HTML><BODY>404!!!</BODY></HTML>");
+            }
+        }
+
+        private void ParseContent(Request request, FeintSDK.Request req, string text)
+        {
             if (text.Length > 0)
             {
                 if (request.ContentType.Value.MediaType == "application/json")
@@ -72,119 +134,96 @@ namespace Feint
                     }
                 }
             }
-
-            if (req.Url.StartsWith("/" + FeintSDK.Settings.StaticFolder))
-            {
-
-                if (req.Url.Contains("./") || req.Url.ToString().Contains(".."))
-                    res = null;
-                else
-                {
-                    try
-                    {
-                        FileStream fs = new FileStream("FeintSite/" + req.Url.Substring(1), FileMode.Open, FileAccess.Read);
-                        byte[] buffer = new byte[fs.Length];
-                        fs.Read(buffer, 0, (int)fs.Length);
-                        res = new FeintSDK.Response(buffer);
-                        fs.Close();
-                        string ext = req.Url.Substring(req.Url.LastIndexOf("."), req.Url.Length - req.Url.LastIndexOf("."));
-                        response.SetHeader(ResponseHeader.HttpContentType, GetMimeType(ext) + "; charset=utf-8");
-                    }
-                    catch
-                    {
-
-                    }
-                }
-            }
-            else
-            {
-                FeintSDK.RequestMethod actualMethod = FeintSDK.RequestMethod.POST;
-                switch (request.RequestMethod.Value)
-                {
-                    case "GET":
-                        actualMethod = FeintSDK.RequestMethod.GET;
-                        break;
-                    case "POST":
-                        actualMethod = FeintSDK.RequestMethod.POST;
-                        break;
-                    case "PUT":
-                        actualMethod = FeintSDK.RequestMethod.PUT;
-                        break;
-                    case "DELETE":
-                        actualMethod = FeintSDK.RequestMethod.DELETE;
-                        break;
-                }
-                if (!req.Url.EndsWith("/"))
-                    req.Url += "/";
-                for (int i = 0; i < FeintSDK.Settings.Urls.Count; i++)
-                {
-                    var match = Regex.Match(req.Url.ToString(), FeintSDK.Settings.Urls[i].UrlMatch);
-
-                    if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
-                    {
-                        setNonPublicSetProperty(req, req.GetType(), "variables", match.Groups);
-
-
-
-                        setSesion(request, response, req);
-                        MethodInfo mi= FeintSDK.Settings.Urls[i].View.GetMethodInfo();
-                        FeintSDK.AOPAttribute[] aops=(FeintSDK.AOPAttribute[]) mi.GetCustomAttributes(typeof( FeintSDK.AOPAttribute), true);
-                        res = null;
-                        foreach (var aop in aops)
-                        {
-                            res = aop.PreRequest(req);
-                        }
-                        if (res == null)
-                        {
-                            res = FeintSDK.Settings.Urls[i].View(req);
-                            if (res.MimeType != null)
-                            {
-                                response.SetHeader(ResponseHeader.HttpContentType, res.MimeType + "; charset=utf-8");
-                            }
-                        }
-                        var redirect = res.GetType().GetField("redirectUrl",
-                         BindingFlags.NonPublic |
-                         BindingFlags.Instance);
-                        foreach (var aop in aops)
-                        {
-                            aop.PostRequest(req);
-                        }
-                        String url = (String)redirect.GetValue(res);
-                        if (url != null)
-                        {
-                            response.SeeOtherRedirect(url);
-                            // response.Redirect(url);
-
-                            // response.Close();
-                            return;
-                        }
-                        break;
-                    }
-                }
-            }
-            if (res != null)
-            {
-
-                //response.ContentLength64 = res.Data.Length;
-                //System.IO.Stream output = response.OutputStream;
-                //output.Write(res.Data, 0, res.Data.Length);
-                //output.Close();
-                response.ResponseStatus =res.Status;
-                response.Put(res.Data);
-            }
-            else
-            {
-                //FeintSDK.
-                response.ResponseStatus = 404;
-                response.PutStr("<HTML><BODY>404!!!</BODY></HTML>");
-                //string responseString = "<HTML><BODY>404!!!</BODY></HTML>";
-                //byte[] buffer = System.Text.Encoding.GetEncoding(1252).GetBytes(responseString);
-                //response.ContentLength64 = buffer.Length;
-                //System.IO.Stream output = response.OutputStream;
-                //output.Write(buffer, 0, buffer.Length);
-                //output.Close();
-            }
         }
+
+        private FeintSDK.Response GetStatic(Response response, FeintSDK.Response res, FeintSDK.Request req)
+        {
+            if (req.Url.Contains("./") || req.Url.ToString().Contains(".."))
+                res = null;
+            else
+            {
+                try
+                {
+                    byte[] buffer;
+                    string path = req.Url.Substring(1);
+                    if (FeintSDK.Settings.StaticCache)
+                    {
+                        if (staticCache.ContainsKey(path))
+                        {
+                            buffer = staticCache[path];
+                        }
+                        else
+                        {
+                            FileStream fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                            buffer = new byte[fs.Length];
+                            fs.Read(buffer, 0, (int)fs.Length);
+                            fs.Close();
+                            staticCache.Add(path, buffer);
+                        }
+                    }
+                    else
+                    {
+                        FileStream fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                        buffer = new byte[fs.Length];
+                        fs.Read(buffer, 0, (int)fs.Length);
+                        fs.Close();
+                    }
+
+                    res = new FeintSDK.Response(buffer);
+
+                    string ext = req.Url.Substring(req.Url.LastIndexOf("."), req.Url.Length - req.Url.LastIndexOf("."));
+                    response.SetHeader(ResponseHeader.HttpContentType, GetMimeType(ext) + "; charset=utf-8");
+                }
+                catch
+                {
+
+                }
+            }
+            return res;
+        }
+
+        private FeintSDK.Url UrlDispatcher(FeintSDK.Request req, FeintSDK.RequestMethod actualMethod)
+        {
+            FeintSDK.Url urlApp = null;
+            for (int i = 0; i < FeintSDK.Settings.Urls.Count; i++)
+            {
+                var match = Regex.Match(req.Url.ToString(), FeintSDK.Settings.Urls[i].UrlMatch);
+                if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
+                {
+                    urlApp = FeintSDK.Settings.Urls[i];
+                    setNonPublicSetProperty(req, req.GetType(), "Variables", match.Groups);
+                    break;
+                }
+            }
+            return urlApp;
+        }
+
+        private static FeintSDK.Response RunApplication(Response response, FeintSDK.Response res, FeintSDK.Request req, FeintSDK.Url urlApp)
+        {
+            MethodInfo mi = urlApp.View.GetMethodInfo();
+            FeintSDK.AOPAttribute[] aops = (FeintSDK.AOPAttribute[])mi.GetCustomAttributes(typeof(FeintSDK.AOPAttribute), true);
+            res = null;
+            foreach (var aop in aops)
+            {
+                res = aop.PreRequest(req);
+            }
+            if (res == null)
+            {
+                res = urlApp.View(req);
+                if (res.MimeType != null)
+                {
+                    response.SetHeader(ResponseHeader.HttpContentType, res.MimeType + "; charset=utf-8");
+                }
+            }
+            foreach (var aop in aops)
+            {
+                aop.PostRequest(req);
+            }
+            return res;
+        }
+
+
+
         private static void setSesion(Request request, Response response, FeintSDK.Request req)
         {
             if (request.Cookies.ContainsKey("session"))
@@ -198,14 +237,16 @@ namespace Feint
                     {
                         response.SetCookie(new Cookie("session", key, "/"));
                     }
-                    catch (NullReferenceException e)
+                    catch (NullReferenceException)
                     {
                         response.SetCookie(new Cookie("session", key, "/"));
                     }
                 }
             }
             else
+            {
                 response.SetCookie(new Cookie("session", req.Session.Start(), "/"));
+            }
         }
         public void setNonPublicSetProperty(Object obj, Type t, string name, dynamic value)
         {

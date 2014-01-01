@@ -8,12 +8,12 @@ using DotLiquid;
 
 namespace Site.Models
 {
-	public class Project:DBModel, ILiquidizable
-	{
-		[DBProperty]
-		public String Name { get; set; }
+public class Project:DBModel, ILiquidizable
+{
+    [DBProperty]
+    public String Name { get; set; }
 
-		public DBForeignKey<User> Owner { get; set; }
+    public DBForeignKey<User> Owner { get; set; }
 
 		public static List<Project> getUserProjects (User u)
 		{
@@ -42,6 +42,10 @@ namespace Site.Models
 		{
 			return this;
 		}
+        public override string ToString()
+        {
+            return Name+" "+Id;
+        }
 	}
 
 	public class ProjectDisplay: ILiquidizable

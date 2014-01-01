@@ -9,6 +9,7 @@ using Feint.FeintORM;
 using System.Reflection;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
+using System.Globalization;
 namespace AdminPanel
 {
     class Views
@@ -55,7 +56,7 @@ namespace AdminPanel
         public static Response Model(Request request)
         {
             init();
-            var model = request.variables["model"].Value;
+            var model = request.Variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             List<List<String>> table = new List<List<string>>();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
@@ -100,9 +101,9 @@ namespace AdminPanel
             init();
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
+                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
                 dbm.Remove();
                 return new Response(JsonConvert.SerializeObject(true));
             }
@@ -117,7 +118,7 @@ namespace AdminPanel
         {
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
                 List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
                 List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
@@ -174,15 +175,16 @@ namespace AdminPanel
         {
             init();
 
-            var model = request.variables["model"].Value;
-            var startIndex = long.Parse(request.variables["startIndex"].Value);
-            var count = long.Parse(request.variables["count"].Value);
-            var collumn = request.variables["collumn"].Value;
-            var asc = bool.Parse(request.variables["asc"].Value);
-            string search = request.variables["search"].Value;
+            var model = request.Variables["model"].Value;
+            var startIndex = long.Parse(request.Variables["startIndex"].Value);
+            var count = long.Parse(request.Variables["count"].Value);
+            var collumn = request.Variables["collumn"].Value;
+            var asc = bool.Parse(request.Variables["asc"].Value);
+            string search = request.Variables["search"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var where = DBModel.Find(t).Where();
             List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+            List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
             int i = 0;
             foreach (var pi in pis)
             {
@@ -195,19 +197,56 @@ namespace AdminPanel
                 }
                 i++;
             }
-            List<DBModel> m = where.Limit(startIndex, count).OrderBy(collumn, asc).Execute();
-            return new Response(JsonConvert.SerializeObject(m));
+
+            List<DBModel> data = where.Limit(startIndex, count).OrderBy(collumn, asc).Execute();
+            List<Dictionary<string, string>> listOfDicts = new List<Dictionary<string, string>>();
+            foreach (var dbm in data)
+            {
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                foreach (var pi in pis)
+                {
+                    if (pi.PropertyType == typeof(DateTime))
+                    {
+
+                        dict.Add(pi.Name, ((DateTime)pi.GetValue(dbm)).ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        dict.Add(pi.Name, (pi.GetValue(dbm)).ToString());
+                    }
+                }
+                foreach (var fi in fis)
+                {
+                    dict.Add(fi.Name, ((dynamic)fi.GetValue(dbm)).Representative);
+                }
+                listOfDicts.Add(dict);
+            }
+            return new Response(JsonConvert.SerializeObject(listOfDicts));
         }
         [AdminAuth]
         public static Response ModelRow(Request request)
         {
             try
             {
-                var model = request.variables["model"].Value;
+                var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.variables["id"].Value), t);
-                return new Response(JsonConvert.SerializeObject(dbm));
+                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t);
+                
+                Dictionary<string, string> dict = new Dictionary<string, string>();
+                List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+                foreach (var pi in pis)
+                {
+                    if (pi.PropertyType == typeof(DateTime))
+                    {
 
+                        dict.Add(pi.Name, ((DateTime)pi.GetValue(dbm)).ToString("dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture));
+                    }
+                    else
+                    {
+                        dict.Add(pi.Name, (pi.GetValue(dbm)).ToString());
+                    }
+                }
+                return new Response(JsonConvert.SerializeObject(dict));
             }
             catch (Exception ex)
             {
@@ -231,7 +270,7 @@ namespace AdminPanel
         public static Response ModelJsonCount(Request request)
         {
             init();
-            var model = request.variables["model"].Value;
+            var model = request.Variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var m = DBModel.Find(t).Where().Count();
             return new Response(JsonConvert.SerializeObject(m));
@@ -241,56 +280,56 @@ namespace AdminPanel
         public static Response EditRow(Request request)
         {
             init();
-         //   try
-         //   {
-                var model = request.variables["model"].Value;
-                var id = long.Parse(request.variables["id"].Value);
-                Type t = modelsTypes[modelNames.IndexOf(model)];
+            //   try
+            //   {
+            var model = request.Variables["model"].Value;
+            var id = long.Parse(request.Variables["id"].Value);
+            Type t = modelsTypes[modelNames.IndexOf(model)];
 
 
-                List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
-                List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
-                DBModel obj = DBModel.Ref(id, t);
-                foreach (var p in pis)
+            List<PropertyInfo> pis = Feint.FeintORM.FeintORM.GetInstance().getPropertiesFromClass(t).ToList();
+            List<PropertyInfo> fis = Feint.FeintORM.FeintORM.GetInstance().getForeignersFromClass(t).ToList();
+            DBModel obj = DBModel.Ref(id, t);
+            foreach (var p in pis)
+            {
+                if (p.Name == "Id")
+                    continue;
+                if (p.PropertyType == typeof(string))
                 {
-                    if (p.Name == "Id")
-                        continue;
-                    if (p.PropertyType == typeof(string))
-                    {
-                        p.SetValue(obj, request.FormData[p.Name]);
-                    }
-                    else if (p.PropertyType == typeof(int))
-                    {
-                        p.SetValue(obj, int.Parse(request.FormData[p.Name]));
-                    }
-                    else if (p.PropertyType == typeof(long))
-                    {
-                        p.SetValue(obj, long.Parse(request.FormData[p.Name]));
-                    }
-                    else if (p.PropertyType == typeof(float))
-                    {
-                        p.SetValue(obj, float.Parse(request.FormData[p.Name]));
-                    }
-                    else if (p.PropertyType == typeof(double))
-                    {
-                        p.SetValue(obj, double.Parse(request.FormData[p.Name]));
-                    }
-                    else if (p.PropertyType == typeof(DateTime))
-                    {
-                        p.SetValue(obj, DateTime.ParseExact(request.FormData[p.Name], "dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
-                    }
+                    p.SetValue(obj, request.FormData[p.Name]);
                 }
-                foreach (var f in fis)
+                else if (p.PropertyType == typeof(int))
                 {
-                    int idp = int.Parse(request.FormData[f.Name]);
-                    var foreginType = typeof(DBForeignKey<>).MakeGenericType(f.PropertyType.GetGenericArguments()[0]);
-                    dynamic fobj = Activator.CreateInstance(foreginType, true);
-                    PropertyInfo pi = foreginType.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
-                    pi.SetValue(fobj, idp);
-                    f.SetValue(obj, fobj);
+                    p.SetValue(obj, int.Parse(request.FormData[p.Name]));
                 }
-                obj.Save();
-                return new Response(JsonConvert.SerializeObject(obj));
+                else if (p.PropertyType == typeof(long))
+                {
+                    p.SetValue(obj, long.Parse(request.FormData[p.Name]));
+                }
+                else if (p.PropertyType == typeof(float))
+                {
+                    p.SetValue(obj, float.Parse(request.FormData[p.Name]));
+                }
+                else if (p.PropertyType == typeof(double))
+                {
+                    p.SetValue(obj, double.Parse(request.FormData[p.Name]));
+                }
+                else if (p.PropertyType == typeof(DateTime))
+                {
+                    p.SetValue(obj, DateTime.ParseExact(request.FormData[p.Name], "dd/MM/yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
+                }
+            }
+            foreach (var f in fis)
+            {
+                int idp = int.Parse(request.FormData[f.Name]);
+                var foreginType = typeof(DBForeignKey<>).MakeGenericType(f.PropertyType.GetGenericArguments()[0]);
+                dynamic fobj = Activator.CreateInstance(foreginType, true);
+                PropertyInfo pi = foreginType.GetProperty("Id", BindingFlags.Public | BindingFlags.Instance);
+                pi.SetValue(fobj, idp);
+                f.SetValue(obj, fobj);
+            }
+            obj.Save();
+            return new Response(JsonConvert.SerializeObject(obj));
             //}
             //catch (Exception ex)
             //{

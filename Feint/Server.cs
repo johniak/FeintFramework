@@ -18,8 +18,9 @@ namespace Feint
         HttpListener listener;
         public DebugServer(String address)
         {
+            
             listener = new HttpListener();
-            listener.Prefixes.Add(address);
+            listener.Prefixes.Add("http://"+address+"/");
             listener.Start();
             Log.I("Fint server started at: " + address);
             //  Console.WriteLine("Fint server started at: " + adress);
@@ -30,7 +31,6 @@ namespace Feint
                 result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
             }
         }
-        int trololo = 0;
         private void listenerCallback(IAsyncResult result)
         {
             HttpListener listener = (HttpListener)result.AsyncState;
@@ -40,52 +40,9 @@ namespace Feint
             try
             {
 
-                Response res = null;
                 Request req = new Request(request.Url.LocalPath.ToString());
-                req.Method = request.HttpMethod;
-                req.Session = new Session();
-
-
-                string text = null;
-                using (var reader = new StreamReader(request.InputStream,
-                                         request.ContentEncoding))
-                {
-                    text = reader.ReadToEnd();
-                }
-                if (text.Length > 0)
-                {
-
-                    if (request.ContentType.StartsWith("application/json"))
-                    {
-                        req.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
-                    }
-                    else if (!request.ContentType.StartsWith("multipart/form-data"))
-                    {
-                        req.FormData = new Dictionary<string, string>(parseContent(text));
-                    }
-                    else
-                    {
-                        req.FormData = new Dictionary<string, string>();
-                        string[] postTab = text.Replace("\r", "").Split('\n');
-                        String postName = "";
-                        for (int i = 0; i < postTab.Length; i++)
-                        {
-                            if (postTab[i].StartsWith("------"))
-                                continue;
-                            if (postTab[i].StartsWith("Content-Disposition: form-data;"))
-                            {
-
-                                postName = HttpUtility.UrlDecode(postTab[i].Substring(38, postTab[i].LastIndexOf("\"") - 38)).Trim();
-                                continue;
-                            }
-                            if (postTab[i].Length > 0)
-                            {
-                                req.FormData.Add(postName, HttpUtility.UrlDecode(postTab[i]).Trim());
-                            }
-
-                        }
-                    }
-                }
+                Response res = null;
+                
                 if (req.Url.StartsWith("/" + FeintSDK.Settings.StaticFolder))
                 {
 
@@ -112,6 +69,48 @@ namespace Feint
                 }
                 else
                 {
+                    req.Method = request.HttpMethod;
+                    req.Session = new Session();
+                    string text = null;
+                    using (var reader = new StreamReader(request.InputStream,
+                                             request.ContentEncoding))
+                    {
+                        text = reader.ReadToEnd();
+                    }
+                    if (text.Length > 0)
+                    {
+
+                        if (request.ContentType.StartsWith("application/json"))
+                        {
+                            req.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
+                        }
+                        else if (!request.ContentType.StartsWith("multipart/form-data"))
+                        {
+                            req.FormData = new Dictionary<string, string>(parseContent(text));
+                        }
+                        else
+                        {
+                            req.FormData = new Dictionary<string, string>();
+                            string[] postTab = text.Replace("\r", "").Split('\n');
+                            String postName = "";
+                            for (int i = 0; i < postTab.Length; i++)
+                            {
+                                if (postTab[i].StartsWith("------"))
+                                    continue;
+                                if (postTab[i].StartsWith("Content-Disposition: form-data;"))
+                                {
+
+                                    postName = HttpUtility.UrlDecode(postTab[i].Substring(38, postTab[i].LastIndexOf("\"") - 38)).Trim();
+                                    continue;
+                                }
+                                if (postTab[i].Length > 0)
+                                {
+                                    req.FormData.Add(postName, HttpUtility.UrlDecode(postTab[i]).Trim());
+                                }
+
+                            }
+                        }
+                    }
                     FeintSDK.RequestMethod actualMethod = FeintSDK.RequestMethod.POST;
                     switch (request.HttpMethod)
                     {
@@ -136,7 +135,7 @@ namespace Feint
 
                         if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
                         {
-                            setNonPublicSetProperty(req, req.GetType(), "variables", match.Groups);
+                            setNonPublicSetProperty(req, req.GetType(), "Variables", match.Groups);
 
 
 
@@ -855,7 +854,12 @@ namespace Feint
                     HttpContentParser parser = new HttpContentParser(data);
                     if (parser.Success)
                     {
-                        return parser.Parameters;
+                        Dictionary<string, string> decodedParameters = new Dictionary<string, string>();
+                        foreach (var p in parser.Parameters)
+                        {
+                            decodedParameters.Add(p.Key,HttpUtility.UrlDecode(p.Value));
+                        }
+                        return decodedParameters;
                     }
                     else
                     {

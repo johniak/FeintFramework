@@ -16,6 +16,7 @@ namespace Feint.FeintORM
         protected DBSetting settings;
         List<String> tablesCreated;
         public String Prefix { get; set; }
+        public static bool Debug;
         protected FeintORM(List<Assembly> assemblies, DBSetting settings)
         {
             this.assemblies = assemblies;
@@ -25,10 +26,11 @@ namespace Feint.FeintORM
             Prefix = "feint_";
 
         }
-        public static FeintORM GetInstance(List<Assembly> assemblies, DBSetting settings)
+        public static FeintORM GetInstance(List<Assembly> assemblies, DBSetting settings,bool debug)
         {
             if (instance == null)
                 instance = new FeintORM(assemblies, settings);
+            Debug = debug;
             return instance;
         }
         public static FeintORM GetInstance()

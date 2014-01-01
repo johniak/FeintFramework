@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -41,10 +42,10 @@ namespace Api.Util
 					int weekday = (int)now.DayOfWeek;
 					if (weekday != dayOfweek)
 					{
-						int days = ((int)DayOfWeek.Saturday - weekday + dayOfweek) % 7;
-						now.Add (new TimeSpan (days, 0, 0, 0));
+						int days = ((int)DayOfWeek.Saturday - weekday + dayOfweek+1) % 7;
+						now= now.Add (new TimeSpan (days, 0, 0, 0));
 					}else{
-						now.Add (new TimeSpan (7, 0, 0, 0));
+                        now = now.Add(new TimeSpan(7, 0, 0, 0));
 					}
 					Date = now;
 				}else if("today".Equals(inputPattern,StringComparison.CurrentCultureIgnoreCase)) {
@@ -53,7 +54,7 @@ namespace Api.Util
 					now.Add (new TimeSpan (1, 0, 0, 0));
 					Date = now;
 				}else if(inputPattern.Length == 10) {
-					Date =DateTime.ParseExact(inputPattern.Replace("-", "/"),"dd/MM/yyyy",null);
+                    Date = DateTime.ParseExact(inputPattern.Replace("-", "/"), "dd/MM/yyyy", CultureInfo.InvariantCulture);
 				}
 				Message= Regex.Replace (input, REGEX, "");
 			}

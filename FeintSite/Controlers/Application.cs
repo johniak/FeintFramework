@@ -33,7 +33,7 @@ namespace Site.Controlers
 
         public static Response DashboardProject(Request request)
         {
-            return DashboardDisplay(request,int.Parse(request.variables["project"].Value),"project");
+            return DashboardDisplay(request,int.Parse(request.Variables["project"].Value),"project");
         }
 
         /// <summary>

@@ -13,29 +13,34 @@ namespace Feint
     {
         static void Main(string[] args)
         {
+            ArgumentsEngine engine = new ArgumentsEngine();
+            engine.Arguments.Add(new ConsoleArgument() {Analize=Program.RunServer,argCount=1,Pattern="^run$" });
+            engine.Analize(args);
             Session s = new Session();
             Template.FileSystem = new LocalFileSystem(AppDomain.CurrentDomain.BaseDirectory + "FeintSite\\" + Settings.ViewsFolder.Replace("/", "\\"));
             List<Assembly> modulesAsseblies = new List<Assembly>();
             Assembly assembly = Assembly.LoadFrom(@"Site.dll");
             getMainMethod(assembly).Invoke(null, null);
             modulesAsseblies.Add(assembly);
-            foreach (var str in Settings.Modules)
+            assembly = Assembly.LoadFrom(@"FeintSDK.dll");
+            modulesAsseblies.Add(assembly);
+            for (int i = 0; i < Settings.Modules.Count; i++)
             {
+                var str = Settings.Modules[i];
                 Assembly moduleAssembly = Assembly.LoadFrom(str + @".dll");
-
                 getMainMethod(moduleAssembly).Invoke(null, null);
                 modulesAsseblies.Add(moduleAssembly);
             }
 
-            FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings);
+            FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings, Settings.DebugMode);
             orm.CreateTablesFromModel();
             if (Settings.DebugMode)
             {
-                DebugServer server = new DebugServer("http://127.0.0.1:8000/");
+                DebugServer server = new DebugServer(Settings.IpAddress);
             }
             else
             {
-                FastCGIServer server = new FastCGIServer("127.0.0.1:9000");
+                FastCGIServer server = new FastCGIServer(Settings.IpAddress);
             }
         }
         public static MethodInfo getMainMethod(Assembly assembly)
@@ -48,6 +53,10 @@ namespace Feint
                     return method;
             }
             return null;
+        }
+        public static void RunServer(List<string> args)
+        {
+            Settings.IpAddress = args[0];
         }
     }
 }

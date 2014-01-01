@@ -28,3 +28,9 @@ C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\Site.pdb
 C:\Users\Johniak\Documents\FeintFramework\FeintSite\obj\Debug\FeintSite.csprojResolveAssemblyReference.cache
 C:\Users\Johniak\Documents\FeintFramework\FeintSite\obj\Debug\Site.dll
 C:\Users\Johniak\Documents\FeintFramework\FeintSite\obj\Debug\Site.pdb
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\Site.dll.config
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\Site.dll
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\Site.pdb
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\FeintSite\obj\Debug\FeintSite.csprojResolveAssemblyReference.cache
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\FeintSite\obj\Debug\Site.dll
+C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\FeintSite\obj\Debug\Site.pdb

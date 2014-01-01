@@ -17,13 +17,14 @@ namespace Site
     {
         public static void Main()
         {
-            //Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
 
-            Settings.databaseSettings = new DBSetting() { Helper = new SQLiteDatabaseHelper(),Name="db.sqlite"};
+            Settings.databaseSettings = new DBSetting() {Helper= new PostgreSQLDatabaseHelper(),Host="127.0.0.1",Port=5432,User="postgres",Password="test",Name="task"};
            
-            
-            Settings.DebugMode = true;
+            //Settings.databaseSettings = new DBSetting() { Helper = new SQLiteDatabaseHelper(),Name="db.sqlite"};
 
+
+            Settings.DebugMode = true;
+            Settings.StaticCache = true;
             Settings.Modules.Add("AdminPanel");
             Settings.Modules.Add("Api");
 

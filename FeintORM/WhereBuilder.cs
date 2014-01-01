@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 namespace Feint.FeintORM
 {
     public class WhereBuilder<T>
@@ -161,7 +162,7 @@ namespace Feint.FeintORM
                 string lastAlias = "";
                 for (int i = 0; i < columns.Length - 1; i++)
                 {
-                    String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).Name;
+                    String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).Name;
 				
                     int id = joins.Count;
 					joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
@@ -169,12 +170,12 @@ namespace Feint.FeintORM
                     lastAlias = columns[i] + id;
                     type = type.GetProperty(columns[i]).PropertyType.GetGenericArguments()[0];
                 }
-                if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType) == null)
                 {
                     int id = joins.Count;
 					var col = type.GetProperty (columns.Last (), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments () [0].Name;
 
-					joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name	, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
                     dynamic d = ((dynamic)value).Value;
                     column = columns.Last() + id + ".Id";
 
@@ -185,10 +186,10 @@ namespace Feint.FeintORM
             }
             else
             {
-                if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType) == null)
                 {
                     int id = joins.Count;
-                    var table=FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name;
+                    var table=FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance|BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name;
                     joins.Add(new DBJoinInformation() { Table = table, Alias = column + id, LeftCollumn = FeintORM.GetInstance().Prefix + typeof(T).Name + "." + "fk_" + column, RightCollumn = "Id" });
                     dynamic d = value;
                     column = column + id + ".Id";
@@ -211,20 +212,20 @@ namespace Feint.FeintORM
                 string lastAlias = "";
                 for (int i = 0; i < columns.Length - 1; i++)
                 {
-                    String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).Name;
+                    String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).Name;
 
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
                  //   dynamic d = value;
                     lastAlias = columns[i] + id;
                     type = type.GetProperty(columns[i]).PropertyType.GetGenericArguments()[0];
                 }
-                if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                if (FeintORM.GetInstance().Helper.getDBType(type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType) == null)
                 {
                     int id = joins.Count;
                     var col = type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name;
 
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
                  //   dynamic d = ((dynamic)value).Value;
                     column = columns.Last() + id + ".Id";
 
@@ -235,10 +236,10 @@ namespace Feint.FeintORM
             }
             else
             {
-                if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType) == null)
+                if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType) == null)
                 {
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
+                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
                //     dynamic d = value;
                     column = column + id + ".Id";
                  //   value = d.Id;
@@ -252,6 +253,7 @@ namespace Feint.FeintORM
         /// implements lazy forgins keys
         /// </summary>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public List<T> Execute()
         {
 
