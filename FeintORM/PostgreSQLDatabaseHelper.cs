@@ -6,6 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Feint.FeintORM
@@ -29,20 +30,31 @@ namespace Feint.FeintORM
             queryOperators.Add(DBQueryOperators.Like, "LIKE");
         }
 
-        public void Connect(String name, String user, String password, String host, int port)
+        public override void Connect(String name, String user, String password, String host, int port)
         {
+
+            Object o = new object();
+            Monitor.Enter(o);
+            Monitor.Enter(o);
+            Monitor.Enter(o);
+            Monitor.Enter(o);
+            Monitor.Enter(o);
+            Monitor.Enter(o);
+            
             connectionString = "Server=" + host + ";Port=" + port + ";User Id=" + user + ";Password=" + password + ";Database=" + name + ";";
             connection = new NpgsqlConnection("Server=" + host + ";Port=" + port + ";User Id=" + user + ";Password=" + password + ";");
             connection.Open();
+            unlockIt();
         }
 
         public static string Esc(string text)
         {
             return System.Security.SecurityElement.Escape(text);
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
+        
         public DataTable Select(string table, List<WhereComponent> where)
         {
+            lockIt();
             StringBuilder builder = new StringBuilder();
             string query = "SELECT * from " + System.Security.SecurityElement.Escape(table) + "";
             if (where.Count != 0)
@@ -63,11 +75,13 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
+            unlockIt();
             return dataSet.Tables[0];
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount,string orderBy,bool ascending)
+        
+        public override DataTable Select(string table, List<WhereComponent> where, List<DBJoinInformation> joins, long limitStart, long limitCount, string orderBy, bool ascending)
         {
+            lockIt();
             StringBuilder builder = new StringBuilder();
             string query = "SELECT * FROM " + System.Security.SecurityElement.Escape(table) + "";
             if (joins != null)
@@ -107,11 +121,14 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
+            unlockIt();
             return dataSet.Tables[0];
         }
-       [MethodImpl(MethodImplOptions.Synchronized)] 
-       public  long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
+       
+        public override long Count(string table, List<WhereComponent> where, List<DBJoinInformation> joins)
         {
+            bool isl = IsLocked;
+            lockIt();
             StringBuilder builder = new StringBuilder();
             string query = "SELECT COUNT (*) from " + System.Security.SecurityElement.Escape(table) + "";
             if (joins != null)
@@ -140,11 +157,13 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
-            return (long) dataSet.Tables[0].Rows[0].ItemArray[0];
+            unlockIt();
+            return (long)dataSet.Tables[0].Rows[0].ItemArray[0];
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public Int64 Insert(string table, List<DBPair> what)
+        
+       public override Int64 Insert(string table, List<DBPair> what)
         {
+            lockIt();
             var commandString = "INSERT INTO " + Esc(table) + " ";
             string collumns = "(";
             string values = "VALUES(";
@@ -163,12 +182,13 @@ namespace Feint.FeintORM
             var dataSet = new DataSet();
             DataTable dataTable = new DataTable();
             adapter.Fill(dataSet);
-
+            unlockIt();
             return (int)dataSet.Tables[0].Rows[0][0];
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void Update(string table, List<DBPair> what, Int64 id)
-        {
+        
+        public override void Update(string table, List<DBPair> what, Int64 id)
+       {
+           lockIt();
             var commandString = "UPDATE " + Esc(table) + " SET ";
             for (int i = 0; i < what.Count; i++)
             {
@@ -180,19 +200,23 @@ namespace Feint.FeintORM
             commandString += "WHERE Id ='" + Esc(id.ToString()) + "'";
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
+            unlockIt();
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void RemoveFromTable(string table, Int64 id)
+        
+        public override void RemoveFromTable(string table, Int64 id)
         {
+            lockIt();
             string query = "DELETE FROM " + Esc(table) + " WHERE Id= '" + Esc(id.ToString()) + "'";
             var command = new NpgsqlCommand(query, connection);
             Log.D(query);
             command.ExecuteNonQuery();
+            unlockIt();
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void CreateTable(string table, List<Column> collumns)
+        
+        public override void CreateTable(string table, List<Column> collumns)
         {
+            lockIt();
             var commandString = "CREATE TABLE IF NOT EXISTS '" + Esc(table) + "' (";
             for (int i = 0; i < collumns.Count; i++)
             {
@@ -203,10 +227,12 @@ namespace Feint.FeintORM
             commandString += ")";
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
+            unlockIt();
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners)
+        
+        public override void CreateTable(string table, List<Column> collumns, List<Foreign> foreigners)
         {
+            lockIt();
             var commandString = "CREATE TABLE IF NOT EXISTS " + Esc(table) + " (";
             for (int i = 0; i < collumns.Count; i++)
             {
@@ -222,15 +248,18 @@ namespace Feint.FeintORM
             commandString += ")";
             var command = new NpgsqlCommand(commandString, connection);
             command.ExecuteNonQuery();
+            unlockIt();
         }
 
         private Foreign getForeginForCollumn(Column c, List<Foreign> foreigners)
         {
+            lockIt();
             foreach (var f in foreigners)
             {
                 if (f.Col == c)
                     return f;
             }
+            unlockIt();
             return null;
         }
 
@@ -253,9 +282,10 @@ namespace Feint.FeintORM
                 cmd += "NOT NULL";
             return cmd;
         }
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        public void CreateDatabase(String name)
+        
+        public override void CreateDatabase(String name)
         {
+            lockIt();
             string commandString = "CREATE DATABASE " + Esc(name);
             var command = new NpgsqlCommand(commandString, connection);
             try
@@ -268,9 +298,10 @@ namespace Feint.FeintORM
             connection.Close();
             connection = new NpgsqlConnection(connectionString);
             connection.Open();
+            unlockIt();
         }
 
-        public string getDBType(Type type)
+        public override string getDBType(Type type)
         {
             if (typeof(int) == type)
                 return "INTEGER";

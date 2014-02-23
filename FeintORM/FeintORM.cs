@@ -17,6 +17,9 @@ namespace Feint.FeintORM
         List<String> tablesCreated;
         public String Prefix { get; set; }
         public static bool Debug;
+        public List<DatabaseHelper> helpers = new List<DatabaseHelper>();
+
+
         protected FeintORM(List<Assembly> assemblies, DBSetting settings)
         {
             this.assemblies = assemblies;
@@ -24,7 +27,7 @@ namespace Feint.FeintORM
             this.settings = settings;
             Helper.Connect(settings.Name, settings.User, settings.Password, settings.Host, settings.Port);
             Prefix = "feint_";
-
+            settings.Helper.Clone();
         }
         public static FeintORM GetInstance(List<Assembly> assemblies, DBSetting settings,bool debug)
         {
