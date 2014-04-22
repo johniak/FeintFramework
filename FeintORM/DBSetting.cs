@@ -14,5 +14,6 @@ namespace Feint.FeintORM
        public String Password { get; set; }
        public String Host { get; set; }
        public int Port { get; set; }
+       public int ConnectionsCount { get; set; }
     }
 }

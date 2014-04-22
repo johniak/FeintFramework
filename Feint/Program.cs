@@ -13,6 +13,9 @@ namespace Feint
     {
         static void Main(string[] args)
         {
+            ArgumentsEngine engine = new ArgumentsEngine();
+            engine.Arguments.Add(new ConsoleArgument() {Analize=Program.RunServer,argCount=1,Pattern="^run$" });
+            engine.Analize(args);
             Session s = new Session();
             Template.FileSystem = new LocalFileSystem(AppDomain.CurrentDomain.BaseDirectory + "FeintSite\\" + Settings.ViewsFolder.Replace("/", "\\"));
             List<Assembly> modulesAsseblies = new List<Assembly>();
@@ -31,11 +34,11 @@ namespace Feint
             orm.CreateTablesFromModel();
             if (Settings.DebugMode)
             {
-                DebugServer server = new DebugServer("http://127.0.0.1:8000/");
+                DebugServer server = new DebugServer(Settings.IpAddress);
             }
             else
             {
-                FastCGIServer server = new FastCGIServer("127.0.0.1:9000");
+                FastCGIServer server = new FastCGIServer(Settings.IpAddress);
             }
         }
         public static MethodInfo getMainMethod(Assembly assembly)
@@ -48,6 +51,10 @@ namespace Feint
                     return method;
             }
             return null;
+        }
+        public static void RunServer(List<string> args)
+        {
+            Settings.IpAddress = args[0];
         }
     }
 }

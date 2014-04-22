@@ -10,6 +10,7 @@ namespace FeintSDK
     public class Settings
     {
         public static List<Url> Urls= new List<Url>();
+        public static String IpAddress = "127.0.0.1:8000";
         public static String ViewsFolder = "views/";
         public static String StaticFolder = "static/";
         public static bool StaticCache = true;

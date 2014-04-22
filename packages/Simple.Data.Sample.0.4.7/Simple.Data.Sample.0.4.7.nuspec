@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Simple.Data.Sample</id>
+    <version>0.4.7</version>
+    <title>Simple.Data.Sample</title>
+    <authors>Mark Rendle</authors>
+    <owners>Mark Rendle</owners>
+    <licenseUrl>http://www.opensource.org/licenses/mit-license.php</licenseUrl>
+    <projectUrl>http://github.com/markrendle/Simple.Data.Sample</projectUrl>
+    <iconUrl>https://nugetgallery.blob.core.windows.net/icons/Simple.Data.Sample.0.4.7.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This sample demonstrates how to use Simple.Data against a SQL Server database.</description>
+    <summary>Sample code demonstrating Simple.Data.</summary>
+    <copyright>Mark Rendle 2010-2011</copyright>
+    <tags>simple.data data sql sample</tags>
+    <dependencies>
+      <dependency id="Simple.Data.SqlServer" version="0.4.7" />
+    </dependencies>
+  </metadata>
+</package>

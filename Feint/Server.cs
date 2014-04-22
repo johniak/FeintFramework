@@ -20,7 +20,7 @@ namespace Feint
         {
             
             listener = new HttpListener();
-            listener.Prefixes.Add(address);
+            listener.Prefixes.Add("http://"+address+"/");
             listener.Start();
             Log.I("Fint server started at: " + address);
             //  Console.WriteLine("Fint server started at: " + adress);
