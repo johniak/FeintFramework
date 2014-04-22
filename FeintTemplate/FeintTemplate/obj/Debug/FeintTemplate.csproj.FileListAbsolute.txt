@@ -1,9 +1,0 @@
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\bin\Debug\FeintTemplate.exe.config
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\bin\Debug\FeintTemplate.exe
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\bin\Debug\FeintTemplate.pdb
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.csprojResolveAssemblyReference.cache
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.Form1.resources
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.Properties.Resources.resources
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.csproj.GenerateResource.Cache
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.exe
-C:\Users\johniak\Dropbox\Feint\FeintTemplate\FeintTemplate\obj\Debug\FeintTemplate.pdb

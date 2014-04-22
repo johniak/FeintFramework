@@ -1,7 +1,0 @@
-trudne sprawy
-
-na windowsie wszystko dziala
-
-na innych systemach potrzebna była specjalnie skompilowana dll system.data.sqlite (managed only)
-
-na innych systemach potrzebne jest specjalnie skompilowana biblioteka natywna sqlite w makefile cflags= =m32 cppflags= -m32 a takze dodana  do sqlite3.c #define SQLITE_ENABLE_COLUMN_METADATA

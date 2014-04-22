@@ -70,10 +70,6 @@
       <Project>{2688f484-74ce-418b-a701-6d8f07c0f74a}</Project>
       <Name>AdminPanel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Api\Api.csproj">
-      <Project>{ebe5413d-08c6-4ace-81e9-05ab96b526b1}</Project>
-      <Name>Api</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FeintSDK\FeintSDK.csproj">
       <Project>{f63a64a6-97b6-478d-bebc-45af892cc6f7}</Project>
       <Name>FeintSDK</Name>
@@ -81,10 +77,6 @@
     <ProjectReference Include="..\FeintORM\FeintORM.csproj">
       <Project>{30bbfb3d-ffd0-4f77-93b8-9bbf20267595}</Project>
       <Name>FeintORM</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FeintSite\FeintSite.csproj">
-      <Project>{4113ef84-7bb0-463e-b332-c9aa7533616c}</Project>
-      <Name>FeintSite</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

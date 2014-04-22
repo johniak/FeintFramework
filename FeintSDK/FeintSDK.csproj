@@ -113,9 +113,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DatabaseCreation.sql" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\FeintORM\FeintORM.csproj">
       <Project>{30BBFB3D-FFD0-4F77-93B8-9BBF20267595}</Project>
       <Name>FeintORM</Name>
