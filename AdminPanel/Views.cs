@@ -1,5 +1,4 @@
-﻿using DotLiquid;
-using FeintSDK;
+﻿using FeintSDK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +23,7 @@ namespace AdminPanel
         public static Response Login(Request request)
         {
             init();
-            var response = new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = "username", passwordName = "password", usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) }));
+            var response = new Response("admin/login.html", new { usernameName = "username", passwordName = "password", usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) });
             return response;
         }
 
@@ -41,14 +40,14 @@ namespace AdminPanel
                     return Response.Redirect("/admin/dashboard/");
                 }
             }
-            return new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) })); ;
+            return new Response("admin/login.html", new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) }); ;
         }
 
         [AdminAuth]
         public static Response Dashboard(Request request)
         {
             init();
-            var response = new Response("admin/dashboard.html", Hash.FromAnonymousObject(new { message = "Hello World!", models = modelNames }));
+            var response = new Response("admin/dashboard.html", new { message = "Hello World!", models = modelNames });
             return response;
         }
 
@@ -92,7 +91,7 @@ namespace AdminPanel
                 forms.Add("<tr><td><p><label>" + f.Name + " Id: </label>" + "</td><td><input type=\"text\" name=\"" + f.Name + "\"/></td>" + "</p></tr>");
                 lsh.Add(f.Name);
             }
-            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model, form = forms }));
+            var response = new Response("admin/model.html", new { message = "Hello World!", collumns = lsh, model = model, form = forms });
             return response;
         }
         [AdminAuth]
