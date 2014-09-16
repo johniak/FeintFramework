@@ -12,5 +12,13 @@ namespace Feint.FeintORM
         public String Alias { get; set; }
         public String LeftCollumn { get; set; }
         public String RightCollumn { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is DBJoinInformation))
+                return false;
+            var obj1=(DBJoinInformation)obj;
+            return Table == obj1.Table && LeftCollumn == obj1.LeftCollumn && RightCollumn == obj1.RightCollumn;
+        }
     }
 }

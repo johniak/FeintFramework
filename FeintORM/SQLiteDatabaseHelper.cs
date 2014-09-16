@@ -16,6 +16,8 @@ namespace Feint.FeintORM
         private static SQLiteDatabaseHelper helper;
         SQLiteConnection connection;
         Dictionary<DBQueryOperators, String> queryOperators = new Dictionary<DBQueryOperators, String>();
+
+
         public SQLiteDatabaseHelper()
         {
             queryOperators.Add(DBQueryOperators.Equals, "=");
@@ -27,6 +29,9 @@ namespace Feint.FeintORM
             queryOperators.Add(DBQueryOperators.Or, " OR ");
             queryOperators.Add(DBQueryOperators.And, " AND ");
             queryOperators.Add(DBQueryOperators.Like, " LIKE ");
+            queryOperators.Add(DBQueryOperators.Not, " NOT ");
+            queryOperators.Add(DBQueryOperators.LeftParenthesis, "(");
+            queryOperators.Add(DBQueryOperators.RightParenthesis, ")");
         }
 
         /// <summary>
@@ -59,9 +64,9 @@ namespace Feint.FeintORM
                 query += " WHERE ";
                 foreach (var w in where)
                 {
-                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    if (!isOperatorWithParams(w.operatorType))
                     {
-                        query += " " + queryOperators[w.operatorType] + " ";
+                        query += "" + queryOperators[w.operatorType] + "";
                         continue;
                     }
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
@@ -91,9 +96,9 @@ namespace Feint.FeintORM
                 query += " WHERE ";
                 foreach (var w in where)
                 {
-                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    if (!isOperatorWithParams(w.operatorType))
                     {
-                        query += " " + queryOperators[w.operatorType] + " ";
+                        query += "" + queryOperators[w.operatorType] + "";
                         continue;
                     }
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
@@ -134,9 +139,9 @@ namespace Feint.FeintORM
                 query += " WHERE ";
                 foreach (var w in where)
                 {
-                    if (w.operatorType == DBQueryOperators.And || w.operatorType == DBQueryOperators.Or)
+                    if (!isOperatorWithParams(w.operatorType))
                     {
-                        query += " " + queryOperators[w.operatorType] + " ";
+                        query += "" + queryOperators[w.operatorType] + "";
                         continue;
                     }
                     query += "" + Esc(w.column) + "" + queryOperators[w.operatorType] + "'" + Esc(w.value) + "'";
@@ -238,6 +243,24 @@ namespace Feint.FeintORM
         /// <param name="name">not used</param>
         public override void CreateDatabase(String name)
         {
+        }
+
+        bool isOperatorWithParams(DBQueryOperators queryOperator)
+        {
+            switch (queryOperator)
+            {
+                case DBQueryOperators.Or:
+                    return false;
+                case DBQueryOperators.And:
+                    return false;
+                case DBQueryOperators.Not:
+                    return false;
+                case DBQueryOperators.LeftParenthesis:
+                    return false;
+                case DBQueryOperators.RightParenthesis:
+                    return false;
+            }
+            return true;
         }
 
         public override string getDBType(Type type)

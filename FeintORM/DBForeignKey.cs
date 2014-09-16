@@ -42,11 +42,35 @@ namespace Feint.FeintORM
             ret._value=d;
             return ret;
         }
-        
+
         public static implicit operator T(DBForeignKey<T> d)
         {
             return d.Value;
         }
-        
+        public static bool operator ==(DBForeignKey<T> a, DBForeignKey<T> b)
+        {
+            return a.Id == b.Id;
+        }
+        public static bool operator ==(DBForeignKey<T> a, T b)
+        {
+            return a.Id == b.Id;
+        }
+        public static bool operator ==(T b, DBForeignKey<T> a)
+        {
+            return b.Id == a.Id;
+        }
+
+        public static bool operator !=(DBForeignKey<T> a, DBForeignKey<T> b)
+        {
+            return a.Id != b.Id;
+        }
+        public static bool operator !=(DBForeignKey<T> a, T b)
+        {
+            return a.Id != b.Id;
+        }
+        public static bool operator !=(T b, DBForeignKey<T> a)
+        {
+            return b.Id != a.Id;
+        }
     }
 }

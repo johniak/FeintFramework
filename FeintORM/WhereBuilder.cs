@@ -134,6 +134,35 @@ namespace Feint.FeintORM
             return this;
         }
 
+        /// <summary>
+        /// Add left parthisis
+        /// </summary>
+        /// <returns></returns>
+        public WhereBuilder<T> Lp()
+        {
+            whereList.Add(new WhereComponent() { operatorType = DBQueryOperators.LeftParenthesis });
+            return this;
+        }
+        /// <summary>
+        /// Add right parthisis
+        /// </summary>
+        /// <returns></returns>
+        public WhereBuilder<T> Rp()
+        {
+            whereList.Add(new WhereComponent() {  operatorType = DBQueryOperators.RightParenthesis });
+            return this;
+        }
+
+        /// <summary>
+        /// Add right parthisis
+        /// </summary>
+        /// <returns></returns>
+        public WhereBuilder<T> Not()
+        {
+            whereList.Add(new WhereComponent() { operatorType = DBQueryOperators.Not });
+            return this;
+        }
+
         public WhereBuilder<T> Limit(long count)
         {
             limitStart = -1;
@@ -165,7 +194,7 @@ namespace Feint.FeintORM
                     String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).Name;
 				
                     int id = joins.Count;
-					joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
+					id= addJoin(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
                     dynamic d = value;
                     lastAlias = columns[i] + id;
                     type = type.GetProperty(columns[i]).PropertyType.GetGenericArguments()[0];
@@ -175,7 +204,7 @@ namespace Feint.FeintORM
                     int id = joins.Count;
 					var col = type.GetProperty (columns.Last (), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments () [0].Name;
 
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                    id = addJoin(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
                     dynamic d = ((dynamic)value).Value;
                     column = columns.Last() + id + ".Id";
 
@@ -190,7 +219,7 @@ namespace Feint.FeintORM
                 {
                     int id = joins.Count;
                     var table=FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance|BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name;
-                    joins.Add(new DBJoinInformation() { Table = table, Alias = column + id, LeftCollumn = FeintORM.GetInstance().Prefix + typeof(T).Name + "." + "fk_" + column, RightCollumn = "Id" });
+                    id = addJoin(new DBJoinInformation() { Table = table, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
                     dynamic d = value;
                     column = column + id + ".Id";
                     value = d.Id;
@@ -215,7 +244,7 @@ namespace Feint.FeintORM
                     String fk = "fk_" + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).Name;
 
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
+                    id = addJoin(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns[i], BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns[i] + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns[i], RightCollumn = "Id" });
                  //   dynamic d = value;
                     lastAlias = columns[i] + id;
                     type = type.GetProperty(columns[i]).PropertyType.GetGenericArguments()[0];
@@ -225,7 +254,7 @@ namespace Feint.FeintORM
                     int id = joins.Count;
                     var col = type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance).PropertyType.GetGenericArguments()[0].Name;
 
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
+                    id = addJoin(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + type.GetProperty(columns.Last(), BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = columns.Last() + id, LeftCollumn = (lastAlias.Length > 0 ? lastAlias + "." : "") + "fk_" + columns.Last(), RightCollumn = "Id" });
                  //   dynamic d = ((dynamic)value).Value;
                     column = columns.Last() + id + ".Id";
 
@@ -239,7 +268,7 @@ namespace Feint.FeintORM
                 if (FeintORM.GetInstance().Helper.getDBType(typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType) == null)
                 {
                     int id = joins.Count;
-                    joins.Add(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
+                    id = addJoin(new DBJoinInformation() { Table = FeintORM.GetInstance().Prefix + typeof(T).GetProperty(column, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase).PropertyType.GetGenericArguments()[0].Name, Alias = column + id, LeftCollumn = "fk_" + column, RightCollumn = "Id" });
                //     dynamic d = value;
                     column = column + id + ".Id";
                  //   value = d.Id;
@@ -247,6 +276,16 @@ namespace Feint.FeintORM
             }
         }
 
+
+
+        private int addJoin(DBJoinInformation join)
+        {
+            int number = joins.IndexOf(join);
+            if (number >= 0)
+                return number;
+            joins.Add(join);
+            return joins.Count - 1;
+        }
         /// <summary>
         /// Execute query and fill object
         /// iterate by all properties of model class and assign values from rows

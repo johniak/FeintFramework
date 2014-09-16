@@ -105,7 +105,6 @@ C:\Users\Johniak\Documents\FeintFramework\Feint\obj\Debug\Feint.csprojResolveAss
 C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\AdminPanel.dll
 C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\AdminPanel.pdb
 C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\Api.dll
-C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\Api.pdb
 C:\Users\johniak\Documents\FeintFramework\Feint\bin\Debug\HttpFormParser.dll
 C:\Users\Johniak\Documents\FeintFramework\Feint\bin\Debug\Site.pdb
 C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\manage.exe.config
@@ -141,3 +140,4 @@ C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\fr\Npgsql.reso
 C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\ja\Npgsql.resources.dll
 C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\bin\Debug\zh-CN\Npgsql.resources.dll
 C:\Users\Johniak\Desktop\Inż\FrameoworkDeveloper\Feint\obj\Debug\Feint.csprojResolveAssemblyReference.cache
+C:\Users\johniak\Documents\FeintFramework\Feint\bin\Debug\Api.pdb
