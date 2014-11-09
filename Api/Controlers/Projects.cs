@@ -15,16 +15,16 @@ namespace Api.Controlers
         {
             var form = Form.FromFormData<ProjectForm>(request.FormData);
             if (!form.IsValid)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request,JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             Project project = new Project() { Name = form.name, Owner = User.GetLoggedUser(request.Session) };
             project.Save();
-            return new Response(JsonConvert.SerializeObject(new { id = project.Id, name = project.Name, user = project.Owner.Id })) { MimeType="application/json"};
+            return new Response(request, JsonConvert.SerializeObject(new { id = project.Id, name = project.Name, user = project.Owner.Id })) { MimeType = "application/json" };
         }
 
         [ApiAuth]
         public static Response GetAllProjects(Request request)
         {
-            return new Response(JsonConvert.SerializeObject(Project.getUserProjectsDisplays(User.GetLoggedUser(request.Session))));
+            return new Response(request, JsonConvert.SerializeObject(Project.getUserProjectsDisplays(User.GetLoggedUser(request.Session))));
         }
 
         [ApiAuth]
@@ -32,7 +32,7 @@ namespace Api.Controlers
         {
             int projectId;
             if (!int.TryParse(request.Variables["project"].Value, out projectId))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
 
             var tasks = Task.getUserTaskToProject(User.GetLoggedUser(request.Session), projectId);
             foreach (var t in tasks)
@@ -40,7 +40,7 @@ namespace Api.Controlers
                 t.Remove();
             }
             Project.Ref<Project>(projectId).Remove();
-            return new Response(JsonConvert.SerializeObject(true));
+            return new Response(request, JsonConvert.SerializeObject(true));
         }
     }
 }

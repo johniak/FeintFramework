@@ -14,9 +14,15 @@ namespace FeintSDK
 {
     public class Session
     {
-        SessionKey sk;
+        SessionKey sessionKey;
         public static Random random = new Random();
         static long maxId = -1;
+
+        public String Key
+        {
+            get { return sessionKey.Key; }    
+        }
+
         public Session()
         {
             
@@ -28,8 +34,8 @@ namespace FeintSDK
             var sks = SessionKey.Find<SessionKey>().Where().Eq("Key", key).Execute();
             if ((sks.Count) == 1)
             {
-                sk = sks[0];
-                return sk.Key;
+                sessionKey = sks[0];
+                return sessionKey.Key;
             }
             else
                 return Start();
@@ -45,8 +51,8 @@ namespace FeintSDK
             var hashed = SHA1Hash(before)+maxId;
             try
             {
-                sk = new SessionKey() { Key = hashed };
-                sk.Save();
+                sessionKey = new SessionKey() { Key = hashed };
+                sessionKey.Save();
             }
             catch
             {
@@ -56,7 +62,7 @@ namespace FeintSDK
     
         public string GetProperty(string name)
         {
-            var props = SessionProperty.Find<SessionProperty>().Where().Eq("owner", sk).And().Eq("Name",name).Execute();
+            var props = SessionProperty.Find<SessionProperty>().Where().Eq("owner", sessionKey).And().Eq("Name",name).Execute();
 
             if (props.Count > 0)
                 return props[0].Value;
@@ -66,13 +72,13 @@ namespace FeintSDK
       
         public void SetProperty(string name, string value)
         {
-            SessionProperty sp = new SessionProperty() { Name = name, Value = value,Owner=sk };
+            SessionProperty sp = new SessionProperty() { Name = name, Value = value,Owner=sessionKey };
             sp.Save();
         }
        
         public void UnsetProperty(String name)
         {
-            var props = SessionProperty.Find<SessionProperty>().Where().Eq("owner", sk).And().Eq("Name", name).Execute();
+            var props = SessionProperty.Find<SessionProperty>().Where().Eq("owner", sessionKey).And().Eq("Name", name).Execute();
             foreach (var p in props)
             {
                 p.Remove();

@@ -24,7 +24,7 @@ namespace AdminPanel
         public static Response Login(Request request)
         {
             init();
-            var response = new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = "username", passwordName = "password", usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) }));
+            var response = new Response(request, "admin/login.html", Hash.FromAnonymousObject(new { usernameName = "username", passwordName = "password", usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) }));
             return response;
         }
 
@@ -38,17 +38,17 @@ namespace AdminPanel
                 if (usr.Count == 1)
                 {
                     request.Session.SetProperty(Site.SessionLoggedKey, usr[0].Id.ToString());
-                    return Response.Redirect("/admin/dashboard/");
+                    return Response.Redirect(request, "/admin/dashboard/");
                 }
             }
-            return new Response("admin/login.html", Hash.FromAnonymousObject(new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) })); ;
+            return new Response(request, "admin/login.html", Hash.FromAnonymousObject(new { usernameName = usernameProperty.Name, passwordName = passwordProperty.Name, usernameLabel = (usernameLabel == null ? usernameProperty.Name : usernameLabel), passwordLabel = (passwordLabel == null ? passwordProperty.Name : passwordLabel) })); ;
         }
 
         [AdminAuth]
         public static Response Dashboard(Request request)
         {
             init();
-            var response = new Response("admin/dashboard.html", Hash.FromAnonymousObject(new { message = "Hello World!", models = modelNames }));
+            var response = new Response(request, "admin/dashboard.html", Hash.FromAnonymousObject(new { message = "Hello World!", models = modelNames }));
             return response;
         }
 
@@ -92,7 +92,7 @@ namespace AdminPanel
                 forms.Add("<tr><td><p><label>" + f.Name + " Id: </label>" + "</td><td><input type=\"text\" name=\"" + f.Name + "\"/></td>" + "</p></tr>");
                 lsh.Add(f.Name);
             }
-            var response = new Response("admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model, form = forms }));
+            var response = new Response(request, "admin/model.html", Hash.FromAnonymousObject(new { message = "Hello World!", collumns = lsh, model = model, form = forms }));
             return response;
         }
         [AdminAuth]
@@ -103,13 +103,13 @@ namespace AdminPanel
             {
                 var model = request.Variables["model"].Value;
                 Type t = modelsTypes[modelNames.IndexOf(model)];
-                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t); // DBModel.Find(t).Where().Eq("Id", request.variables["id"].Value).Execute()[0];
+                var dbm = DBModel.Ref(long.Parse(request.Variables["id"].Value), t);
                 dbm.Remove();
-                return new Response(JsonConvert.SerializeObject(true));
+                return new Response(request, JsonConvert.SerializeObject(true));
             }
             catch (Exception ex)
             {
-                return new Response(JsonConvert.SerializeObject(false));
+                return new Response(request, JsonConvert.SerializeObject(false));
             }
         }
 
@@ -162,11 +162,11 @@ namespace AdminPanel
                     f.SetValue(obj, fobj);
                 }
                 obj.Save();
-                return new Response(JsonConvert.SerializeObject(obj));
+                return new Response(request, JsonConvert.SerializeObject(obj));
             }
             catch (Exception ex)
             {
-                return new Response(JsonConvert.SerializeObject(false));
+                return new Response(request, JsonConvert.SerializeObject(false));
             }
         }
 
@@ -221,7 +221,7 @@ namespace AdminPanel
                 }
                 listOfDicts.Add(dict);
             }
-            return new Response(JsonConvert.SerializeObject(listOfDicts));
+            return new Response(request, JsonConvert.SerializeObject(listOfDicts));
         }
         [AdminAuth]
         public static Response ModelRow(Request request)
@@ -246,11 +246,11 @@ namespace AdminPanel
                         dict.Add(pi.Name, (pi.GetValue(dbm)).ToString());
                     }
                 }
-                return new Response(JsonConvert.SerializeObject(dict));
+                return new Response(request, JsonConvert.SerializeObject(dict));
             }
             catch (Exception ex)
             {
-                return new Response(JsonConvert.SerializeObject(false));
+                return new Response(request, JsonConvert.SerializeObject(false));
             }
         }
         static bool isLikablePropertyAfter(List<PropertyInfo> lsh, int index)
@@ -273,7 +273,7 @@ namespace AdminPanel
             var model = request.Variables["model"].Value;
             Type t = modelsTypes[modelNames.IndexOf(model)];
             var m = DBModel.Find(t).Where().Count();
-            return new Response(JsonConvert.SerializeObject(m));
+            return new Response(request, JsonConvert.SerializeObject(m));
         }
 
         [AdminAuth]
@@ -329,7 +329,7 @@ namespace AdminPanel
                 f.SetValue(obj, fobj);
             }
             obj.Save();
-            return new Response(JsonConvert.SerializeObject(obj));
+            return new Response(request, JsonConvert.SerializeObject(obj));
             //}
             //catch (Exception ex)
             //{

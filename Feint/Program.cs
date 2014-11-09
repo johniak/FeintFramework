@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Feint.Core;
 using FeintSDK;
 using System.Reflection;
 using DotLiquid;
@@ -32,14 +33,16 @@ namespace Feint
 
             FeintORM.FeintORM orm = FeintORM.FeintORM.GetInstance(modulesAsseblies, Settings.databaseSettings, Settings.DebugMode);
             orm.CreateTablesFromModel();
+            Server server;
             if (Settings.DebugMode)
             {
-                DebugServer server = new DebugServer(Settings.IpAddress);
+                server = new DebugServer(Settings.IpAddress);
             }
             else
             {
-                FastCGIServer server = new FastCGIServer(Settings.IpAddress);
+                server = new FastCgiServer(Settings.IpAddress);
             }
+            server.Start();
         }
         public static MethodInfo getMainMethod(Assembly assembly)
         {

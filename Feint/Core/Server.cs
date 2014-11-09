@@ -1,252 +1,229 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net;
-using System.IO;
+﻿using System.Net;
 using FeintSDK;
-using System.Text.RegularExpressions;
-using System.Reflection;
-using Newtonsoft.Json;
 using HttpUtils;
-using System.Web;
-namespace Feint
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
+namespace Feint.Core
 {
-    class DebugServer
+    abstract class Server
     {
-        HttpListener listener;
-        public DebugServer(String address)
+        protected String Address;
+        protected Dictionary<string, byte[]> StaticCache = new Dictionary<string, byte[]>();
+
+        protected Server(String address)
         {
-            
-            listener = new HttpListener();
-            listener.Prefixes.Add("http://"+address+"/");
-            listener.Start();
-            Log.I("Fint server started at: " + address);
-            //  Console.WriteLine("Fint server started at: " + adress);
-            IAsyncResult result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
-            while (true)
-            {
-                result.AsyncWaitHandle.WaitOne();
-                result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
-            }
-        }
-        private void listenerCallback(IAsyncResult result)
-        {
-            HttpListener listener = (HttpListener)result.AsyncState;
-            HttpListenerContext context = listener.EndGetContext(result);
-            HttpListenerRequest request = context.Request;
-            HttpListenerResponse response = context.Response;
-            try
-            {
-
-                Request req = new Request(request.Url.LocalPath.ToString());
-                Response res = null;
-                
-                if (req.Url.StartsWith("/" + FeintSDK.Settings.StaticFolder))
-                {
-
-                    if (req.Url.Contains("./") || req.Url.ToString().Contains(".."))
-                        res = null;
-                    else
-                    {
-                        try
-                        {
-                            FileStream fs = new FileStream("FeintSite/" + req.Url.Substring(1), FileMode.Open, FileAccess.Read);
-                            byte[] buffer = new byte[fs.Length];
-                            fs.Read(buffer, 0, (int)fs.Length);
-                            res = new FeintSDK.Response(buffer);
-                            fs.Close();
-                            string ext = req.Url.Substring(req.Url.LastIndexOf("."), req.Url.Length - req.Url.LastIndexOf("."));
-                            response.Headers.Add("Content-Type", GetMimeType(ext) + "; charset=utf-8");
-
-                        }
-                        catch
-                        {
-
-                        }
-                    }
-                }
-                else
-                {
-                    req.Method = request.HttpMethod;
-                    req.Session = new Session();
-                    string text = null;
-                    using (var reader = new StreamReader(request.InputStream,
-                                             request.ContentEncoding))
-                    {
-                        text = reader.ReadToEnd();
-                    }
-                    if (text.Length > 0)
-                    {
-
-                        if (request.ContentType.StartsWith("application/json"))
-                        {
-                            req.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(text);
-                        }
-                        else if (!request.ContentType.StartsWith("multipart/form-data"))
-                        {
-                            req.FormData = new Dictionary<string, string>(parseContent(text));
-                        }
-                        else
-                        {
-                            req.FormData = new Dictionary<string, string>();
-                            string[] postTab = text.Replace("\r", "").Split('\n');
-                            String postName = "";
-                            for (int i = 0; i < postTab.Length; i++)
-                            {
-                                if (postTab[i].StartsWith("------"))
-                                    continue;
-                                if (postTab[i].StartsWith("Content-Disposition: form-data;"))
-                                {
-
-                                    postName = HttpUtility.UrlDecode(postTab[i].Substring(38, postTab[i].LastIndexOf("\"") - 38)).Trim();
-                                    continue;
-                                }
-                                if (postTab[i].Length > 0)
-                                {
-                                    req.FormData.Add(postName, HttpUtility.UrlDecode(postTab[i]).Trim());
-                                }
-
-                            }
-                        }
-                    }
-                    FeintSDK.RequestMethod actualMethod = FeintSDK.RequestMethod.POST;
-                    switch (request.HttpMethod)
-                    {
-                        case "GET":
-                            actualMethod = FeintSDK.RequestMethod.GET;
-                            break;
-                        case "POST":
-                            actualMethod = FeintSDK.RequestMethod.POST;
-                            break;
-                        case "PUT":
-                            actualMethod = FeintSDK.RequestMethod.PUT;
-                            break;
-                        case "DELETE":
-                            actualMethod = FeintSDK.RequestMethod.DELETE;
-                            break;
-                    }
-                    if (!req.Url.EndsWith("/"))
-                        req.Url += "/";
-                    for (int i = 0; i < FeintSDK.Settings.Urls.Count; i++)
-                    {
-                        var match = Regex.Match(req.Url.ToString(), FeintSDK.Settings.Urls[i].UrlMatch);
-
-                        if (match.Success && (FeintSDK.Settings.Urls[i].Method == FeintSDK.RequestMethod.ALL || actualMethod == FeintSDK.Settings.Urls[i].Method))
-                        {
-                            setNonPublicSetProperty(req, req.GetType(), "Variables", match.Groups);
-
-
-
-                            setSesion(request, response, req);
-                            MethodInfo mi = FeintSDK.Settings.Urls[i].View.GetMethodInfo();
-                            FeintSDK.AOPAttribute[] aops = (FeintSDK.AOPAttribute[])mi.GetCustomAttributes(typeof(FeintSDK.AOPAttribute), true);
-                            res = null;
-                            foreach (var aop in aops)
-                            {
-                                res = aop.PreRequest(req);
-                            }
-                            if (res == null)
-                            {
-                                res = FeintSDK.Settings.Urls[i].View(req);
-                                if (res.MimeType != null)
-                                {
-                                    response.Headers.Add("Content-Type", res.MimeType + "; charset=utf-8");
-                                }
-                            }
-                            var redirect = res.GetType().GetField("redirectUrl",
-                             BindingFlags.NonPublic |
-                             BindingFlags.Instance);
-                            foreach (var aop in aops)
-                            {
-                                aop.PostRequest(req);
-                            }
-                            String url = (String)redirect.GetValue(res);
-                            if (url != null)
-                            {
-                                //response.SeeOtherRedirect(url);
-                                response.Redirect(url);
-
-                                 response.Close();
-                                return;
-                            }
-                            break;
-                        }
-                    }
-                }
-                if (res != null)
-                {
-
-                    //response.ContentLength64 = res.Data.Length;
-                    //System.IO.Stream output = response.OutputStream;
-                    //output.Write(res.Data, 0, res.Data.Length);
-                    //output.Close();
-                    response.StatusCode = res.Status;
-                    response.ContentLength64 = res.Data.Length;
-                    System.IO.Stream output = response.OutputStream;
-                    output.Write(res.Data, 0, res.Data.Length);
-                    output.Close();
-                }
-                else
-                {
-                    string responseString = "<HTML><BODY>404!!!</BODY></HTML>";
-                    byte[] buffer = System.Text.Encoding.GetEncoding(1252).GetBytes(responseString);
-                    response.ContentLength64 = buffer.Length;
-                    System.IO.Stream output = response.OutputStream;
-                    output.Write(buffer, 0, buffer.Length);
-                    output.Close();
-                }
-
-
-
-            }
-            catch (IOException e)
-            {
-                Log.D(e);
-                // Console.WriteLine(e);
-                string responseString = "<HTML><BODY>Im n00b- internal server erron- 503!!!</BODY></HTML>";
-                byte[] buffer = System.Text.Encoding.GetEncoding(1252).GetBytes(responseString);
-                response.ContentLength64 = buffer.Length;
-                System.IO.Stream output = response.OutputStream;
-                output.Write(buffer, 0, buffer.Length);
-                output.Close();
-            }
+            Address = address;
         }
 
-        private static void setSesion(HttpListenerRequest request, HttpListenerResponse response, Request req)
+        public abstract void Start();
+
+
+        protected Response HandleRequest(Request request)
         {
-            var c = request.Cookies["session"];
-            if (c == null)
-                response.Cookies.Add(new Cookie("session", req.Session.Start(), "/"));
+            Response response = null;
+            request.Session = new Session();
+
+
+            ParseContent(request);
+
+            if (request.Url.StartsWith("/" + Settings.StaticFolder))
+            {
+
+                response = GetStatic(request);
+            }
             else
             {
-
-                string key = req.Session.Start(c.Value);
-
-                if (c.Value.CompareTo(key) != 0)
+                if (!request.Url.EndsWith("/"))
+                    request.Url += "/";
+                var urlApp = UrlDispatcher(request);
+                if (urlApp != null)
                 {
-                    try
-                    {
-                        response.Cookies["session"].Value = key;
-                    }
-                    catch (NullReferenceException e)
-                    {
-                        response.Cookies.Add(new Cookie("session", key, "/"));
-                    }
-
-
+                    var key = SetSesion(request);
+                    response = RunApplication(request, urlApp);
+                    if (key != null)
+                        response.Cookies.SetCookie(new Cookie("session", request.Session.Key, "/"));
                 }
+            }
+            return response ?? new Response(request, "404") { Status = 404 };
 
+        }
+
+
+        #region App Handling
+
+        private static string SetSesion(Request request)
+        {
+            if (!request.Cookies.IsCookieExist("session"))
+            {
+                return request.Session.Start();
+            }
+            var c = request.Cookies["session"];
+            request.Session.Start(c.Value);
+            return null;
+        }
+
+        private Url UrlDispatcher(Request request)
+        {
+            Url urlApp = null;
+            foreach (var url in Settings.Urls)
+            {
+                var match = Regex.Match(request.Url, url.UrlMatch);
+                if (!match.Success || (url.Method != RequestMethod.ALL && request.Method != url.Method))
+                    continue;
+                urlApp = url;
+                SetNonPublicSetProperty(request, request.GetType(), "Variables", match.Groups);
+            }
+            return urlApp;
+        }
+
+        private static Response RunApplication(Request request, Url urlApp)
+        {
+            var mi = urlApp.View.GetMethodInfo();
+            var aops = (AOPAttribute[])mi.GetCustomAttributes(typeof(AOPAttribute), true);
+            Response response = null;
+            foreach (var aop in aops)
+            {
+                response = aop.PreRequest(request);
+            }
+            if (response == null)
+            {
+                response = urlApp.View(request);
+                if (response.MimeType != null)
+                {
+                    response.Headers.Add("Content-Type", response.MimeType + "; charset=utf-8");
+                }
+            }
+            foreach (var aop in aops)
+            {
+                aop.PostRequest(request);
+            }
+            return response;
+        }
+
+        #endregion
+
+        private void ParseContent(Request request)
+        {
+            if (request.Body.Length > 0)
+            {
+                if (request.ContentType == "application/json")
+                {
+                    request.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.Body);
+                }
+                else if (!request.ContentType.StartsWith("multipart/form-data"))
+                {
+                    request.FormData = ParseMultipartForm(request.Body);
+                }
+                else if (request.ContentType == "application/x-www-form-urlencoded")
+                {
+                    request.FormData = ParseMultipartForm(request.Body);
+                }
             }
         }
-        public void setNonPublicSetProperty(Object obj, Type t, string name, dynamic value)
+
+        #region multipart form
+
+        private static Dictionary<String, String> ParseMultipartForm(String content)
         {
-            var properties = t.GetProperties();
-            t.GetProperty(name).SetValue(obj, value);
+            using (var data = GenerateStreamFromString(content))
+            {
+
+                if (content.StartsWith("multipart/form-data"))
+                {
+                    var parser = new HttpMultipartParser(data, "image");
+                    if (parser.Success)
+                        return new Dictionary<string, string>(parser.Parameters);
+                    return new Dictionary<String, String>();
+                }
+                else
+                {
+                    var parser = new HttpContentParser(data);
+                    if (parser.Success)
+                        return new Dictionary<string, string>(parser.Parameters);
+                    return new Dictionary<String, String>();
+                }
+            }
         }
 
-        private static IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
+        private static Stream GenerateStreamFromString(string s)
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(s);
+            writer.Flush();
+            stream.Position = 0;
+            return stream;
+        }
+        #endregion
+
+        #region static handling
+        private Response GetStatic(Request request)
+        {
+            if (request.Url.Contains("./") || request.Url.Contains("../"))
+                return null;
+            Response response = null;
+            try
+            {
+                byte[] buffer;
+                var path = request.Url.Substring(1);
+                if (Settings.StaticCache)
+                {
+                    if (StaticCache.ContainsKey(path))
+                    {
+                        buffer = StaticCache[path];
+                    }
+                    else
+                    {
+                        var fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                        buffer = new byte[fs.Length];
+                        fs.Read(buffer, 0, (int)fs.Length);
+                        fs.Close();
+                        StaticCache.Add(path, buffer);
+                    }
+                }
+                else
+                {
+                    var fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                    buffer = new byte[fs.Length];
+                    fs.Read(buffer, 0, (int)fs.Length);
+                    fs.Close();
+                }
+
+                response = new Response(request, buffer);
+
+                var ext = request.Url.Substring(request.Url.LastIndexOf(".", StringComparison.Ordinal), request.Url.Length - request.Url.LastIndexOf(".", StringComparison.Ordinal));
+                response.Headers.Add("Content-Type", getMimeType(ext) + "; charset=utf-8");
+            }
+            catch
+            {
+
+            }
+            return response;
+        }
+
+        private string getMimeType(string extension)
+        {
+            if (extension == null)
+            {
+                throw new ArgumentNullException("extension");
+            }
+
+            if (!extension.StartsWith("."))
+            {
+                extension = "." + extension;
+            }
+
+            string mime;
+
+            return Mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
+        }
+
+        private static readonly IDictionary<string, string> Mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
 
         #region Big freaking list of mime types
         // combination of values from Windows 7 Registry and 
@@ -815,68 +792,11 @@ namespace Feint
 
         };
 
-        public static string GetMimeType(string extension)
+        #endregion static handling
+
+        public void SetNonPublicSetProperty(Object obj, Type t, string name, dynamic value)
         {
-            if (extension == null)
-            {
-                throw new ArgumentNullException("extension");
-            }
-
-            if (!extension.StartsWith("."))
-            {
-                extension = "." + extension;
-            }
-
-            string mime;
-
-            return _mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
-        }
-        IDictionary<String, String> parseContent(String content)
-        {
-
-            using (Stream data = GenerateStreamFromString(content))
-            {
-
-                if (content.StartsWith("multipart/form-data"))
-                {
-                    HttpMultipartParser parser = new HttpMultipartParser(data, "image");
-                    if (parser.Success)
-                    {
-                        return parser.Parameters;
-                    }
-                    else
-                    {
-                        return new Dictionary<String, String>();
-                    }
-                }
-                else
-                {
-                    HttpContentParser parser = new HttpContentParser(data);
-                    if (parser.Success)
-                    {
-                        Dictionary<string, string> decodedParameters = new Dictionary<string, string>();
-                        foreach (var p in parser.Parameters)
-                        {
-                            decodedParameters.Add(p.Key,HttpUtility.UrlDecode(p.Value));
-                        }
-                        return decodedParameters;
-                    }
-                    else
-                    {
-                        return new Dictionary<String, String>();
-                    }
-                }
-            }
-        }
-
-        public Stream GenerateStreamFromString(string s)
-        {
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
+            t.GetProperty(name).SetValue(obj, value);
         }
     }
 }

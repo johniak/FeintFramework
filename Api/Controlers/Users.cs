@@ -16,16 +16,16 @@ namespace Api.Controlers
         {
             UpdateUserForm form = Form.FromFormData<UpdateUserForm>(request.FormData);
             if (!form.IsValid)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) {Status=400};
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             User user = User.GetLoggedUser(request.Session);
             if(user.Password!=User.MD5Hash(form.oldPassword))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongConfirmationPassword)) { Status = 403 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongConfirmationPassword)) { Status = 403 };
             if (form.password != form.retypePassword)
-                return new Response(JsonConvert.SerializeObject(Errors.PaswordsAreNotTheSame)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.PaswordsAreNotTheSame)) { Status = 400 };
             user.Mail = form.email;
             user.Password = User.MD5Hash(form.password);
             user.Save();
-            return new Response(JsonConvert.SerializeObject(user)); 
+            return new Response(request, JsonConvert.SerializeObject(user)); 
         }
     }
 }

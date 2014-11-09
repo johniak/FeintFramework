@@ -18,7 +18,7 @@ namespace AdminPanel
             }
             else
             {
-                return Response.Redirect(Site.AdminLoginUrl);
+                return Response.Redirect(req, Site.AdminLoginUrl);
             }
             //throw new NotImplementedException();
             

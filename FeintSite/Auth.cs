@@ -11,15 +11,15 @@ namespace Site
 {
     class Auth : AOPAttribute
     {
-        public override Response PreRequest(Request req)
+        public override Response PreRequest(Request request)
         {
-            if (User.IsLogged(req.Session))
+            if (User.IsLogged(request.Session))
                 return null;
             else
-                return new Response("403") {Status=403};
+                return new Response(request, "403") { Status = 403 };
         }
 
-        public override void PostRequest(Request req)
+        public override void PostRequest(Request request)
         {
         }
     }

@@ -16,7 +16,7 @@ namespace Api
             if (User.IsLogged(req.Session))
                 return null;
             else
-                return new Response(JsonConvert.SerializeObject(Errors.NotLoggedIn)) {Status=403};
+                return new Response(req,JsonConvert.SerializeObject(Errors.NotLoggedIn)) {Status=403};
         }
 
         public override void PostRequest(Request req)
