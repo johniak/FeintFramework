@@ -56,7 +56,7 @@ namespace FeintSDK
 
         private void initializeByRequest(Request request)
         {
-            _cookiesSet.AddAll(request.Cookies.GetAll());
+           // _cookiesSet.AddAll(request.Cookies.GetAll());
         }
 
     }

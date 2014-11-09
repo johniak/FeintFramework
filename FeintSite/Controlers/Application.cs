@@ -15,9 +15,9 @@ namespace Site.Controlers
         {
             if (User.IsLogged(request.Session))
             {
-                return Response.Redirect("/dashboard/");
+                return Response.Redirect(request, "/dashboard/");
             }
-            var response = new Response("index.html", Hash.FromAnonymousObject(new {  }));
+            var response = new Response(request, "index.html", Hash.FromAnonymousObject(new { }));
             return response;
         }
         [Auth]
@@ -47,14 +47,14 @@ namespace Site.Controlers
         {
             User loggedUser = User.GetLoggedUser(request.Session);
 			List<ProjectDisplay> projects = Project.getUserProjectsDisplays (loggedUser);
-			var response = new Response("dashboard.html", Hash.FromAnonymousObject(new { projects=projects,selectedProject=projectId,user=loggedUser,type=global }));
+            var response = new Response(request, "dashboard.html", Hash.FromAnonymousObject(new { projects = projects, selectedProject = projectId, user = loggedUser, type = global }));
 			return response;
 		//return ok(dashboard.render(logged_user, projects, project_id, global, projects.size()>1));
 	}
 
         public static Response Login(Request request)
         {
-            return new Response("login.html", Hash.FromAnonymousObject(new { }));;
+            return new Response(request, "login.html", Hash.FromAnonymousObject(new { })); ;
         }
 
         public static Response Authenticate(Request request)
@@ -68,21 +68,21 @@ namespace Site.Controlers
                 request.Session.SetProperty(User.LOGGED_IN_KEY, true.ToString());
                 request.Session.SetProperty(User.LOGGED_IN_USER_ID_KEY, u.Id.ToString());
                 var prop = request.Session.GetProperty(User.LOGGED_IN_USER_ID_KEY);
-                return Response.Redirect("/dashboard/#message/success/Welcome " + username);
+                return Response.Redirect(request, "/dashboard/#message/success/Welcome " + username);
             }
-            return new Response("login.html", Hash.FromAnonymousObject(new {hasError=true,errorMessage= "Wrong username or password"}));
+            return new Response(request, "login.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Wrong username or password" }));
         }
 
         [Auth]
         public static Response Logout(Request request)
         {
             request.Session.UnsetProperty(User.LOGGED_IN_KEY);
-            return Response.Redirect("/login/");
+            return Response.Redirect(request, "/login/");
         }
 
         public static Response Register(Request request)
         {
-            return new Response("register.html", Hash.FromAnonymousObject(new { })); ;
+            return new Response(request, "register.html", Hash.FromAnonymousObject(new { })); ;
         }
 
         public static Response RegisterPost(Request request)
@@ -93,26 +93,26 @@ namespace Site.Controlers
             var email = request.FormData["email"];
             if (password != rePassword)
             {
-                return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Passwords don't match." }));
+                return new Response(request, "register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Passwords don't match." }));
             }
             var status = User.SignUp(username, password, email);
             if (status == 1)
             {
-                return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Can't creat an acount. The username is not available." }));
+                return new Response(request, "register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Can't creat an acount. The username is not available." }));
             }
             if (status == 2)
             {
-                return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Password is to short." }));
+                return new Response(request, "register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Password is to short." }));
             }
             if (status == 3)
             {
-                return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Invalid email." }));
+                return new Response(request, "register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Invalid email." }));
             }
             if (status == 0)
             {
-                return Response.Redirect("/login/");
+                return Response.Redirect(request, "/login/");
             }
-            return new Response("register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Unexpected error." }));
+            return new Response(request, "register.html", Hash.FromAnonymousObject(new { hasError = true, errorMessage = "Unexpected error." }));
         }
         [Auth]
         public static Response UpdateUser(Request request)
@@ -122,12 +122,12 @@ namespace Site.Controlers
 
         public static Response Mobile(Request request)
         {
-            return new Response("mobile.html", Hash.FromAnonymousObject(new { }));
+            return new Response(request, "mobile.html", Hash.FromAnonymousObject(new { }));
         }
 
         public static Response Usage(Request request)
         {
-            return new Response("usage.html",Hash.FromAnonymousObject(new {}));
+            return new Response(request, "usage.html", Hash.FromAnonymousObject(new { }));
         }
     }
 }

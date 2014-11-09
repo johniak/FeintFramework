@@ -68,7 +68,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AOPAttribute.cs" />
-    <Compile Include="Cookie.cs" />
     <Compile Include="CookiesSet.cs" />
     <Compile Include="DotInclude.cs" />
     <Compile Include="Form.cs" />

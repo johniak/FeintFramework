@@ -18,7 +18,7 @@ namespace Api.Controlers
         {
             User user = User.GetLoggedUser(request.Session);
             if (user == null)
-                return Response.Redirect("/login/");
+                return Response.Redirect(request,"/login/");
             return add(request, user, Project.getUserProjects(user)[0]);
         }
 
@@ -27,11 +27,11 @@ namespace Api.Controlers
         {
             int projectId;
             if (!int.TryParse(request.Variables["project"].Value, out projectId))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             User user = User.GetLoggedUser(request.Session);
             var project = Project.Ref<Project>(projectId);
             if (!project.isOwnerOfProject(user))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
 
             return add(request, user, project);
         }
@@ -71,11 +71,11 @@ namespace Api.Controlers
                     Deadline = deadline
                 };
                 task.Save();
-                return new Response(JsonConvert.SerializeObject(task.ToTaskSafe()));
+                return new Response(request, JsonConvert.SerializeObject(task.ToTaskSafe()));
             }
             catch (Exception e)
             {
-                return new Response(JsonConvert.SerializeObject(false));
+                return new Response(request, JsonConvert.SerializeObject(false));
             }
         }
 
@@ -85,7 +85,7 @@ namespace Api.Controlers
             int task;
             int project=0;
             if (!int.TryParse(request.Variables["task"].Value, out task))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             return updateTask(request, task, project);
         }
 
@@ -95,9 +95,9 @@ namespace Api.Controlers
             int task;
             int project;
             if (!int.TryParse(request.Variables["task"].Value, out task))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             if (!int.TryParse(request.Variables["project"].Value, out project))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             return updateTask(request, task, project);
         }
 
@@ -105,12 +105,12 @@ namespace Api.Controlers
         {
             var form = Form.FromFormData<TaskForm>(request.FormData);
             if (!form.IsValid)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             Task taskModel = Task.Ref<Task>(task);
             if (taskModel == null)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             if (taskModel.Owner.Id != User.GetLoggedUser(request.Session).Id)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
             taskModel.ProjectToTask=Project.Ref<Project>(form.project);
             taskModel.Priority = form.priority;
             taskModel.Message = form.message;
@@ -118,7 +118,7 @@ namespace Api.Controlers
             taskModel.Deadline = form.deadline;
             taskModel.Updated = DateTime.Now;
             taskModel.Save();
-            return new Response(JsonConvert.SerializeObject(taskModel.ToTaskSafe()));
+            return new Response(request, JsonConvert.SerializeObject(taskModel.ToTaskSafe()));
         }
 
         [ApiAuth]
@@ -126,14 +126,14 @@ namespace Api.Controlers
         {
             int taskId;
             if (!int.TryParse(request.Variables["task"].Value, out taskId))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             var task = Task.Ref<Task>(taskId);
             if (task == null)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             if (task.Owner.Id != User.GetLoggedUser(request.Session).Id)
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 403 };
             task.Remove();
-            return new Response(JsonConvert.SerializeObject(true));
+            return new Response(request, JsonConvert.SerializeObject(true));
         }
 
         [ApiAuth]
@@ -141,9 +141,9 @@ namespace Api.Controlers
         {
             User user = User.GetLoggedUser(request.Session);
             if (user == null)
-                return Response.Redirect("/login/");
+                return Response.Redirect(request, "/login/");
             List<Task> tasks = Task.getUserTask(user);
-            return new Response(JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
+            return new Response(request, JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
         }
 
         [ApiAuth]
@@ -151,10 +151,10 @@ namespace Api.Controlers
         {
             int projectId;
             if (!int.TryParse(request.Variables["project"].Value, out projectId))
-                return new Response(JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
+                return new Response(request, JsonConvert.SerializeObject(Errors.WrongFormData)) { Status = 400 };
             var user = User.GetLoggedUser(request.Session);
             var tasks = Task.getUserTaskToProject(user, projectId);
-            return new Response(JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
+            return new Response(request, JsonConvert.SerializeObject(Task.ToTasksSafe(tasks)));
         }
 
 

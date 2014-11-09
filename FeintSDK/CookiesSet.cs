@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace FeintSDK
 {
-    public class CookiesSet
+    public class CookiesSet :IEnumerable<Cookie>
     {
         private readonly List<Cookie> cookies = new List<Cookie>();
 
@@ -92,5 +94,14 @@ namespace FeintSDK
             this.cookies.AddRange(cookies);
         }
 
+        public IEnumerator<Cookie> GetEnumerator()
+        {
+            return cookies.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
     }
 }

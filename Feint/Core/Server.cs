@@ -1,79 +1,79 @@
-﻿using FeintSDK;
+﻿using System.Net;
+using FeintSDK;
 using HttpUtils;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace Feint.Core
 {
     abstract class Server
     {
         protected String Address;
+        protected Dictionary<string, byte[]> StaticCache = new Dictionary<string, byte[]>();
 
-        public Server(String address)
+        protected Server(String address)
         {
-            this.Address = address;
+            Address = address;
         }
 
         public abstract void Start();
 
-        Dictionary<string, byte[]> staticCache;
 
-        protected FeintSDK.Response HandelRequest(Request request)
+        protected Response HandleRequest(Request request)
         {
-            FeintSDK.Response response = null;
-            request.Session = new FeintSDK.Session();
+            Response response = null;
+            request.Session = new Session();
 
 
-            parseContent(request);
+            ParseContent(request);
 
-            if (request.Url.StartsWith("/" + FeintSDK.Settings.StaticFolder))
+            if (request.Url.StartsWith("/" + Settings.StaticFolder))
             {
 
-                response = getStatic(request);
+                response = GetStatic(request);
             }
             else
             {
                 if (!request.Url.EndsWith("/"))
                     request.Url += "/";
-                var urlApp = urlDispatcher(request);
+                var urlApp = UrlDispatcher(request);
                 if (urlApp != null)
                 {
-                    setSesion(request);
-                    response = runApplication(request, urlApp);
+                    var key = SetSesion(request);
+                    response = RunApplication(request, urlApp);
+                    if (key != null)
+                        response.Cookies.SetCookie(new Cookie("session", request.Session.Key, "/"));
                 }
             }
-            return response ?? (response = new Response(request, "404") {Status = 404});
+            return response ?? new Response(request, "404") { Status = 404 };
+
         }
 
 
         #region App Handling
 
-        private static void setSesion(Request request)
+        private static string SetSesion(Request request)
         {
             if (!request.Cookies.IsCookieExist("session"))
             {
-                request.Session.Start();
-                return;
+                return request.Session.Start();
             }
             var c = request.Cookies["session"];
             request.Session.Start(c.Value);
+            return null;
         }
 
-        private FeintSDK.Url urlDispatcher(FeintSDK.Request request)
+        private Url UrlDispatcher(Request request)
         {
-            FeintSDK.Url urlApp = null;
-            foreach (var url in FeintSDK.Settings.Urls)
+            Url urlApp = null;
+            foreach (var url in Settings.Urls)
             {
-                var match = Regex.Match(request.Url.ToString(), url.UrlMatch);
-                if (!match.Success || (url.Method != FeintSDK.RequestMethod.ALL && request.Method != url.Method))
+                var match = Regex.Match(request.Url, url.UrlMatch);
+                if (!match.Success || (url.Method != RequestMethod.ALL && request.Method != url.Method))
                     continue;
                 urlApp = url;
                 SetNonPublicSetProperty(request, request.GetType(), "Variables", match.Groups);
@@ -81,10 +81,10 @@ namespace Feint.Core
             return urlApp;
         }
 
-        private static FeintSDK.Response runApplication(FeintSDK.Request request, FeintSDK.Url urlApp)
+        private static Response RunApplication(Request request, Url urlApp)
         {
             var mi = urlApp.View.GetMethodInfo();
-            var aops = (FeintSDK.AOPAttribute[])mi.GetCustomAttributes(typeof(FeintSDK.AOPAttribute), true);
+            var aops = (AOPAttribute[])mi.GetCustomAttributes(typeof(AOPAttribute), true);
             Response response = null;
             foreach (var aop in aops)
             {
@@ -107,7 +107,7 @@ namespace Feint.Core
 
         #endregion
 
-        private void parseContent(FeintSDK.Request request)
+        private void ParseContent(Request request)
         {
             if (request.Body.Length > 0)
             {
@@ -117,53 +117,43 @@ namespace Feint.Core
                 }
                 else if (!request.ContentType.StartsWith("multipart/form-data"))
                 {
-                    request.FormData = parseMultipartForm(request.Body);
+                    request.FormData = ParseMultipartForm(request.Body);
                 }
                 else if (request.ContentType == "application/x-www-form-urlencoded")
                 {
-                    request.FormData = parseMultipartForm(request.Body);
+                    request.FormData = ParseMultipartForm(request.Body);
                 }
             }
         }
 
         #region multipart form
 
-        private Dictionary<String, String> parseMultipartForm(String content)
+        private static Dictionary<String, String> ParseMultipartForm(String content)
         {
-            using (Stream data = generateStreamFromString(content))
+            using (var data = GenerateStreamFromString(content))
             {
 
                 if (content.StartsWith("multipart/form-data"))
                 {
-                    HttpMultipartParser parser = new HttpMultipartParser(data, "image");
+                    var parser = new HttpMultipartParser(data, "image");
                     if (parser.Success)
-                    {
                         return new Dictionary<string, string>(parser.Parameters);
-                    }
-                    else
-                    {
-                        return new Dictionary<String, String>();
-                    }
+                    return new Dictionary<String, String>();
                 }
                 else
                 {
-                    HttpContentParser parser = new HttpContentParser(data);
+                    var parser = new HttpContentParser(data);
                     if (parser.Success)
-                    {
                         return new Dictionary<string, string>(parser.Parameters);
-                    }
-                    else
-                    {
-                        return new Dictionary<String, String>();
-                    }
+                    return new Dictionary<String, String>();
                 }
             }
         }
 
-        private Stream generateStreamFromString(string s)
+        private static Stream GenerateStreamFromString(string s)
         {
-            MemoryStream stream = new MemoryStream();
-            StreamWriter writer = new StreamWriter(stream);
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
             writer.Write(s);
             writer.Flush();
             stream.Position = 0;
@@ -172,45 +162,46 @@ namespace Feint.Core
         #endregion
 
         #region static handling
-        private FeintSDK.Response getStatic(FeintSDK.Request request)
+        private Response GetStatic(Request request)
         {
-            if (request.Url.Contains("./") || request.Url.ToString().Contains("../"))
+            if (request.Url.Contains("./") || request.Url.Contains("../"))
                 return null;
-            FeintSDK.Response response = null;
+            Response response = null;
             try
             {
                 byte[] buffer;
-                string path = request.Url.Substring(1);
-                if (FeintSDK.Settings.StaticCache)
+                var path = request.Url.Substring(1);
+                if (Settings.StaticCache)
                 {
-                    if (staticCache.ContainsKey(path))
+                    if (StaticCache.ContainsKey(path))
                     {
-                        buffer = staticCache[path];
+                        buffer = StaticCache[path];
                     }
                     else
                     {
-                        FileStream fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                        var fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
                         buffer = new byte[fs.Length];
                         fs.Read(buffer, 0, (int)fs.Length);
                         fs.Close();
-                        staticCache.Add(path, buffer);
+                        StaticCache.Add(path, buffer);
                     }
                 }
                 else
                 {
-                    FileStream fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
+                    var fs = new FileStream("FeintSite/" + path, FileMode.Open, FileAccess.Read);
                     buffer = new byte[fs.Length];
                     fs.Read(buffer, 0, (int)fs.Length);
                     fs.Close();
                 }
 
-                response = new FeintSDK.Response(request,buffer);
+                response = new Response(request, buffer);
 
-                string ext = request.Url.Substring(request.Url.LastIndexOf("."), request.Url.Length - request.Url.LastIndexOf("."));
+                var ext = request.Url.Substring(request.Url.LastIndexOf(".", StringComparison.Ordinal), request.Url.Length - request.Url.LastIndexOf(".", StringComparison.Ordinal));
                 response.Headers.Add("Content-Type", getMimeType(ext) + "; charset=utf-8");
             }
             catch
             {
+
             }
             return response;
         }
@@ -229,10 +220,10 @@ namespace Feint.Core
 
             string mime;
 
-            return _mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
+            return Mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
         }
 
-        private static IDictionary<string, string> _mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
+        private static readonly IDictionary<string, string> Mappings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase) {
 
         #region Big freaking list of mime types
         // combination of values from Windows 7 Registry and 
@@ -805,7 +796,6 @@ namespace Feint.Core
 
         public void SetNonPublicSetProperty(Object obj, Type t, string name, dynamic value)
         {
-            var properties = t.GetProperties();
             t.GetProperty(name).SetValue(obj, value);
         }
     }

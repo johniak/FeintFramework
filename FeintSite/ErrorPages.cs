@@ -13,7 +13,7 @@ namespace Site
         public static Response ExpectedPostMethod(Request request)
         {
 
-            var response = new Response("error/error_post.html", Hash.FromAnonymousObject(new { message = "Hello World!" }));
+            var response = new Response(request, "error/error_post.html", Hash.FromAnonymousObject(new { message = "Hello World!" }));
             return response;
         }
     }

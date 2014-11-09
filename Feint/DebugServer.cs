@@ -1,94 +1,91 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Net;
 using System.IO;
 using FeintSDK;
-using System.Text.RegularExpressions;
-using System.Reflection;
-using Newtonsoft.Json;
-using HttpUtils;
-using System.Web;
 using Feint.Core;
-using Cookie = FeintSDK.Cookie;
 
 namespace Feint
 {
+    /// <summary>
+    /// Simple asynchronus HTTP server.
+    /// </summary>
     class DebugServer : Server
     {
-        HttpListener listener;
+        HttpListener _listener;
         public DebugServer(String address)
             : base(address)
         {
 
 
         }
-
+        /// <summary>
+        /// Starts HTTP server on selected address and port. Server starts infinity loop.
+        /// Each request is asychronus
+        /// </summary>
         public override void Start()
         {
-            listener = new HttpListener();
-            listener.Prefixes.Add("http://" + Address + "/");
-            listener.Start();
-            Log.I("Fint server started at: " + Address);
-            //  Console.WriteLine("Fint server started at: " + adress);
-            IAsyncResult result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
+            _listener = new HttpListener();
+            _listener.Prefixes.Add("http://" + Address + "/");
+            _listener.Start();
+            Log.I("Feint server started at: " + Address);
+            var result = _listener.BeginGetContext(ListenerCallback, _listener);
             while (true)
             {
                 result.AsyncWaitHandle.WaitOne();
-                result = listener.BeginGetContext(new AsyncCallback(listenerCallback), listener);
+                result = _listener.BeginGetContext(ListenerCallback, _listener);
             }
         }
 
-        private void listenerCallback(IAsyncResult result)
+        /// <summary>
+        /// Request handling
+        /// </summary>
+        /// <param name="result"></param>
+        private void ListenerCallback(IAsyncResult result)
         {
-            HttpListener listener = (HttpListener)result.AsyncState;
-            HttpListenerContext context = listener.EndGetContext(result);
-            HttpListenerRequest request = context.Request;
-            HttpListenerResponse response = context.Response;
-            string requestBody = null;
+            var listener = (HttpListener)result.AsyncState;
+            var context = listener.EndGetContext(result);
+            var request = context.Request;
+            var response = context.Response;
+            string requestBody;
             using (var reader = new StreamReader(request.InputStream,
                                      request.ContentEncoding))
             {
                 requestBody = reader.ReadToEnd();
             }
-            var req = new Request(request.Url.LocalPath.ToString())
+            var req = new Request(request.Url.LocalPath)
             {
                 Body = requestBody,
                 ContentType = request.ContentType,
                 MethodString = request.HttpMethod
             };
-            //foreach (var cookie in request.Cookies)
-            for(var i =0;i<request.Cookies.Count;i++)
+            for (var i = 0; i < request.Cookies.Count; i++)
             {
                 var cookie = request.Cookies[i];
-                
-                req.Cookies.Set(new Cookie(){Name = cookie.Name,ExperiationDate = cookie.Expires,});
+                req.Cookies.Set(cookie);
             }
             foreach (var key in request.Headers.AllKeys)
             {
-                req.Headers.Add(key, request.Headers.GetValues(key)[0]);
+                var value = request.Headers.GetValues(key);
+                if (value != null)
+                    req.Headers.Add(key, value[0]);
             }
 
-            var res = base.HandelRequest(req);
+            var res = HandleRequest(req);
+            foreach (var cookie in res.Cookies)
+            {
+                response.SetCookie(cookie);
+            }
+            if (res.IsRedirect)
+            {
+                response.Redirect(res.RedirectUrl);
+                response.OutputStream.Close();
+                return;
+            }
             response.StatusCode = res.Status;
             response.ContentLength64 = res.Data.Length;
             var output = response.OutputStream;
             output.Write(res.Data, 0, res.Data.Length);
             output.Close();
         }
-
-        public Stream GenerateStreamFromString(string s)
-        {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-            writer.Write(s);
-            writer.Flush();
-            stream.Position = 0;
-            return stream;
-        }
-
-
     }
 }
