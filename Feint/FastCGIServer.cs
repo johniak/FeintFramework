@@ -1,4 +1,6 @@
-﻿using FastCGI;
+﻿using System.Runtime.Remoting.Messaging;
+using DotLiquid.Util;
+using FastCGI;
 using FeintORM;
 using HttpUtils;
 using Newtonsoft.Json;
@@ -17,27 +19,37 @@ using System.Web;
 
 namespace Feint
 {
-    class FastCGIServer
+    class FastCGIServer:Core.Server
     {
-        Dictionary<string, byte[]> staticCache;
-        bool first = true;
-        public FastCGIServer(String address)
+        private readonly Options _config;
+        public FastCGIServer(String address):base(address)
         {
             var splittedAddress = address.Split(':');
-            Options config = new Options();
-            config.Bind = BindMode.CreateSocket;
-            config.EndPoint = new IPEndPoint(IPAddress.Parse(splittedAddress[0]), short.Parse(splittedAddress[1]));
-            config.OnError = Log.E;
+            _config = new Options();
+            _config.Bind = BindMode.CreateSocket;
+            _config.EndPoint = new IPEndPoint(IPAddress.Parse(splittedAddress[0]), short.Parse(splittedAddress[1]));
+            _config.OnError = Log.E;
             Log.I("FastCGI started at: " + address);
-            staticCache = new Dictionary<string,byte[]>();
-            Server.Start(HandleRequest, config);
+        }
+
+        public override void Start()
+        {
+            FastCGI.Server.Start(HandleRequest, _config);
         }
         void HandleRequest(Request request, Response response)
         {
             
             Log.E(request.RequestURI.Value);
             FeintSDK.Response res = null;
-            FeintSDK.Request req = new FeintSDK.Request(request.RequestURI.Value);
+            FeintSDK.Request req = new FeintSDK.Request(request.RequestURI.Value)
+            {
+               MethodString = request.RequestMethod.Value,
+               Body = System.Text.Encoding.UTF8.GetString(request.Stdin.GetContents()),
+            };
+            foreach (var VARIABLE in request.Cookies.All())
+            {
+                
+            }
             req.Method = request.RequestMethod.Value;
             req.Session = new FeintSDK.Session();
             string text = null;
