@@ -26,5 +26,6 @@
     <Content Include="Settings.cs" />
     <Content Include="DbBase.cs" />
     <Content Include="Midelware.cs" />
+    <Content Include="Middlewars\CookieSessionMiddleware.cs" />
   </ItemGroup>
 </Project>

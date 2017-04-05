@@ -10,6 +10,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Linq;
 
 namespace FeintServer.Core
 {
@@ -73,7 +74,6 @@ namespace FeintServer.Core
                 StreamReader reader = new StreamReader(req.Body);
                 sdkRequest.Body = reader.ReadToEnd();
             }
-            Console.WriteLine($"Body {sdkRequest.Body}");
             List<Cookie> cookieList = new List<Cookie>();
             foreach (var cookie in req.Cookies)
             {
@@ -112,9 +112,6 @@ namespace FeintServer.Core
         protected Response HandleRequest(Request request)
         {
             Response response = null;
-            request.Session = new Session();
-
-
             ParseContent(request);
 
             if (request.Url.StartsWith("/" + Settings.StaticFolder))
@@ -128,10 +125,7 @@ namespace FeintServer.Core
                 var urlApp = UrlDispatcher(request);
                 if (urlApp != null)
                 {
-                    var key = SetSesion(request);
                     response = HandleRunApplication(request, urlApp);
-                    if (key != null)
-                        response.Cookies.SetCookie(new Cookie("session", request.Session.Key, "/"));
                 }
             }
             return response ?? new Response(request, "404") { Status = 404 };
@@ -140,17 +134,6 @@ namespace FeintServer.Core
 
 
         #region App Handling
-
-        private static string SetSesion(Request request)
-        {
-            if (!request.Cookies.IsCookieExist("session"))
-            {
-                return request.Session.Start();
-            }
-            var c = request.Cookies["session"];
-            request.Session.Start(c.Value);
-            return null;
-        }
 
         private Url UrlDispatcher(Request request)
         {
@@ -175,9 +158,10 @@ namespace FeintServer.Core
         private static Response RunAMiddlewareApplication(Request request, Url urlApp)
         {
             Response response = null;
+            var middlewaresInstances = Settings.Midelwares.Select(type => (Midelware)Activator.CreateInstance(type)).ToList();
             try
             {
-                foreach (var middleware in Settings.Midelwares)
+                foreach (var middleware in middlewaresInstances)
                 {
                     request = middleware.ModifyRequest(request, urlApp);
                     response = middleware.IterruptResuest(request, urlApp);
@@ -187,14 +171,14 @@ namespace FeintServer.Core
                     }
                 }
                 response = RunAOPApplication(request, urlApp);
-                foreach (var middleware in Settings.Midelwares)
+                foreach (var middleware in middlewaresInstances)
                 {
                     response = middleware.ModifyResponse(request, response, urlApp);
                 }
             }
             catch (Exception ex)
             {
-                foreach (var middleware in Settings.Midelwares)
+                foreach (var middleware in middlewaresInstances)
                 {
                     response = middleware.HandleException(request, response, urlApp, ex);
                 }
@@ -203,8 +187,6 @@ namespace FeintServer.Core
                     throw ex;
                 }
             }
-            Console.Write("Response");
-            Console.WriteLine(response);
             return response;
         }
 

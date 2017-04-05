@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.Data;
 using System.Security.Cryptography;
-using System.IO;
-using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace FeintSDK
 {
