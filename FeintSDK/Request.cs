@@ -29,6 +29,9 @@ namespace FeintSDK
                     case "PUT":
                         Method = RequestMethod.PUT;
                         break;
+                    case "PATCH":
+                        Method = RequestMethod.PATCH;
+                        break;
                     case "DELETE":
                         Method = RequestMethod.DELETE;
                         break;

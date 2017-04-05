@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
+using static FeintSDK.DbBase;
 
 namespace FeintSDK
 {
@@ -25,7 +26,7 @@ namespace FeintSDK
         
         public string Start(string key)
         {
-            var query =DbBase.DbSet<SessionKey>().Where(sk => sk.Key == key);
+            var query = DbSet<SessionKey>().Where(sk => sk.Key == key);
             if ((query.Count()) == 1)
             {
                 sessionKey = query.First();
@@ -39,14 +40,14 @@ namespace FeintSDK
         {
             SHA1 sha1 = SHA1.Create();
             if (maxId == -1)
-                maxId = DbBase.DbSet<SessionKey>().Count();
+                maxId = DbSet<SessionKey>().Count();
             string before = DateTime.Now.Ticks.ToString() + random.Next() + "" + maxId;
             maxId++;
             var hashed = SHA256Hash(before)+maxId;
             try
             {
                 sessionKey = new SessionKey() { Key = hashed };
-                DbBase.DbSet<SessionKey>().Add(sessionKey);
+                DbSet<SessionKey>().Add(sessionKey);
                 DbBase.Instance.SaveChanges();
             }
             catch
@@ -57,7 +58,7 @@ namespace FeintSDK
 
         public string GetProperty(string name)
         {
-            var query = DbBase.DbSet<SessionProperty>().Where(sp => sp.Owner == sessionKey && sp.Name == name);
+            var query = DbSet<SessionProperty>().Where(sp => sp.Owner == sessionKey && sp.Name == name);
             if (query.Count() <= 0)
                 return null;
             return query.First().Value;
@@ -66,14 +67,14 @@ namespace FeintSDK
         public void SetProperty(string name, string value)
         {
             SessionProperty sp = new SessionProperty() { Name = name, Value = value,Owner=sessionKey };
-            DbBase.DbSet<SessionProperty>().Add(sp);
+            DbSet<SessionProperty>().Add(sp);
             DbBase.Instance.SaveChanges();
         }
        
         public void UnsetProperty(String name)
         {
-            var query = DbBase.DbSet<SessionProperty>().Where(sp => sp.Owner == sessionKey && sp.Name == name);
-            DbBase.DbSet<SessionProperty>().RemoveRange(query);
+            var query = DbSet<SessionProperty>().Where(sp => sp.Owner == sessionKey && sp.Name == name);
+            DbSet<SessionProperty>().RemoveRange(query);
             DbBase.Instance.SaveChanges();
         }
         public String this[string key]
@@ -100,17 +101,4 @@ namespace FeintSDK
         }
 
     }
-    
-    // class SessionContext : DbContext
-    // {
-    //     public DbSet<SessionKey> SessionKeys { get; set; }
-    //     public DbSet<SessionProperty> SessionProperties { get; set; }
-
-    //     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //     {
-    
-    //         optionsBuilder.UseSqlite("Data Source=session.db");
-    //     }
-
-    // }
 }

@@ -8,6 +8,8 @@ framework:
     - /app/FeintSDK/bin
     - /app/FeintSite/obj
     - /app/FeintSite/bin
+    - /app/FeintApi/obj
+    - /app/FeintApi/bin
   ports:
     - 5000:5000
   command: dotnet watch run

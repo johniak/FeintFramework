@@ -105,7 +105,7 @@ namespace FeintServer.Core
                 httpResponse.Headers.Add(header.Key, header.Value);
             }
             httpResponse.StatusCode = response.Status;
-            httpResponse.ContentType = response.MimeType;
+            httpResponse.ContentType = response.ContentType;
             httpResponse.Body.Write(response.Data, 0, response.Data.Length);
         }
 
@@ -128,7 +128,7 @@ namespace FeintServer.Core
                     response = HandleRunApplication(request, urlApp);
                 }
             }
-            return response ?? new Response(request, "404") { Status = 404 };
+            return response ?? new Response("404") { Status = 404 };
 
         }
 
@@ -211,9 +211,9 @@ namespace FeintServer.Core
         }
         private static Response RunApplication(Request request, Url urlApp){
             var response = urlApp.View(request);
-            if (response.MimeType != null)
+            if (response.ContentType != null)
             {
-                response.Headers.Add("Content-Type", response.MimeType + "; charset=utf-8");
+                response.Headers.Add("Content-Type", response.ContentType);
             }
             return response;
         }
@@ -277,7 +277,7 @@ namespace FeintServer.Core
                     fs.Read(buffer, 0, (int)fs.Length);
                 }
 
-                response = new Response(request, buffer);
+                response = new Response(buffer);
 
                 var ext = request.Url.Substring(request.Url.LastIndexOf(".", StringComparison.Ordinal), request.Url.Length - request.Url.LastIndexOf(".", StringComparison.Ordinal));
                 response.Headers.Add("Content-Type", getMimeType(ext) + "; charset=utf-8");

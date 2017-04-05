@@ -12,6 +12,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.1" PrivateAssets="All" />
     <DotNetCliToolReference Include="Microsoft.DotNet.Watcher.Tools" Version="1.0.0" />
     <Content Include="Program.cs" />
+    <ProjectReference Include="..\FeintApi\app.csproj">
+      <Name>FeintAPI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FeintSDK\app.csproj">
       <Name>FeintSDK</Name>
     </ProjectReference>

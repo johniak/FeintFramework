@@ -26,6 +26,14 @@
     <Content Include="Settings.cs" />
     <Content Include="DbBase.cs" />
     <Content Include="Midelware.cs" />
-    <Content Include="Middlewars\CookieSessionMiddleware.cs" />
+    <Content Include="ClassView.cs" />
+    <Content Include="HttpExceptions\HttpException.cs" />
+    <Content Include="HttpExceptions\Http404Exception.cs" />
+    <Content Include="HttpExceptions\Http405Exception.cs" />
+    <Content Include="HttpExceptions\Http404Exception.1.cs" />
+    <Content Include="Middlewares\CookieSessionMiddleware.cs" />
+    <Content Include="BaseModel.cs" />
+    <Content Include="Helpers.cs" />
+    <Content Include="IModelWritable.cs" />
   </ItemGroup>
 </Project>

@@ -10,7 +10,7 @@ namespace FeintSDK
     {
         public byte[] Data { get; set; }
         public int Status { get; set; }
-        public string MimeType { get; set; }
+        public string ContentType { get; set; }
         private readonly Dictionary<String, String> _headers = new Dictionary<string, string>();
         public Dictionary<String, String> Headers { get { return _headers; } }
         private readonly CookiesSet _cookiesSet = new CookiesSet();
@@ -18,26 +18,33 @@ namespace FeintSDK
         public bool IsRedirect { get { return RedirectUrl != null; } }
         public string RedirectUrl { get; private set; }
 
-        private Response(Request request)
+        protected Response()
         {
-            initializeByRequest(request);
             Status = 200;
         }
-        public Response(Request request, byte[] data)
+        public Response(byte[] data)
         {
-            initializeByRequest(request);
             Status = 200;
             this.Data = data;
         }
-        public Response(Request request, string data)
+        public Response( string data)
         {
-            initializeByRequest(request);
             Status = 200;
-            this.Data = System.Text.Encoding.GetEncoding("utf-8").GetBytes(data);
+            initWithText(data);
         }
-        // public Response(Request request, String name, Hash parameters)
+        
+
+        protected void initWithText(string text){
+            this.Data = System.Text.Encoding.GetEncoding("utf-8").GetBytes(text);
+            init();
+        }
+
+        protected void init()
+        {
+            ContentType = "text/html; charset=utf-8";
+        }
+        // public Response( String name, Hash parameters)
         // {
-        //     initializeByRequest(request);
         //     Status = 200;
         //     var fs = new FileStream("FeintSite/" + Settings.ViewsFolder + name, FileMode.Open, FileAccess.Read);
         //     var reader = new StreamReader(fs, Encoding.UTF8);
@@ -47,15 +54,10 @@ namespace FeintSDK
         //     var renderedTemplate = template.Render(parameters);
         //     this.Data = System.Text.Encoding.GetEncoding("utf-8").GetBytes(renderedTemplate);
         // }
-        public static Response Redirect(Request request, String url)
+        public static Response Redirect( String url)
         {
-            var r = new Response(request) { RedirectUrl = url };
+            var r = new Response() { RedirectUrl = url };
             return r;
-        }
-
-        private void initializeByRequest(Request request)
-        {
-           // _cookiesSet.AddAll(request.Cookies.GetAll());
         }
 
     }

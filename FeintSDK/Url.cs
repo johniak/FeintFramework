@@ -26,6 +26,6 @@ namespace FeintSDK
     }
     public enum RequestMethod
     {
-        ALL, GET, POST, PUT, DELETE, Unknown
+        ALL, GET, POST, PUT, PATCH, DELETE, Unknown
     }
 }

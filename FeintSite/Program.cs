@@ -8,7 +8,7 @@ namespace app
     {
         public static Response Index(Request request)
         {
-            var response = new Response(request,"Hi! Im your dashboard");
+            var response = new Response("Hi! Im your dashboard");
             return response;
         }
         
