@@ -2,10 +2,12 @@ FROM microsoft/dotnet:sdk
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
-COPY . .
+COPY ./FeintServer/app.csproj ./FeintServer/app.csproj
+COPY ./FeintSDK/app.csproj ./FeintSDK/app.csproj
+COPY ./FeintSite/app.csproj ./FeintSite/app.csproj
 WORKDIR /app/FeintSite
 RUN dotnet restore
-
-# copy and build everything else
-#RUN dotnet publish -c Release -o out
-#ENTRYPOINT ["dotnet", "out/dotnetapp.dll"]
+WORKDIR /app
+COPY . .
+WORKDIR /app/FeintSite
+RUN dotnet ef database update

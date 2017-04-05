@@ -25,5 +25,6 @@
     <Content Include="Url.cs" />
     <Content Include="Settings.cs" />
     <Content Include="DbBase.cs" />
+    <Content Include="Midelware.cs" />
   </ItemGroup>
 </Project>

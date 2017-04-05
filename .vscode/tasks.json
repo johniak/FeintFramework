@@ -5,7 +5,7 @@
     "args": [],
     "tasks": [
         {
-            "taskName": "build",
+            "taskName": "build_server",
             "args": [
                 "${workspaceRoot}/FeintServer/app.csproj"
             ],
@@ -13,7 +13,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "taskName": "build",
+            "taskName": "build_sdk",
             "args": [
                 "${workspaceRoot}/FeintSDK/app.csproj"
             ],
