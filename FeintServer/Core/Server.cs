@@ -129,7 +129,7 @@ namespace FeintServer.Core
                 if (urlApp != null)
                 {
                     var key = SetSesion(request);
-                    response = RunApplication(request, urlApp);
+                    response = HandleRunApplication(request, urlApp);
                     if (key != null)
                         response.Cookies.SetCookie(new Cookie("session", request.Session.Key, "/"));
                 }
@@ -166,7 +166,49 @@ namespace FeintServer.Core
             return urlApp;
         }
 
-        private static Response RunApplication(Request request, Url urlApp)
+        private static Response HandleRunApplication(Request request, Url urlApp)
+        {
+            return RunAMiddlewareApplication(request, urlApp);
+        }
+
+
+        private static Response RunAMiddlewareApplication(Request request, Url urlApp)
+        {
+            Response response = null;
+            try
+            {
+                foreach (var middleware in Settings.Midelwares)
+                {
+                    request = middleware.ModifyRequest(request, urlApp);
+                    response = middleware.IterruptResuest(request, urlApp);
+                    if (response != null)
+                    {
+                        return response;
+                    }
+                }
+                response = RunAOPApplication(request, urlApp);
+                foreach (var middleware in Settings.Midelwares)
+                {
+                    response = middleware.ModifyResponse(request, response, urlApp);
+                }
+            }
+            catch (Exception ex)
+            {
+                foreach (var middleware in Settings.Midelwares)
+                {
+                    response = middleware.HandleException(request, response, urlApp, ex);
+                }
+                if (response == null)
+                {
+                    throw ex;
+                }
+            }
+            Console.Write("Response");
+            Console.WriteLine(response);
+            return response;
+        }
+
+        private static Response RunAOPApplication(Request request, Url urlApp)
         {
             var mi = urlApp.View.GetMethodInfo();
             var aops = (AOPAttribute[])mi.GetCustomAttributes(typeof(AOPAttribute), true);
@@ -177,11 +219,7 @@ namespace FeintServer.Core
             }
             if (response == null)
             {
-                response = urlApp.View(request);
-                if (response.MimeType != null)
-                {
-                    response.Headers.Add("Content-Type", response.MimeType + "; charset=utf-8");
-                }
+                response = RunApplication(request, urlApp);
             }
             foreach (var aop in aops)
             {
@@ -189,6 +227,16 @@ namespace FeintServer.Core
             }
             return response;
         }
+        private static Response RunApplication(Request request, Url urlApp){
+            var response = urlApp.View(request);
+            if (response.MimeType != null)
+            {
+                response.Headers.Add("Content-Type", response.MimeType + "; charset=utf-8");
+            }
+            return response;
+        }
+
+        
 
         #endregion
 
@@ -252,7 +300,7 @@ namespace FeintServer.Core
                 var ext = request.Url.Substring(request.Url.LastIndexOf(".", StringComparison.Ordinal), request.Url.Length - request.Url.LastIndexOf(".", StringComparison.Ordinal));
                 response.Headers.Add("Content-Type", getMimeType(ext) + "; charset=utf-8");
             }
-            catch(IOException ex)
+            catch(IOException)
             {
                 Console.WriteLine("FileNot Found");
             }

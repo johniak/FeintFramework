@@ -17,6 +17,7 @@ namespace FeintSDK
         public static List<string> Modules = new List<string>();
         public static Dictionary<String, object> Configurations = new Dictionary<string, object>();
         public static DbSettings DatabaseSettings = new DbSettings();
+        public static List<IMidelware> Midelwares= new List<IMidelware>();
     }
 
     public class DbSettings{
