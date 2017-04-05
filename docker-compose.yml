@@ -1,0 +1,13 @@
+framework:
+  build: .
+  volumes:
+    - .:/app
+    - /app/FeintServer/obj
+    - /app/FeintServer/bin
+    - /app/FeintSDK/obj
+    - /app/FeintSDK/bin
+    - /app/FeintSite/obj
+    - /app/FeintSite/bin
+  ports:
+    - 5000:5000
+

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netcoreapp1.0</TargetFramework>
+    <RootNamespace>FeintSDK</RootNamespace>
+    <AssemblyName>FeintSDK</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0-msbuild3-final" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="1.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.1" PrivateAssets="All" />
+    <Content Include="Program.cs" />
+    <Content Include="AOPAttribute.cs" />
+    <Content Include="CookiesSet.cs" />
+    <Content Include="Log.cs" />
+    <Content Include="Request.cs" />
+    <Content Include="Response.cs" />
+    <Content Include="SessionKey.cs" />
+    <Content Include="Session.cs" />
+    <Content Include="SessionProperty.cs" />
+    <Content Include="UserModel.cs" />
+    <Content Include="Url.cs" />
+    <Content Include="Settings.cs" />
+    <Content Include="DbBase.cs" />
+  </ItemGroup>
+</Project>
