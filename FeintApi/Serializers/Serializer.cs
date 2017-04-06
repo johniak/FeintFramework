@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using FeintApi.Serializers.Fields;
 using System.Reflection;
 using System.Linq;
+using Newtonsoft.Json;
+using static FeintApi.Helpers;
 
 namespace FeintApi.Serializers
 {
     public class Serializer<T> : ISerializer where T : class
     {
-        public Dictionary<string, object> data
+        public Dictionary<string, object> Data
         {
             get
             {
@@ -16,17 +18,17 @@ namespace FeintApi.Serializers
             }
             protected set
             {
-                _data = value;
+                data = value;
             }
         }
-        public string Json {}
-        Dictionary<string, object> _data;
+        public string Json { get { return objectToJson(Data); } }
+        Dictionary<string, object> data;
         protected Dictionary<string, object> context = new Dictionary<string, object>();
         protected T instance;
         protected bool many;
         protected bool isValidated = false;
 
-        
+
 
         public Serializer(
           Dictionary<string, object> data = null,
@@ -34,7 +36,7 @@ namespace FeintApi.Serializers
           Dictionary<string, object> context = null,
           bool many = false)
         {
-            this.data = data;
+            this.Data = data;
             this.instance = instance;
             if (context != null)
                 this.context = context;
@@ -54,7 +56,7 @@ namespace FeintApi.Serializers
 
         Dictionary<string, object> getDataFromFields()
         {
-            if (_data != null && isValidated)
+            if (data != null && isValidated)
                 throw new NotSupportedException("Data is not validated");
             var dict = new Dictionary<string, object>();
             foreach (dynamic field in this.fields)
@@ -71,10 +73,10 @@ namespace FeintApi.Serializers
                 type = ((PropertyInfo)info).PropertyType;
             else
                 type = ((FieldInfo)info).FieldType;
-            if (instance != null && _data != null)
-                return (IField)Activator.CreateInstance(type, info.Name, getFieldByName(instance, info.Name), _data);
-            if (_data != null)
-                return (IField)Activator.CreateInstance(type, info.Name, _data);
+            if (instance != null && data != null)
+                return (IField)Activator.CreateInstance(type, info.Name, getFieldByName(instance, info.Name), data);
+            if (data != null)
+                return (IField)Activator.CreateInstance(type, info.Name, data);
             if (instance != null)
                 return (IField)Activator.CreateInstance(type, info.Name, getFieldByName(instance, info.Name));
             return null;
@@ -92,7 +94,10 @@ namespace FeintApi.Serializers
         protected object getFieldByName(Object instance, string name)
         {
             var type = instance.GetType();
-            var memberInfo = type.GetMember(name)[0];
+            var members = type.GetMember(name);
+            if (members.Length < 1)
+                throw new NotSupportedException($"There is no {name} field inside {instance}");
+            var memberInfo = members[0];
             if (memberInfo.MemberType == MemberTypes.Field)
                 return ((FieldInfo)memberInfo).GetValue(instance);
 
@@ -100,6 +105,7 @@ namespace FeintApi.Serializers
                 return ((PropertyInfo)memberInfo).GetValue(instance);
             return null;
         }
+
         protected void setFieldByName(Object instance, string name, object value)
         {
             var type = instance.GetType();
