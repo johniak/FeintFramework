@@ -85,7 +85,7 @@ namespace FeintApi.Serializers
         protected IEnumerable<MemberInfo> getFieldsMember()
         {
             Type thisType = this.GetType();
-            var fields = thisType.GetFields().ToList();//.Where(mi => typeof(IField).IsAssignableFrom(mi.FieldType)).Select(x => (MemberInfo)x);
+            var fields = thisType.GetFields().Where(mi => typeof(IField).IsAssignableFrom(mi.FieldType)).Select(x => (MemberInfo)x);
             var properties = thisType.GetProperties().Where(mi => typeof(IField).IsAssignableFrom(mi.PropertyType)).Select(x => (MemberInfo)x);
             var memberInfos = fields.Concat(properties).ToList();
             return memberInfos;
