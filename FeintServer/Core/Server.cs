@@ -39,6 +39,7 @@ namespace FeintServer.Core
         
         protected async Task handleNewRequest(HttpContext context)
         {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 var request = createSdkRequest(context.Request);
@@ -52,7 +53,9 @@ namespace FeintServer.Core
             }
             finally
             {
-                Console.WriteLine($"{context.Request.Path} {context.Response.StatusCode}");
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
+                Console.WriteLine($"[DateTime.Now] \"{context.Request.Path} {context.Response.StatusCode}\" {elapsedMs}ms");
             }
         }
         protected Request createSdkRequest(HttpRequest req)

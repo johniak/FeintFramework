@@ -15,5 +15,8 @@
     <Content Include="ApiGenericView.cs" />
     <Content Include="Middlewares\ApiHttpExceptionsMiddleware.cs" />
     <Content Include="ApiResponse.cs" />
+    <Content Include="Serializers\Serializer.cs" />
+    <Content Include="Serializers\Fields\Fields.cs" />
+    <Content Include="Serializers\ValidationException.cs" />
   </ItemGroup>
 </Project>

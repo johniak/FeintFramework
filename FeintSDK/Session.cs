@@ -15,15 +15,15 @@ namespace FeintSDK
 
         public String Key
         {
-            get { return sessionKey.Key; }    
+            get { return sessionKey.Key; }
         }
 
         public Session()
         {
-            
+
 
         }
-        
+
         public string Start(string key)
         {
             var query = DbSet<SessionKey>().Where(sk => sk.Key == key);
@@ -35,7 +35,7 @@ namespace FeintSDK
             else
                 return Start();
         }
-       
+
         public string Start()
         {
             SHA1 sha1 = SHA1.Create();
@@ -43,7 +43,7 @@ namespace FeintSDK
                 maxId = DbSet<SessionKey>().Count();
             string before = DateTime.Now.Ticks.ToString() + random.Next() + "" + maxId;
             maxId++;
-            var hashed = SHA256Hash(before)+maxId;
+            var hashed = SHA256Hash(before) + maxId;
             try
             {
                 sessionKey = new SessionKey() { Key = hashed };
@@ -63,14 +63,14 @@ namespace FeintSDK
                 return null;
             return query.First().Value;
         }
-      
+
         public void SetProperty(string name, string value)
         {
-            SessionProperty sp = new SessionProperty() { Name = name, Value = value,Owner=sessionKey };
+            SessionProperty sp = new SessionProperty() { Name = name, Value = value, Owner = sessionKey };
             DbSet<SessionProperty>().Add(sp);
             DbBase.Instance.SaveChanges();
         }
-       
+
         public void UnsetProperty(String name)
         {
             var query = DbSet<SessionProperty>().Where(sp => sp.Owner == sessionKey && sp.Name == name);
@@ -93,7 +93,7 @@ namespace FeintSDK
             var sha256 = SHA256.Create();
             byte[] result = sha256.ComputeHash(ASCIIEncoding.ASCII.GetBytes(text));
             StringBuilder strBuilder = new StringBuilder();
-            foreach(var item in result)
+            foreach (var item in result)
             {
                 strBuilder.Append(item.ToString("x2"));
             }
