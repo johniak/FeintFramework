@@ -1,103 +1,134 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 
 namespace FeintApi.Serializers.Fields
 {
-    public class Field<T> : IField
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+    public class FieldAttribute : Attribute
     {
-        public string Name { get; set; }
         public bool IsReadOnly { get; set; }
+        public bool IsWriteOnly { get; set; }
         public bool IsRequired { get; set; }
-        public string Source { get { return source ?? Name; } set { source = value; } }
+        public string Source { get; set; }
+        public List<Validator> Validators;
+    }
 
-        protected string source;
-        public bool Many { get; set; }
-        Dictionary<string, object> data;
-        public T ExternalValue { get; protected set; }
-        public object InternalValue { get; protected set; }
-        public string Errors { get; protected set; }
+    public abstract class BaseField
+    {
+        protected FieldAttribute attributeInstance;
 
-
-        public Field(string name, T value)
+        public FieldAttribute AttributeInstance
         {
-            this.ExternalValue = value;
-            this.Name = name;
-        }
-        public Field(string name, Dictionary<String, object> data)
-        {
-            this.data = data;
-            this.Name = name;
-        }
-        public Field(string name, T value, Dictionary<String, object> data)
-        {
-            this.InternalValue = value;
-            this.ExternalValue = value;
-            this.data = data;
-            this.Name = name;
-        }
-        public Field(string name, Object value)
-        {
-            this.InternalValue = value;
-            this.ExternalValue = convertToExternalValue(value);
-            this.Name = name;
-        }
-
-        public Field(string name, Object value, Dictionary<String, object> data)
-        {
-            this.InternalValue = value;
-            this.ExternalValue = convertToExternalValue(value);
-            this.data = data;
-            this.Name = name;
-        }
-
-        protected T convertToExternalValue(object internalValue)
-        {
-            if (!(internalValue is T))
-                throw new NotImplementedException();
-            return (T)internalValue;
-        }
-
-        protected object convertToInternalValue(object externalValue)
-        {
-            if (!(externalValue is T))
-                throw new NotImplementedException();
-            return (T)externalValue;
-        }
-
-        public bool Validate()
-        {
-            bool hasErrors = false;
-            List<string> errors = new List<String>();
-            if (Name == null)
-                throw new NotSupportedException("Name cannot be null");
-            if (this.IsRequired && !this.data.ContainsKey(this.Name))
+            get
             {
-                errors.Add("This field is required.");
-                hasErrors = true;
+                return attributeInstance ?? defaultAttributeInstance;
             }
-            if (this.IsReadOnly && this.data.ContainsKey(this.Name))
+            protected set { attributeInstance = value; }
+        }
+
+        public IEnumerable<Validator> Validators
+        {
+            get
             {
-                errors.Add("This field is read only.");
-                hasErrors = true;
+                return defaultValidators.Concat(AttributeInstance.Validators);
             }
-            var value = this.data[this.Name];
+        }
+
+        protected IEnumerable<Validator> defaultValidators
+        {
+            get
+            {
+                return new[] { new BasicValidator() };
+            }
+        }
+
+        protected FieldAttribute defaultAttributeInstance = new FieldAttribute() { };
+
+        public BaseField Parent { get; set; }
+
+        public abstract object ToRepresentation(object value);
+
+        public abstract object ToInternalValue(object data);
+
+        public string Name { get; set; }
+
+        public BaseField()
+        {
+
+        }
+
+        public void Bind(string name, BaseField parent)
+        {
+            this.Name = name;
+            this.Parent = parent;
+        }
+
+        public object GetValue(Dictionary<string, object> data)
+        {
+            return data[this.Name];
+        }
+
+        public object Validate(Dictionary<string, object> data)
+        {
+            List<ValidationException> exceptions = new List<ValidationException>();
+            object value = null;
+            bool empty = false;
             try
             {
-                InternalValue = convertToInternalValue(value);
-                ExternalValue = convertToExternalValue(value);
+                value = ToInternalValue(GetValue(data));
             }
-            catch (InvalidCastException)
+            catch (KeyNotFoundException)
             {
-                errors.Add("Data is wrong type.");
-                hasErrors = true;
+                empty = true;
             }
-            return hasErrors;
+            catch (ValidationException ex)
+            {
+                exceptions.Add(ex);
+                throw new ValidationException(Name, exceptions);
+            }
+            foreach (var validator in Validators)
+            {
+                try
+                {
+                    validator.Validate(this, value, empty);
+                }
+                catch (ValidationException ex)
+                {
+                    exceptions.Add(ex);
+                }
+            }
+            if (exceptions.Count > 0)
+                throw new ValidationException(Name, exceptions);
+            return value;
         }
     }
 
-    public interface IField
+    public class Field<T> : BaseField
     {
-        bool Validate();
-    };
+        public Field() : base()
+        {
+
+        }
+
+        public override object ToInternalValue(object data)
+        {
+            if (data == null)
+                return null;
+            try
+            {
+                return (T)data;
+            }
+            catch (InvalidCastException)
+            {
+                throw new ValidationException($"This is not a valid {typeof(T).Name} field.");
+            }
+        }
+
+        public override object ToRepresentation(object value)
+        {
+            return Helpers.objectToJson(value);
+        }
+    }
 }

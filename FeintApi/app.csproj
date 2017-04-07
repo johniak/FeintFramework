@@ -19,5 +19,7 @@
     <Content Include="Serializers\Fields\Fields.cs" />
     <Content Include="Serializers\ValidationException.cs" />
     <Content Include="Helpers.cs" />
+    <Content Include="Serializers\Fields\Validator.cs" />
+    <Content Include="Serializers\Fields\BasicValidator.cs" />
   </ItemGroup>
 </Project>

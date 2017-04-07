@@ -8,5 +8,9 @@ namespace FeintSDK.Exceptions
         {
 
         }
+        public HttpException(string message) : base(message)
+        {
+
+        }
     }
 }

@@ -8,85 +8,69 @@ using static FeintApi.Helpers;
 
 namespace FeintApi.Serializers
 {
-    public class Serializer<T> : ISerializer where T : class
+
+    public class BaseSerializer
     {
-        public Dictionary<string, object> Data
-        {
-            get
-            {
-                return getDataFromFields();
-            }
-            protected set
-            {
-                data = value;
-            }
-        }
+
+    }
+
+    public class Serializer<T> : BaseField where T : class
+    {
+
+        protected object data;
+        public object Data { get { return Instance == null ? data : ToRepresentation(Instance); } }
+        public object Instance { get; protected set; }
+
         public string Json { get { return objectToJson(Data); } }
-        Dictionary<string, object> data;
-        protected Dictionary<string, object> context = new Dictionary<string, object>();
-        protected T instance;
-        protected bool many;
-        protected bool isValidated = false;
-
-
-
-        public Serializer(
-          Dictionary<string, object> data = null,
-          T instance = null,
-          Dictionary<string, object> context = null,
-          bool many = false)
+        public bool Many { get; protected set; }
+        protected Serializer()
         {
-            this.Data = data;
-            this.instance = instance;
-            if (context != null)
-                this.context = context;
-            this.many = many;
+
         }
-
-        private Serializer() { }
-
-        protected IEnumerable<IField> fields
+        public Serializer(object instance = null, object data = null, bool many = false) : base()
+        {
+            if (instance == null && data == null)
+                throw new NotSupportedException("Useless serializer, please provide instacne or data.");
+            if (many && !(instance is IEnumerable<T>))
+            {
+                throw new NotSupportedException($"The instance should be IEnumerable of {typeof(T).Name}");
+            }
+            if (!many && !(instance is T))
+                throw new NotSupportedException($"The instance should be IEnumerable of {typeof(T).Name}");
+            this.data = data;
+            Instance = instance;
+            Many = many;
+        }
+        protected IEnumerable<BaseField> fields;
+        public IEnumerable<BaseField> Fields
         {
             get
             {
-                var members = getFieldsMember();
-                return members.Select(mi => createFieldObject(mi));
+                if (fields == null)
+                    fields = getFieldsMember().Select(mi => createFieldObject(mi)).ToList();
+                return fields;
             }
         }
 
-        Dictionary<string, object> getDataFromFields()
-        {
-            if (data != null && isValidated)
-                throw new NotSupportedException("Data is not validated");
-            var dict = new Dictionary<string, object>();
-            foreach (dynamic field in this.fields)
-            {
-                dict[field.Name] = field.ExternalValue;
-            }
-            return dict;
-        }
-
-        protected IField createFieldObject(MemberInfo info)
+        protected BaseField createFieldObject(MemberInfo info)
         {
             Type type;
             if (info.MemberType == MemberTypes.Property)
                 type = ((PropertyInfo)info).PropertyType;
             else
                 type = ((FieldInfo)info).FieldType;
-            if (instance != null && data != null)
-                return (IField)Activator.CreateInstance(type, info.Name, getFieldByName(instance, info.Name), data);
-            if (data != null)
-                return (IField)Activator.CreateInstance(type, info.Name, data);
-            if (instance != null)
-                return (IField)Activator.CreateInstance(type, info.Name, getFieldByName(instance, info.Name));
-            return null;
+            var field = (BaseField)Activator.CreateInstance(type);
+            field.Bind(info.Name, this);
+            return field;
         }
 
         protected IEnumerable<MemberInfo> getFieldsMember()
         {
             Type thisType = this.GetType();
-            var fields = thisType.GetFields().Where(mi => typeof(IField).IsAssignableFrom(mi.FieldType)).Select(x => (MemberInfo)x);
-            var properties = thisType.GetProperties().Where(mi => typeof(IField).IsAssignableFrom(mi.PropertyType)).Select(x => (MemberInfo)x);
+            var fields = thisType.GetFields(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                                .Where(mi => typeof(BaseField).IsAssignableFrom(mi.FieldType)).Select(x => (MemberInfo)x);
+            var properties = thisType.GetProperties(BindingFlags.Public | BindingFlags.DeclaredOnly | BindingFlags.Instance)
+                                    .Where(mi => typeof(BaseField).IsAssignableFrom(mi.PropertyType)).Select(x => (MemberInfo)x);
             var memberInfos = fields.Concat(properties).ToList();
             return memberInfos;
         }
@@ -116,7 +100,45 @@ namespace FeintApi.Serializers
                 ((PropertyInfo)memberInfo).SetValue(instance, value);
         }
 
+        public override object ToRepresentation(object instance)
+        {
+            if (instance is IEnumerable<T>)
+                return new ListSerializer<T>(this, (IEnumerable<T>)instance).Data;
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            foreach (var field in Fields)
+            {
+                dict.Add(field.Name, getFieldByName(instance, field.Name));
+            }
+            return dict;
+        }
+
+        public override object ToInternalValue(object data)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class ListSerializer<T> : Serializer<IEnumerable<T>>
+    {
+        public BaseField Child { get; protected set; }
+        public ListSerializer(BaseField child, IEnumerable<T> instance = null, object data = null)
+        {
+            if (instance == null && data == null)
+                throw new NotSupportedException("Useless serializer, please provide instance or data.");
+            Child = child;
+            this.Instance = instance;
+            this.data = data;
+            this.Many = true;
+        }
+        public override object ToRepresentation(object instance)
+        {
+            IEnumerable<T> enumerable = (IEnumerable<T>)instance;
+            List<object> repChilds = new List<object>();
+            foreach (var item in enumerable)
+            {
+                repChilds.Add(Child.ToRepresentation(item));
+            }
+            return repChilds;
+        }
     }
 }
-
-interface ISerializer { };
