@@ -9,13 +9,30 @@ using Newtonsoft.Json;
 using System.Reflection;
 namespace app
 {
-
+    class Example2Model
+    {
+        public int SampleId = 666;
+        public int SampleId2 = 666;
+    }
     class ExampleModel
     {
         public int TestId = 123;
         public string Name = "abc";
+        public Example2Model ForeignKey = new Example2Model();
+        //public List<Example2Model> ForeignKey = new List<Example2Model>(){ new Example2Model(),new Example2Model()};
     }
+    class Example2Serializer : Serializer<ExampleModel>
+    {
+        public Example2Serializer(object instance = null, object data = null, bool many = false) : base(instance, data, many)
+        {
 
+        }
+        public Example2Serializer()
+        {
+
+        }
+        public Field<int> SampleId;
+    }
 
     class ExampleSerializer : Serializer<ExampleModel>
     {
@@ -26,6 +43,7 @@ namespace app
 
         public Field<int> TestId;
         public Field<string> Name;
+        public Example2Serializer ForeignKey;
     }
 
 
@@ -42,7 +60,7 @@ namespace app
             var inst = new ExampleModel();
             Console.WriteLine(new ExampleSerializer(instance: inst).Json);
             var instArr = new[] { inst, inst };
-            Console.WriteLine(new ExampleSerializer(instance: instArr, many: true).Json);
+            //Console.WriteLine(new ExampleSerializer(instance: instArr, many: true).Json);
 
             // Settings.Urls.Add(new Url(@"^/$", Program.Index));
             // Settings.Midelwares.Add(typeof(CookieSessionMiddleware));

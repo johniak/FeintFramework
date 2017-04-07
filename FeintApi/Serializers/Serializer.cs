@@ -23,7 +23,7 @@ namespace FeintApi.Serializers
 
         public string Json { get { return objectToJson(Data); } }
         public bool Many { get; protected set; }
-        protected Serializer()
+        public Serializer()
         {
 
         }
@@ -107,7 +107,7 @@ namespace FeintApi.Serializers
             Dictionary<string, object> dict = new Dictionary<string, object>();
             foreach (var field in Fields)
             {
-                dict.Add(field.Name, getFieldByName(instance, field.Name));
+                dict.Add(field.Name, field.ToRepresentation(getFieldByName(instance, field.Name)));
             }
             return dict;
         }

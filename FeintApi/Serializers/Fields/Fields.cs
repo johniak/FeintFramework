@@ -128,7 +128,7 @@ namespace FeintApi.Serializers.Fields
 
         public override object ToRepresentation(object value)
         {
-            return Helpers.objectToJson(value);
+            return value; 
         }
     }
 }
