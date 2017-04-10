@@ -46,7 +46,7 @@ namespace FeintApi
         }
         protected Response create(Request request)
         {
-            IModelWritable instance = (IModelWritable) JsonConvert.DeserializeObject(request.Body,serializer);
+            IWritable instance = (IWritable) JsonConvert.DeserializeObject(request.Body,serializer);
             instance.Save();
             return new ApiResponse(instance) { Status = 201 };
         }

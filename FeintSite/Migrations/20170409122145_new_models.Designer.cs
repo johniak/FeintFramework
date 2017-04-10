@@ -8,9 +8,10 @@ using FeintSite;
 namespace FeintSite.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20170409122145_new_models")]
+    partial class new_models
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1");
@@ -49,6 +50,8 @@ namespace FeintSite.Migrations
                 {
                     b.Property<int?>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ExamplePropertyInteger");
 
                     b.Property<string>("ExamplePropertyString");
 

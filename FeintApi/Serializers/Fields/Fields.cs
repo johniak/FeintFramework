@@ -12,7 +12,7 @@ namespace FeintApi.Serializers.Fields
         public bool IsWriteOnly { get; set; }
         public bool IsRequired { get; set; }
         public string Source { get; set; }
-        public List<Validator> Validators;
+        public List<Validator> Validators  = new List<Validator>();
     }
 
     public abstract class BaseField
@@ -59,25 +59,26 @@ namespace FeintApi.Serializers.Fields
 
         }
 
-        public void Bind(string name, BaseField parent)
+        public virtual void Bind(string name, BaseField parent)
         {
             this.Name = name;
             this.Parent = parent;
         }
 
-        public object GetValue(Dictionary<string, object> data)
+        public virtual object GetValue(Dictionary<string, object> data)
         {
             return data[this.Name];
         }
 
-        public object Validate(Dictionary<string, object> data)
+        public virtual object Validate(object data)
         {
+            Dictionary<string, object> dict = (Dictionary<string, object>)data;
             List<ValidationException> exceptions = new List<ValidationException>();
             object value = null;
             bool empty = false;
             try
             {
-                value = ToInternalValue(GetValue(data));
+                value = ToInternalValue(GetValue(dict));
             }
             catch (KeyNotFoundException)
             {
@@ -128,7 +129,7 @@ namespace FeintApi.Serializers.Fields
 
         public override object ToRepresentation(object value)
         {
-            return value; 
+            return value;
         }
     }
 }

@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using FeintApi.Serializers.Fields;
 using System.Reflection;
 using System.Linq;
-using Newtonsoft.Json;
 using static FeintApi.Helpers;
+using FeintSDK;
 
 namespace FeintApi.Serializers
 {
-
-    public class BaseSerializer
-    {
-
-    }
-
-    public class Serializer<T> : BaseField where T : class
+    public class Serializer<T> : BaseField, IWritable where T : class
     {
 
         protected object data;
@@ -31,12 +25,12 @@ namespace FeintApi.Serializers
         {
             if (instance == null && data == null)
                 throw new NotSupportedException("Useless serializer, please provide instacne or data.");
-            if (many && !(instance is IEnumerable<T>))
+            if (many && !(instance is IEnumerable<T>) && instance != null)
             {
                 throw new NotSupportedException($"The instance should be IEnumerable of {typeof(T).Name}");
             }
-            if (!many && !(instance is T))
-                throw new NotSupportedException($"The instance should be IEnumerable of {typeof(T).Name}");
+            if (!many && !(instance is T) && instance != null)
+                throw new NotSupportedException($"The instance should be {typeof(T).Name}");
             this.data = data;
             Instance = instance;
             Many = many;
@@ -47,12 +41,17 @@ namespace FeintApi.Serializers
             get
             {
                 if (fields == null)
-                    fields = getFieldsMember().Select(mi => createFieldObject(mi)).ToList();
+                    fields = getFields();
                 return fields;
             }
         }
 
-        protected BaseField createFieldObject(MemberInfo info)
+        protected virtual IEnumerable<BaseField> getFields()
+        {
+            return getFieldsMember().Select(mi => createFieldObject(mi)).ToList();
+        }
+
+        protected virtual BaseField createFieldObject(MemberInfo info)
         {
             Type type;
             if (info.MemberType == MemberTypes.Property)
@@ -111,34 +110,67 @@ namespace FeintApi.Serializers
             }
             return dict;
         }
-
+        /// Transform dict of internal data into the dict of native data
         public override object ToInternalValue(object data)
+        {
+            Dictionary<string, object> fieldDict = (Dictionary<string, object>)data;
+            Dictionary<string, object> serializerDict = new Dictionary<string, object>();
+            List<ValidationException> validationExceptions = new List<ValidationException>();
+            foreach (var field in Fields)
+            {
+                try
+                {
+                    serializerDict[field.Name] = field.Validate(fieldDict);
+                }
+                catch (ValidationException ex)
+                {
+                    validationExceptions.Add(new ValidationException(ex.Exceptions));
+                }
+            }
+            if (validationExceptions.Count > 0)
+            {
+                throw new ValidationException(validationExceptions);
+            }
+            return serializerDict;
+        }
+
+        public override object Validate(object data)
+        {
+            return ToInternalValue(data);
+        }
+
+        public virtual object Create(Dictionary<string, object> validatedDate)
         {
             throw new NotImplementedException();
         }
-    }
 
-    public class ListSerializer<T> : Serializer<IEnumerable<T>>
-    {
-        public BaseField Child { get; protected set; }
-        public ListSerializer(BaseField child, IEnumerable<T> instance = null, object data = null)
+        public virtual object Update(Dictionary<string, object> validatedDate, object Instance)
         {
-            if (instance == null && data == null)
-                throw new NotSupportedException("Useless serializer, please provide instance or data.");
-            Child = child;
-            this.Instance = instance;
-            this.data = data;
-            this.Many = true;
+            throw new NotImplementedException();
         }
-        public override object ToRepresentation(object instance)
+
+        public virtual object Save()
         {
-            IEnumerable<T> enumerable = (IEnumerable<T>)instance;
-            List<object> repChilds = new List<object>();
-            foreach (var item in enumerable)
+            var objectData = Validate(this.Data);
+            if (objectData is Dictionary<string, object>)
+                throw new NotSupportedException("You have to overridde save method to create from other type than dictionary");
+            var validatedData = (Dictionary<string, object>)Validate(this.Data);
+            object instance = null;
+            if (Instance == null)
             {
-                repChilds.Add(Child.ToRepresentation(item));
+                instance = Create(validatedData);
             }
-            return repChilds;
+            else
+            {
+                instance = Update(validatedData, Instance);
+            }
+            Instance = instance;
+            return instance;
+        }
+
+        public virtual void delete()
+        {
+            throw new NotImplementedException();
         }
     }
 }

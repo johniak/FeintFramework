@@ -22,5 +22,6 @@
       <Name>FeintServer</Name>
     </ProjectReference>
     <Content Include="Db.cs" />
+    <Content Include="ExampleModel.cs" />
   </ItemGroup>
 </Project>

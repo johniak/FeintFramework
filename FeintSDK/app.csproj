@@ -34,6 +34,6 @@
     <Content Include="Middlewares\CookieSessionMiddleware.cs" />
     <Content Include="BaseModel.cs" />
     <Content Include="Helpers.cs" />
-    <Content Include="IModelWritable.cs" />
+    <Content Include="IWritable.cs" />
   </ItemGroup>
 </Project>

@@ -21,5 +21,7 @@
     <Content Include="Helpers.cs" />
     <Content Include="Serializers\Fields\Validator.cs" />
     <Content Include="Serializers\Fields\BasicValidator.cs" />
+    <Content Include="Serializers\ListSerializer.cs" />
+    <Content Include="Serializers\ModelSerializer.cs" />
   </ItemGroup>
 </Project>
