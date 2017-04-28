@@ -22,6 +22,20 @@ namespace FeintSite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExampleModel",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ExamplePropertyInteger = table.Column<int>(nullable: false),
+                    ExamplePropertyString = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExampleModel", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SessionProperty",
                 columns: table => new
                 {
@@ -52,6 +66,9 @@ namespace FeintSite.Migrations
         {
             migrationBuilder.DropTable(
                 name: "SessionProperty");
+
+            migrationBuilder.DropTable(
+                name: "ExampleModel");
 
             migrationBuilder.DropTable(
                 name: "SessionKey");

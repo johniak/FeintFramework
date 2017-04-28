@@ -8,7 +8,7 @@ using FeintSite;
 namespace FeintSite.Migrations
 {
     [DbContext(typeof(Db))]
-    [Migration("20170405065036_init")]
+    [Migration("20170411172741_init")]
     partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,20 @@ namespace FeintSite.Migrations
                     b.HasIndex("OwnerSessionKeyId");
 
                     b.ToTable("SessionProperty");
+                });
+
+            modelBuilder.Entity("FeintSite.ExampleModel", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("ExamplePropertyInteger");
+
+                    b.Property<string>("ExamplePropertyString");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExampleModel");
                 });
 
             modelBuilder.Entity("FeintSDK.SessionProperty", b =>

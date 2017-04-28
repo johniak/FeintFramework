@@ -28,11 +28,9 @@ namespace FeintApi.Serializers
         }
         protected virtual BaseField createFieldOfType(Type t, string name)
         {
-            var sth = new Field<object>();
-            Type sthType = sth.GetType();
-            sthType = sthType.GetGenericTypeDefinition();
-            sthType = sthType.MakeGenericType(t);
-            var field = (BaseField)Activator.CreateInstance(sthType);
+            Type fieldType = typeof(Field<>);
+            fieldType = fieldType.MakeGenericType(t);
+            var field = (BaseField)Activator.CreateInstance(fieldType);
             field.Bind(name, this);
             return field;
         }

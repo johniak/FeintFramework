@@ -50,6 +50,8 @@ namespace FeintSite.Migrations
                     b.Property<int?>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("ExamplePropertyInteger");
+
                     b.Property<string>("ExamplePropertyString");
 
                     b.HasKey("Id");
