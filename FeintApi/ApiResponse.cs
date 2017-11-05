@@ -7,6 +7,12 @@ namespace FeintApi
 {
     public class ApiResponse : Response
     {
+        public ApiResponse(string json)
+        {
+            initWithText(json);
+            ContentType = "application/json; charset=utf-8";
+        }
+
         public ApiResponse(object data)
         {
             var json = JsonConvert.SerializeObject(data);

@@ -2,7 +2,7 @@
 
 namespace FeintSDK
 {
-    class SessionKey
+    class SessionKey : BaseModel
     {
         public int SessionKeyId {get;set;}
         public String Key { get; set; }

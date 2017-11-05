@@ -152,7 +152,7 @@ namespace FeintApi.Serializers
         public virtual object Save()
         {
             var objectData = Validate(this.Data);
-            if (objectData is Dictionary<string, object>)
+            if (!(objectData is Dictionary<string, object>))
                 throw new NotSupportedException("You have to overridde save method to create from other type than dictionary");
             var validatedData = (Dictionary<string, object>)Validate(this.Data);
             object instance = null;

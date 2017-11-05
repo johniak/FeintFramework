@@ -1,16 +1,21 @@
+using Microsoft.EntityFrameworkCore;
 
 namespace FeintSDK
 {
     public class BaseModel : IWritable
     {
-        public int? Id { get; set; }
+        public virtual int? Id { get; set; }
 
         public object Save()
         {
-            if (Id != null)
-                DbBase.Instance.Update(this);
-            else
+            if (DbBase.Instance.Entry(this).State == EntityState.Detached)
+            {
                 DbBase.Instance.Add(this);
+            }
+            else
+            {
+                DbBase.Instance.Update(this);
+            }
             DbBase.Instance.SaveChanges();
             return this;
         }

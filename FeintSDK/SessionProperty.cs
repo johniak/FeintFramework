@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FeintSDK
 {
-    class SessionProperty 
+    class SessionProperty : BaseModel
     {
         public int SessionPropertyId { get; set; }
         public SessionKey Owner { get; set; }

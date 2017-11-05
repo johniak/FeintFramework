@@ -17,22 +17,26 @@ namespace FeintServer.Core
     public class Server
     {
         protected String Address;
+        protected int Port;
         protected Dictionary<string, byte[]> StaticCache = new Dictionary<string, byte[]>();
 
-        public Server(String address)
+        public Server(String address,int port)
         {
             Address = address;
+            Port = port;
         }
 
         public void Start()
         {
             var host = new WebHostBuilder()
-            .UseKestrel()
+            .UseKestrel(options =>
+            {
+                options.Listen(IPAddress.Parse(this.Address), this.Port);
+            })
             .Configure(app =>
             {
                 app.Run(handleNewRequest);
-            }).
-            UseUrls("http://0.0.0.0:5000")
+            })
             .Build();
             host.Run();
         }
@@ -55,7 +59,7 @@ namespace FeintServer.Core
             {
                 watch.Stop();
                 var elapsedMs = watch.ElapsedMilliseconds;
-                Console.WriteLine($"[DateTime.Now] \"{context.Request.Path} {context.Response.StatusCode}\" {elapsedMs}ms");
+                Console.WriteLine($"[{DateTime.Now}] \"{context.Request.Path} {context.Response.StatusCode}\" {elapsedMs}ms");
             }
         }
         protected Request createSdkRequest(HttpRequest req)

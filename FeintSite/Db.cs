@@ -9,7 +9,7 @@ namespace FeintSite
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity(typeof(ExampleModel));
+           // modelBuilder.Entity(typeof(ExampleModel));
         }
     }
 }

@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
 using System.Threading;
+using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace FeintSDK
 {
@@ -36,10 +39,18 @@ namespace FeintSDK
             }
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected async override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity(typeof(SessionKey));
-            modelBuilder.Entity(typeof(SessionProperty));
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            var allModels = new List<Type>();
+            foreach (var assembly in assemblies)
+            {
+                var types = assembly.GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(BaseModel)));
+                allModels.AddRange(types);
+            }
+            foreach(var type in allModels){
+                modelBuilder.Entity(type);
+            }
         }
     }
 }
