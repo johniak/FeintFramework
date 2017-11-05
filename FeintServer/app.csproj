@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>FeintServer</RootNamespace>
     <AssemblyName>FeintServer</AssemblyName>
+    <Version>0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\FeintSDK\app.csproj">

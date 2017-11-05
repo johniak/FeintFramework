@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>FeintSDK</RootNamespace>
     <AssemblyName>FeintSDK</AssemblyName>
+    <Version>0.0.1</Version>
   </PropertyGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
@@ -30,7 +31,6 @@
     <Content Include="HttpExceptions\HttpException.cs" />
     <Content Include="HttpExceptions\Http404Exception.cs" />
     <Content Include="HttpExceptions\Http405Exception.cs" />
-    <Content Include="HttpExceptions\Http404Exception.1.cs" />
     <Content Include="Middlewares\CookieSessionMiddleware.cs" />
     <Content Include="BaseModel.cs" />
     <Content Include="Helpers.cs" />
