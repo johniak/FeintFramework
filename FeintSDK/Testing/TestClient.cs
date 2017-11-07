@@ -15,8 +15,12 @@ using FeintSDK.Server;
 
 namespace FeintSDK.Testing
 {
-    public abstract class TestClient : BaseServer
+    public class TestClient : BaseServer
     {
+        public TestClient()
+        {
+
+        }
 
         public virtual Response HttpCall(string path, RequestMethod method, String body, Dictionary<string, string> headers)
         {

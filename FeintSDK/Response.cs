@@ -9,6 +9,7 @@ namespace FeintSDK
     public class Response
     {
         public byte[] Data { get; set; }
+        public string BodyString {get; protected set;}
         public int Status { get; set; }
         public string ContentType { get; set; }
         private readonly Dictionary<String, String> _headers = new Dictionary<string, string>();
@@ -35,6 +36,7 @@ namespace FeintSDK
         
 
         protected void initWithText(string text){
+            this.BodyString =text;
             this.Data = System.Text.Encoding.GetEncoding("utf-8").GetBytes(text);
             init();
         }

@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <RootNamespace>FeintSDK</RootNamespace>
     <AssemblyName>FeintSDK</AssemblyName>
-    <Version>0.0.1</Version>
+    <Version>0.0.4</Version>
   </PropertyGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
