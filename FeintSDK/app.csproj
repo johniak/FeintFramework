@@ -13,6 +13,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="2.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <Content Include="Server\Server.cs" />
+    <Content Include="Server\BaseServer.cs" />
+    <Content Include="Server\ComplexContentConverter.cs" />
+    <Content Include="Testing\TestClient.cs" />
     <Content Include="Program.cs" />
     <Content Include="AOPAttribute.cs" />
     <Content Include="CookiesSet.cs" />

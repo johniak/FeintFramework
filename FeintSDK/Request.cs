@@ -42,6 +42,7 @@ namespace FeintSDK
         public String Body { get; set; }
         public String ContentType { get; set; }
         public Dictionary<String, String> FormData = new Dictionary<string, string>();
+        public object Data;
         public Session Session { get; set; }
         public GroupCollection Variables { get; private set; }
         private readonly Dictionary<String, String> _headers = new Dictionary<string, string>();

@@ -18,9 +18,6 @@
     <ProjectReference Include="..\FeintSDK\app.csproj">
       <Name>FeintSDK</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FeintServer\app.csproj">
-      <Name>FeintServer</Name>
-    </ProjectReference>
     <Content Include="Db.cs" />
     <Content Include="ExampleModel.cs" />
   </ItemGroup>

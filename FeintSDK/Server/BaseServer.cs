@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -12,109 +12,11 @@ using System.Text.RegularExpressions;
 using System.Net;
 using System.Linq;
 
-namespace FeintServer.Core
+namespace FeintSDK.Server
 {
-    public class Server
+    public abstract class BaseServer
     {
-        protected String Address;
-        protected int Port;
         protected Dictionary<string, byte[]> StaticCache = new Dictionary<string, byte[]>();
-
-        public Server(String address,int port)
-        {
-            Address = address;
-            Port = port;
-        }
-
-        public void Start()
-        {
-            var host = new WebHostBuilder()
-            .UseKestrel(options =>
-            {
-                options.Listen(IPAddress.Parse(this.Address), this.Port);
-            })
-            .Configure(app =>
-            {
-                app.Run(handleNewRequest);
-            })
-            .Build();
-            host.Run();
-        }
-        
-        protected async Task handleNewRequest(HttpContext context)
-        {
-            var watch = System.Diagnostics.Stopwatch.StartNew();
-            try
-            {
-                var request = createSdkRequest(context.Request);
-                var response = HandleRequest(request);
-                fillHttpResponse(context.Response, response);
-            }
-            catch (Exception ex)
-            {
-                context.Response.StatusCode = 503;
-                await context.Response.WriteAsync(ex.ToString());
-            }
-            finally
-            {
-                watch.Stop();
-                var elapsedMs = watch.ElapsedMilliseconds;
-                Console.WriteLine($"[{DateTime.Now}] \"{context.Request.Path} {context.Response.StatusCode}\" {elapsedMs}ms");
-            }
-        }
-        protected Request createSdkRequest(HttpRequest req)
-        {
-            var sdkRequest = new Request(req.Path);
-            sdkRequest.Body = "";
-            sdkRequest.ContentType = req.ContentType;
-            sdkRequest.MethodString = req.Method;
-            if(req.HasFormContentType)
-            {
-                foreach (var formElement in req.Form)
-                {
-                    sdkRequest.FormData.Add(formElement.Key, formElement.Value);
-                }
-            }
-            else
-            {
-
-                StreamReader reader = new StreamReader(req.Body);
-                sdkRequest.Body = reader.ReadToEnd();
-            }
-            List<Cookie> cookieList = new List<Cookie>();
-            foreach (var cookie in req.Cookies)
-            {
-                cookieList.Add(new Cookie(cookie.Key, cookie.Value));
-            }
-            sdkRequest.Cookies.AddAll(cookieList);
-            foreach (var header in req.Headers)
-            {
-                sdkRequest.Headers.Add(header.Key, header.Value);
-            }
-            return sdkRequest;
-        }
-        protected void fillHttpResponse(HttpResponse httpResponse, Response response)
-        {
-            foreach (var cookie in response.Cookies)
-            {
-                var options = new CookieOptions();
-                if(cookie.Domain.Length!=0)
-                     options.Domain = cookie.Domain;
-                if(cookie.Expires.Ticks!=0)
-                    options.Expires = cookie.Expires;
-                options.HttpOnly = cookie.HttpOnly;
-                options.Path = cookie.Path;
-                options.Secure = cookie.Secure;
-                httpResponse.Cookies.Append(cookie.Name, cookie.Value, options);
-            }
-            foreach (var header in response.Headers)
-            {
-                httpResponse.Headers.Add(header.Key, header.Value);
-            }
-            httpResponse.StatusCode = response.Status;
-            httpResponse.ContentType = response.ContentType;
-            httpResponse.Body.Write(response.Data, 0, response.Data.Length);
-        }
 
         protected Response HandleRequest(Request request)
         {
@@ -216,7 +118,8 @@ namespace FeintServer.Core
             }
             return response;
         }
-        private static Response RunApplication(Request request, Url urlApp){
+        private static Response RunApplication(Request request, Url urlApp)
+        {
             var response = urlApp.View(request);
             if (response.ContentType != null)
             {
@@ -225,7 +128,7 @@ namespace FeintServer.Core
             return response;
         }
 
-        
+
 
         #endregion
 
@@ -235,7 +138,22 @@ namespace FeintServer.Core
             {
                 if (request.ContentType == "application/json")
                 {
-                    request.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.Body);
+                    try
+                    {
+                        request.FormData = JsonConvert.DeserializeObject<Dictionary<string, string>>(request.Body);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                    if (request.Body.Trim()[0] == '[')
+                    {
+                        request.Data = JsonConvert.DeserializeObject<List<object>>(request.Body, new JsonConverter[] { new ComplexContentConverter() });
+                    }
+                    else
+                    {
+                        request.Data = JsonConvert.DeserializeObject<Dictionary<string, object>>(request.Body, new JsonConverter[] { new ComplexContentConverter() });
+                    }
                 }
             }
         }
@@ -289,7 +207,7 @@ namespace FeintServer.Core
                 var ext = request.Url.Substring(request.Url.LastIndexOf(".", StringComparison.Ordinal), request.Url.Length - request.Url.LastIndexOf(".", StringComparison.Ordinal));
                 response.Headers.Add("Content-Type", getMimeType(ext) + "; charset=utf-8");
             }
-            catch(IOException)
+            catch (IOException)
             {
                 Console.WriteLine("FileNot Found");
             }
@@ -313,7 +231,7 @@ namespace FeintServer.Core
             return Mappings.TryGetValue(extension, out mime) ? mime : "application/octet-stream";
         }
 
-       private static readonly IDictionary<string, string> Mappings = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase) {
+        private static readonly IDictionary<string, string> Mappings = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase) {
 
         #region Big freaking list of mime types
         // combination of values from Windows 7 Registry and 

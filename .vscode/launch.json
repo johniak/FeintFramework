@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/FeintSite/bin/Debug/netcoreapp1.0/FeintSite.dll",
+            "program": "${workspaceRoot}/FeintSite/bin/Debug/netcoreapp2.0/FeintSite.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "console": "internalConsole",
