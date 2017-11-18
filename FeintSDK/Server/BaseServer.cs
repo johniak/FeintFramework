@@ -87,6 +87,7 @@ namespace FeintSDK.Server
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 foreach (var middleware in middlewaresInstances)
                 {
                     response = middleware.HandleException(request, response, urlApp, ex);
