@@ -1,7 +1,7 @@
 using System;
 using FeintSDK;
 
-namespace FeintSite
+namespace FeintSite.Models
 {
     public class ExampleModel : BaseModel
     {

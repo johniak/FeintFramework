@@ -3,10 +3,12 @@
   
   services:
     db:
-      image: postgres
+      image: kartoza/postgis
       restart: always
       environment:
-        POSTGRES_PASSWORD: pass
+        POSTGRES_PASS: pass
+        POSTGRES_USER: postgres
+        POSTGRES_DBNAME: postgres
       ports:
         - 5432:5432
     app:

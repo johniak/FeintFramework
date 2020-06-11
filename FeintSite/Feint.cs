@@ -8,20 +8,50 @@ using System.Linq;
 using Newtonsoft.Json;
 using GraphQL.Types;
 using GraphQL;
+using Feint.Graphql;
+using System.Linq.Expressions;
+using FeintSite.Models;
 
 namespace FeintSite
 {
 
-    public class ExampleModelType : ObjectGraphType<ExampleModel>
+    public class ExampleModelType : FeintObjectType<ExampleModel>
     {
-        public ExampleModelType()
+        static Expression<Func<ExampleModel, dynamic>>[] Excluded = { em => em.ExamplePropertyInteger };
+        public ExampleModelType() : base(Excluded)
         {
-            Name = "ExampleModel";
+            Field<StringGraphType>("TestField", resolve: ctx => ctx.Source.ExamplePropertyInteger + "Test");
+        }
+    }
 
-            // Field(h => h.Id).Description("The id of the human.");
-            Field<Int32>("Id", f => f.Id.Value, nullable: true);
-            Field(e=>e.ExamplePropertyInteger);
-            // Field<String>("Weird")
+    public class TripModelType : FeintObjectType<TripModel>
+    {
+
+    }
+    public class TripInputType : InputObjectGraphType
+    {
+        public TripInputType()
+        {
+            Field<NonNullGraphType<StringGraphType>>("name");
+        }
+    }
+
+    public class Mutation : ObjectGraphType
+    {
+        public Mutation()
+        {
+            Field<TripModelType>(
+      "createTrip",
+      arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<TripInputType>> { Name = "input" }
+      ),
+      resolve: context =>
+      {
+          var trip = context.GetArgument<TripModel>("input");
+          trip.StartTime = DateTime.Now;
+          trip.Save();
+          return trip;
+      });
         }
     }
 
@@ -34,6 +64,8 @@ namespace FeintSite
                 "exampleModel",
                 resolve: context => Db.DbSet<ExampleModel>().FirstOrDefault()
             );
+            Field<ListGraphType<ExampleModelType>>("allExamples", resolve: ctx => Db.DbSet<ExampleModel>().ToList());
+            Field<ListGraphType<TripModelType>>("allTrips", resolve: ctx => Db.DbSet<TripModel>().ToList());
         }
     }
     public class StarWarsSchema : Schema
@@ -42,42 +74,18 @@ namespace FeintSite
             : base()
         {
             Query = new Query();
+            Mutation = new Mutation();
         }
     }
-    // class ExampleModelType : ObjectType
-    // {
-    //     public ExampleModelType()
-    //     {
-    //         this.Field(new StringType(), "ExamplePropertyString", null, true, null, null);
-    //         this.Field(new IntType(), "ExamplePropertyInteger", null, true, null, null);
-    //         this.Field(new IntType(), "ExamplePropertyInteger1", null, true, null, null);
-    //     }
-    // }
-    // class Query : ObjectType
-    // {
-    //     public Query()
-    //     {
-    //         this.Field(new ExampleModelType(), "ExampleModel", null, true, null, null);
-    //     }
-
-    //     dynamic ResolveExampleModel(dynamic parent)
-    //     {
-    //         return null;
-    //     }
-    // }
-    // class FeintSchema : Schema
-    // {
-    //     public FeintSchema()
-    //         : base()
-    //     {
-    //         this.Query = new Query();
-    //     }
-    // }
-
     class Feint : FeintSetup
     {
         public static Response Index(Request request)
         {
+            var tripModel = new TripModel()
+            {
+                StartTime = DateTime.Now
+            };
+            tripModel.Save();
             var exmpModel = Db.DbSet<ExampleModel>().FirstOrDefault();
             if (exmpModel == null)
             {
@@ -94,15 +102,24 @@ namespace FeintSite
 
         public static Response Graphql(Request request)
         {
+            Console.WriteLine(request.Data.GetType());
             Schema schema = new StarWarsSchema();
-            Console.WriteLine(request.FormData["query"]);
+            var data = (Dictionary<string, object>)request.Data;
+            Dictionary<string, object> variables = null;
+            if (data.ContainsKey("variables"))
+            {
+                variables = (Dictionary<string, object>)data["variables"];
+            }
             var xD = schema.Execute(_ =>
             {
                 _.Schema = schema;
-                _.Query = request.FormData["query"];
+                _.Query = data["query"].ToString();
+                if (variables != null)
+                {
+                    _.Inputs = new Inputs(variables);
+                }
             });
 
-            Console.WriteLine(xD);
             var response = new ApiResponse(xD);
             return response;
         }
@@ -110,12 +127,12 @@ namespace FeintSite
         {
             Settings.Urls.Add(new Url(@"^/$", Feint.Index));
             Settings.Urls.Add(new Url(@"^/graphql/$", Feint.Graphql));
-            Settings.DatabaseSettings = new DbSettings() { ConnectionString = "Host=db;Database=postgres;Username=postgres;Password=pass", Type = DbTypes.PosgreSQL };
+            Settings.DatabaseSettings = new DbSettings() { ConnectionString = "Host=localhost;Database=postgres;Username=postgres;Password=pass", Type = DbTypes.PostGIS };
         }
 
         static void Main(string[] args)
         {
-
+            Schema schema = new StarWarsSchema();
             FeintSetup.CallSetup();
             Server s = new Server("0.0.0.0", 5000);
             s.Start();

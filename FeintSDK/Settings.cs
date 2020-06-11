@@ -26,6 +26,7 @@ namespace FeintSDK
     }
     public enum DbTypes{
         Sqlite,
-        PosgreSQL
+        PosgreSQL,
+        PostGIS,
     }
 }

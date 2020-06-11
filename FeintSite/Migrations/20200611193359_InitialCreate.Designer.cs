@@ -3,16 +3,17 @@ using System;
 using FeintSite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace FeintSite.Migrations
 {
     [DbContext(typeof(Db))]
-    partial class DbModelSnapshot : ModelSnapshot
+    [Migration("20200611193359_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,59 +84,11 @@ namespace FeintSite.Migrations
                     b.ToTable("ExampleModel");
                 });
 
-            modelBuilder.Entity("FeintSite.Models.TripModel", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TripModel");
-                });
-
-            modelBuilder.Entity("FeintSite.Models.TripPointModel", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-                    b.Property<Point>("Location")
-                        .HasColumnType("geometry");
-
-                    b.Property<DateTime>("Time")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int?>("TripId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TripId");
-
-                    b.ToTable("TripPointModel");
-                });
-
             modelBuilder.Entity("FeintSDK.SessionProperty", b =>
                 {
                     b.HasOne("FeintSDK.SessionKey", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId");
-                });
-
-            modelBuilder.Entity("FeintSite.Models.TripPointModel", b =>
-                {
-                    b.HasOne("FeintSite.Models.TripModel", "Trip")
-                        .WithMany()
-                        .HasForeignKey("TripId");
                 });
 #pragma warning restore 612, 618
         }

@@ -31,7 +31,7 @@ namespace FeintSDK
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            FeintSetup.CallSetup(); 
+            FeintSetup.CallSetup();
             switch (Settings.DatabaseSettings.Type)
             {
                 case DbTypes.Sqlite:
@@ -40,11 +40,19 @@ namespace FeintSDK
                 case DbTypes.PosgreSQL:
                     optionsBuilder.UseNpgsql(Settings.DatabaseSettings.ConnectionString);
                     break;
+                case DbTypes.PostGIS:
+                    optionsBuilder.UseNpgsql(Settings.DatabaseSettings.ConnectionString, o => o.UseNetTopologySuite());
+                    break;
+
             }
         }
 
         protected async override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            if (Settings.DatabaseSettings.Type == DbTypes.PostGIS)
+            {
+                modelBuilder.HasPostgresExtension("postgis");
+            }
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
             var allModels = new List<Type>();
             foreach (var assembly in assemblies)
