@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>FeintApi</RootNamespace>
     <AssemblyName>FeintApi</AssemblyName>
     <Version>0.0.1</Version>
@@ -12,7 +12,7 @@
       <Project>{f63a64a6-97b6-478d-bebc-45af892cc6f7}</Project>
       <Name>FeintSDK</Name>
     </ProjectReference>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
     <Content Include="ApiGenericView.cs" />
     <Content Include="Middlewares\ApiHttpExceptionsMiddleware.cs" />
     <Content Include="ApiResponse.cs" />

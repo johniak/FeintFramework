@@ -16,7 +16,7 @@ namespace FeintSDK
             {
                 DbBase instance = null;
                 var success = threadCondextDictionary.TryGetValue(Thread.CurrentThread.ManagedThreadId, out instance);
-                if(success)
+                if (success)
                     return instance;
                 instance = new DbBase();
                 threadCondextDictionary.TryAdd(Thread.CurrentThread.ManagedThreadId, instance);
@@ -31,10 +31,14 @@ namespace FeintSDK
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            FeintSetup.CallSetup(); 
             switch (Settings.DatabaseSettings.Type)
             {
                 case DbTypes.Sqlite:
                     optionsBuilder.UseSqlite(Settings.DatabaseSettings.ConnectionString);
+                    break;
+                case DbTypes.PosgreSQL:
+                    optionsBuilder.UseNpgsql(Settings.DatabaseSettings.ConnectionString);
                     break;
             }
         }
@@ -48,7 +52,8 @@ namespace FeintSDK
                 var types = assembly.GetTypes().Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(BaseModel)));
                 allModels.AddRange(types);
             }
-            foreach(var type in allModels){
+            foreach (var type in allModels)
+            {
                 modelBuilder.Entity(type);
             }
         }

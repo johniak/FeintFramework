@@ -1,16 +1,28 @@
-framework:
-  build: .
-  volumes:
-    - .:/app
-    - /app/FeintServer/obj
-    - /app/FeintServer/bin
-    - /app/FeintSDK/obj
-    - /app/FeintSDK/bin
-    - /app/FeintSite/obj
-    - /app/FeintSite/bin
-    - /app/FeintApi/obj
-    - /app/FeintApi/bin
-  ports:
-    - 5000:5000
-  command: dotnet watch run
 
+  version: '3.1'
+  
+  services:
+    db:
+      image: postgres
+      restart: always
+      environment:
+        POSTGRES_PASSWORD: pass
+      ports:
+        - 5432:5432
+    app:
+      build: .
+      volumes:
+        - .:/app
+        - /app/FeintServer/obj
+        - /app/FeintServer/bin
+        - /app/FeintSDK/obj
+        - /app/FeintSDK/bin
+        - /app/FeintSite/obj
+        - /app/FeintSite/bin
+        - /app/FeintApi/obj
+        - /app/FeintApi/bin
+      ports:
+        - 5000:5000
+      command: ./docker-entrypoint.sh
+        
+        
