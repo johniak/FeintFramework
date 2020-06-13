@@ -25,7 +25,7 @@ namespace Feint.Graphql
             }
             var mainType = typeof(TSourceType);
             var properties = mainType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
-            Field(h => h.Id, nullable: true);
+            Field(typeof(StringGraphType), "id", resolve: ctx => $"{this.Name}:{ctx.Source.Id}".Base64Encode());
             foreach (var property in properties)
             {
                 if (excludedNames.Contains(property.Name))
@@ -36,9 +36,9 @@ namespace Feint.Graphql
                 Field(GetCorrectType(property.PropertyType), property.Name);
             }
         }
-        public FeintObjectType():this(new Expression<Func<TSourceType, dynamic>>[0])
+        public FeintObjectType() : this(new Expression<Func<TSourceType, dynamic>>[0])
         {
-            
+
         }
         protected Type GetCorrectType(Type type)
         {
@@ -50,7 +50,7 @@ namespace Feint.Graphql
             {
                 return typeof(IntGraphType);
             }
-            if (type == typeof(float)) 
+            if (type == typeof(float))
             {
                 return typeof(FloatGraphType);
             }

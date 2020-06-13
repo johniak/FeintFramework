@@ -11,6 +11,7 @@ using GraphQL;
 using Feint.Graphql;
 using System.Linq.Expressions;
 using FeintSite.Models;
+using FeintSite.GraphQL;
 
 namespace FeintSite
 {
@@ -40,22 +41,13 @@ namespace FeintSite
     {
         public Mutation()
         {
-            Field<TripModelType>(
-      "createTrip",
-      arguments: new QueryArguments(
-        new QueryArgument<NonNullGraphType<TripInputType>> { Name = "input" }
-      ),
-      resolve: context =>
-      {
-          var trip = context.GetArgument<TripModel>("input");
-          trip.StartTime = DateTime.Now;
-          trip.Save();
-          return trip;
-      });
+            AddField(new CreateTripMutation().FieldType);
+
         }
+
     }
 
-    public class Query : ObjectGraphType<object>
+    public class Query : ObjectGraphType
     {
         public Query()
         {
@@ -65,7 +57,8 @@ namespace FeintSite
                 resolve: context => Db.DbSet<ExampleModel>().FirstOrDefault()
             );
             Field<ListGraphType<ExampleModelType>>("allExamples", resolve: ctx => Db.DbSet<ExampleModel>().ToList());
-            Field<ListGraphType<TripModelType>>("allTrips", resolve: ctx => Db.DbSet<TripModel>().ToList());
+            this.FeintConnectionField<TripModel, TripModelType>("allTrips");
+            // Field<ListGraphType<TripModelType>>("allTrips", resolve: ctx => Db.DbSet<TripModel>().ToList());
         }
     }
     public class StarWarsSchema : Schema
