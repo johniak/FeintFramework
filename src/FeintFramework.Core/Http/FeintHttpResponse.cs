@@ -1,0 +1,11 @@
+using Microsoft.AspNetCore.Http;
+
+namespace FeintFramework.Core.Http;
+public class FeintHttpResponse
+{
+    public int StatusCode { get; set; } = 200;
+    public string ContentType { get; set; } = "text/plain";
+    public string Content { get; set; } = "";
+    public IHeaderDictionary Headers { get; protected set; } = new HeaderDictionary();
+
+}

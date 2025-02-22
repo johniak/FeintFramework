@@ -3,15 +3,18 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
-using FeintFramework.Routing; // Zakładamy, że masz swój system routingu
+using FeintFramework.Core.Routing;
+
+using Example;
+using FeintFramework.Core.Http; // Zakładamy, że masz swój system routingu
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
-
-// Definiujemy middleware, który przechwytuje wszystkie żądania
-app.Use(async (context, next) =>
+var mainUrlPatterns = new MainUrlPatterns();
+var router = new Router(mainUrlPatterns);
+var serverHanler = new KestrelServerHandler(router.HandleRequest);
+app.Use(async (HttpContext context, RequestDelegate next) =>
 {
-    // Tutaj możesz przekazać żądanie do swojego systemu routingu
-    // Przykładowo, wywołanie metody obsługującej wszystkie zapytania:
-    await CustomRoutingHandler(context);
+    serverHanler.HandleRequest(context);
+    await context.Response.CompleteAsync();
 });

@@ -1,4 +1,4 @@
-using FeinFramework.Core.Settings;
+using FeintFramework.Core.Settings;
 
 namespace Example.Core{
     public class Settings : BaseSettings{
