@@ -9,14 +9,17 @@ public class KestrelServerHandler : BaseServerHandler
     {
     }
 
-    public override object HandleRequest(object request)
+    public override object? HandleRequest(object request)
     {
-        throw new NotImplementedException();
+        var context = (HttpContext)request;
+        handleRequest(context);
+        return null;
     }
 
     protected void handleRequest(HttpContext context)
     {
         var feintRequest = convertToFeintRequest(context.Request);
+        convertToKestrelResponse(handler(feintRequest), context);
     }
     protected FeintHttpRequest convertToFeintRequest(HttpRequest kestrelRequest)
     {
@@ -38,8 +41,9 @@ public class KestrelServerHandler : BaseServerHandler
         return feintRequest;
     }
 
-    protected HttpResponse convertToKestrelResponse(FeintHttpResponse feintResponse, HttpResponse kestrelResponse)
+    protected void convertToKestrelResponse(FeintHttpResponse feintResponse, HttpContext context)
     {
+        var kestrelResponse = context.Response;
         kestrelResponse.StatusCode = feintResponse.StatusCode;
         kestrelResponse.ContentType = feintResponse.ContentType;
 
@@ -49,6 +53,5 @@ public class KestrelServerHandler : BaseServerHandler
             kestrelResponse.Headers[header.Key] = header.Value;
         }
         kestrelResponse.Body.Write(Encoding.UTF8.GetBytes(feintResponse.Content));
-        return kestrelResponse;
     }
 }

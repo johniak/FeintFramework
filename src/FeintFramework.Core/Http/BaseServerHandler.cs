@@ -8,5 +8,5 @@ public abstract class BaseServerHandler
         this.handler = handler;
     }
 
-    public abstract object HandleRequest(object request);
+    public abstract object? HandleRequest(object request);
 }
