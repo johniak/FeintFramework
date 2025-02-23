@@ -5,25 +5,42 @@ using Microsoft.AspNetCore.Http.Features;
 
 namespace FeinFramework.Core.Routing.Tests;
 
-
-class TestUrlPatterns : UrlPatterns
+class NestedUrlPatterns : UrlPatterns
 {
+
     Func<FeintHttpRequest, FeintHttpResponse> handler;
-    public TestUrlPatterns(Func<FeintHttpRequest, FeintHttpResponse> handler)
+    public NestedUrlPatterns(Func<FeintHttpRequest, FeintHttpResponse> handler)
     {
         this.handler = handler;
     }
     public override List<UrlPattern> Urls => new List<UrlPattern>
     {
-        new UrlPattern("/test", this.handler)
+        new UrlPattern("/nested", this.handler),
     };
 }
+
+class TestUrlPatterns : UrlPatterns
+{
+    Func<FeintHttpRequest, FeintHttpResponse> handler;
+    Func<FeintHttpRequest, FeintHttpResponse> nestedHandler;
+    public TestUrlPatterns(Func<FeintHttpRequest, FeintHttpResponse> handler, Func<FeintHttpRequest, FeintHttpResponse> nestedHandler)
+    {
+        this.handler = handler;
+        this.nestedHandler = nestedHandler;
+    }
+    public override List<UrlPattern> Urls => new List<UrlPattern>
+    {
+        new UrlPattern("/test", this.handler),
+        new UrlPattern("/foo", new NestedUrlPatterns(this.nestedHandler).Urls),
+    };
+}
+
 
 
 [TestClass]
 public sealed class TestRouter
 {
-    
+
     [TestMethod]
     public void HandleRequest_CallsHandler_WhenMatchedUrl()
     {
@@ -34,11 +51,21 @@ public sealed class TestRouter
                 StatusCode = 200,
                 Content = "OK"
             };
-        });
+
+        },
+        (request) =>
+        {
+            return new FeintHttpResponse
+            {
+                StatusCode = 200,
+                Content = "NESTED"
+            };
+        }
+        );
         Router router = new Router(urlPatterns);
         FeintHttpRequest request = new FeintHttpRequest
         {
-            ContentType="text/plain",
+            ContentType = "text/plain",
             Body = new MemoryStream(),
             ContentLength = 0,
             Host = "localhost",
@@ -55,7 +82,7 @@ public sealed class TestRouter
         Assert.AreEqual("OK", response.Content);
     }
 
-        [TestMethod]
+    [TestMethod]
     public void HandleRequest_DontCallsHandler_WhenNotMatchedUrl()
     {
         TestUrlPatterns urlPatterns = new TestUrlPatterns((request) =>
@@ -65,11 +92,19 @@ public sealed class TestRouter
                 StatusCode = 200,
                 Content = "OK"
             };
+        },
+        (request) =>
+        {
+            return new FeintHttpResponse
+            {
+                StatusCode = 200,
+                Content = "NESTED"
+            };
         });
         Router router = new Router(urlPatterns);
         FeintHttpRequest request = new FeintHttpRequest
         {
-            ContentType="text/plain",
+            ContentType = "text/plain",
             Body = new MemoryStream(),
             ContentLength = 0,
             Host = "localhost",
@@ -83,5 +118,46 @@ public sealed class TestRouter
         };
         var response = router.HandleRequest(request);
         Assert.AreEqual(404, response.StatusCode);
+    }
+
+    [TestMethod]
+    public void HandleRequest_CallsHandler_WhenMatchedNestedUrl()
+    {
+        TestUrlPatterns urlPatterns = new TestUrlPatterns((request) =>
+        {
+            return new FeintHttpResponse
+            {
+                StatusCode = 200,
+                Content = "OK"
+            };
+
+        },
+        (request) =>
+        {
+            return new FeintHttpResponse
+            {
+                StatusCode = 200,
+                Content = "NESTED"
+            };
+        }
+        );
+        Router router = new Router(urlPatterns);
+        FeintHttpRequest request = new FeintHttpRequest
+        {
+            ContentType = "text/plain",
+            Body = new MemoryStream(),
+            ContentLength = 0,
+            Host = "localhost",
+            Protocol = "HTTP/1.1",
+            QueryString = "",
+            Query = new QueryCollection(),
+            Scheme = "http",
+            Path = "/foo/nested",
+            Method = "GET",
+            Headers = new HeaderDictionary()
+        };
+        var response = router.HandleRequest(request);
+        Assert.AreEqual(200, response.StatusCode);
+        Assert.AreEqual("NESTED", response.Content);
     }
 }

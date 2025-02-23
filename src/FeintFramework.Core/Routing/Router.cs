@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using FeintFramework.Core.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
@@ -15,7 +16,7 @@ public class Router
     public FeintHttpResponse HandleRequest(FeintHttpRequest request)
     {
         var path = request.Path;
-        var url = matchPath(path);
+        var url = matchPath(path, urlPatterns.Urls);
         if (url == null)
         {
             return new FeintHttpResponse
@@ -28,15 +29,16 @@ public class Router
         return handler!(request);
     }
 
-    // TODO: nested patterns
-    protected UrlPattern? matchPath(string path)
+    protected UrlPattern? matchPath(string path, List<UrlPattern> urls)
     {
-        foreach (var url in urlPatterns.Urls)
+        foreach (var url in urls)
         {
-            if (url.Match(path))
-            {
+            if (!url.Match(path))
+                continue;
+            if (url.Handler != null)
                 return url;
-            }
+            var newPath = Regex.Replace(path, url.RegexPattern, "");
+            return matchPath(newPath, url.Patterns!);
         }
         return null;
     }

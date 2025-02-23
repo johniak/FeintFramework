@@ -1,6 +1,7 @@
-namespace FeintFramework.Core.Settings;
-public abstract class BaseSettings
+namespace FeintFramework.Core.Settings
 {
-
-    public abstract List<Type> InstalledApps { get; }
+    public abstract class BaseSettings
+    {
+        public abstract List<Type> InstalledApps { get; }
+    }
 }
