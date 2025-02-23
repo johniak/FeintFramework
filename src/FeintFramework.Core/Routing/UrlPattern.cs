@@ -1,7 +1,6 @@
 
 using System.Text.RegularExpressions;
 using FeintFramework.Core.Http;
-using Microsoft.AspNetCore.Http;
 
 namespace FeintFramework.Core.Routing;
 public class UrlPattern
@@ -23,9 +22,9 @@ public class UrlPattern
         }
     }
     public string? Name { get; protected set; }
-    public Func<FeintHttpRequest, FeintHttpResponse>? Handler;
+    public RequestHandler? Handler;
     public List<UrlPattern>? Patterns { get; protected set; }
-    public UrlPattern(string regexPattern, Func<FeintHttpRequest, FeintHttpResponse> handler, string? name = null)
+    public UrlPattern(string regexPattern, RequestHandler handler, string? name = null)
     {
         this.RegexPattern = regexPattern;
         this.Name = name;

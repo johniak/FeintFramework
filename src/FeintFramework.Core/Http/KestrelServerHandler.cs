@@ -5,7 +5,7 @@ namespace FeintFramework.Core.Http;
 
 public class KestrelServerHandler : BaseServerHandler
 {
-    public KestrelServerHandler(Func<FeintHttpRequest, FeintHttpResponse> handler) : base(handler)
+    public KestrelServerHandler(RequestHandler handler) : base(handler)
     {
     }
 
@@ -19,7 +19,7 @@ public class KestrelServerHandler : BaseServerHandler
     protected void handleRequest(HttpContext context)
     {
         var feintRequest = convertToFeintRequest(context.Request);
-        convertToKestrelResponse(handler(feintRequest), context);
+        convertToKestrelResponse(routerHandler(feintRequest), context);
     }
     protected FeintHttpRequest convertToFeintRequest(HttpRequest kestrelRequest)
     {

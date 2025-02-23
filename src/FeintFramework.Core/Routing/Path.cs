@@ -1,14 +1,13 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using FeintFramework.Core.Http;
-using Microsoft.AspNetCore.Http;
 
 namespace FeintFramework.Core.Routing;
 public class Path : UrlPattern
 {
     protected Dictionary<string, IParameterType>? parameterTypes;
     public string PathPattern { get; }
-    public Path(string pathPattern, Func<FeintHttpRequest, FeintHttpResponse> handler, string? name = null) : base(ConvertPatternToRegex(pathPattern), handler, name)
+    public Path(string pathPattern, RequestHandler handler, string? name = null) : base(ConvertPatternToRegex(pathPattern), handler, name)
     {
         this.PathPattern = pathPattern;
     }

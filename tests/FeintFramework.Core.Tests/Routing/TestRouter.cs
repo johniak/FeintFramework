@@ -1,15 +1,14 @@
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 
 namespace FeinFramework.Core.Routing.Tests;
 
 class NestedUrlPatterns : UrlPatterns
 {
 
-    Func<FeintHttpRequest, FeintHttpResponse> handler;
-    public NestedUrlPatterns(Func<FeintHttpRequest, FeintHttpResponse> handler)
+    RequestHandler handler;
+    public NestedUrlPatterns(RequestHandler handler)
     {
         this.handler = handler;
     }
@@ -21,9 +20,9 @@ class NestedUrlPatterns : UrlPatterns
 
 class TestUrlPatterns : UrlPatterns
 {
-    Func<FeintHttpRequest, FeintHttpResponse> handler;
-    Func<FeintHttpRequest, FeintHttpResponse> nestedHandler;
-    public TestUrlPatterns(Func<FeintHttpRequest, FeintHttpResponse> handler, Func<FeintHttpRequest, FeintHttpResponse> nestedHandler)
+    RequestHandler handler;
+    RequestHandler nestedHandler;
+    public TestUrlPatterns(RequestHandler handler, RequestHandler nestedHandler)
     {
         this.handler = handler;
         this.nestedHandler = nestedHandler;

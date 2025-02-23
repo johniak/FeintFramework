@@ -1,7 +1,5 @@
 using System.Text.RegularExpressions;
 using FeintFramework.Core.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Rewrite;
 
 namespace FeintFramework.Core.Routing;
 public class Router
