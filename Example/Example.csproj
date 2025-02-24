@@ -4,6 +4,13 @@
     <ProjectReference Include="..\src\FeintFramework.Core\FeintFramework.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="linq2db" Version="5.4.1" />
+    <PackageReference Include="linq2db.SQLite" Version="5.4.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+  </ItemGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
