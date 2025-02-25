@@ -41,7 +41,7 @@ public static class Configurator
             serverHanler.HandleRequest(context);
             await context.Response.CompleteAsync();
         });
-        app.Run("http://0.0.0.0:8080");
+        app.Run("http://0.0.0.0:9000");
     }
 
 }
