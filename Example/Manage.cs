@@ -2,8 +2,8 @@
 using FeintFramework.Core.Config;
 using LinqToDB;
 using Microsoft.Data.Sqlite;
-// Configurator.Settings = new Example.Core.Settings();
-// Configurator.Configure(args);
+Configurator.Settings = new Example.Core.Settings();
+Configurator.Configure(args);
 
 using (var db = new MyDbConnection())
 {

@@ -4,12 +4,12 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
- <ItemGroup>
-    <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
-  </ItemGroup>
+
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="linq2db" Version="5.4.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />
   </ItemGroup>
 
 </Project>

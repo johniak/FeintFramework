@@ -3,6 +3,8 @@
 using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
+using FeintFramework.Db;
+using LinqToDB.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -38,8 +40,23 @@ public static class Configurator
         var serverHanler = new KestrelServerHandler(router.HandleRequest);
         app.Use(async (HttpContext context, RequestDelegate next) =>
         {
-            serverHanler.HandleRequest(context);
-            await context.Response.CompleteAsync();
+            using (var db = new DataConnection(Settings.DatabaseProvider, Settings.DatabaseConnectionString))
+            {
+                Connections.Connection = db;
+                try
+                {
+                    serverHanler.HandleRequest(context);
+                    await context.Response.CompleteAsync();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    Connections.Connection = null;
+                }
+            }
         });
         app.Run("http://0.0.0.0:9000");
     }

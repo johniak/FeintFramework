@@ -10,6 +10,7 @@ public class MyDbConnection : DataConnection
     public MyDbConnection() 
         : base("Microsoft.Data.Sqlite", "Data Source=./MyDatabase.sqlite")
     {
+        
     }
 
     // // Expose the Blogs table
