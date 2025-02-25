@@ -1,9 +1,18 @@
 {
   "image": "mcr.microsoft.com/dotnet/sdk:9.0",
   "appPort": [
-    "8080:8080"
+    "9000:9000"
   ],
   "forwardPorts": [
-    8080
-  ]
+    9000
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-dotnettools.csdevkit",
+        "GitHub.copilot"
+      ]
+    }
+  },
+  "postCreateCommand": "dotnet restore"
 }
