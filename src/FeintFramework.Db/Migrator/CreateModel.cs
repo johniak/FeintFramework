@@ -1,4 +1,4 @@
-
+namespace FeintFramework.Db.Migrator;
 public class ModelOperation : MigrationOperation
 {
     public string Name { get; set; }

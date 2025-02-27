@@ -1,5 +1,5 @@
 
-
+namespace FeintFramework.Db.Migrator;
 public abstract class BaseMigration
 {
     public abstract MigrationDependency[] Dependencies { get; }

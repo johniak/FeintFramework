@@ -1,4 +1,5 @@
 
+namespace FeintFramework.Db.Migrator;
 
 public class MigrationDependency
 {

@@ -2,12 +2,11 @@ namespace FeintFramework.Db.Migrator;
 
 public abstract class DatabaseHandler
 {
-    public string ConnectionString { get; protected set; }
-    public MigrationOperationHandler MigrationOperationHandler { get; protected set; }
-    public DatabaseHandler(string connectionString, MigrationOperationHandler migrationOperationHandler)
+    protected string connectionString { get; set; }
+    public MigrationOperationHandler? MigrationOperationHandler { get; protected set; }
+    public DatabaseHandler(string connectionString)
     {
-        ConnectionString = connectionString;
-        MigrationOperationHandler = migrationOperationHandler;
+        this.connectionString = connectionString;
     }
 
     public abstract void Connect();

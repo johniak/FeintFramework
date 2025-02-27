@@ -1,21 +1,37 @@
 
 namespace FeintFramework.Db.Migrator;
 
-public delegate string SqlGenerator(MigrationOperation operation);
-
-public abstract class SqlGenerator<T> where T : MigrationOperation
+public interface ISqlGenerator<in T> where T : MigrationOperation
 {
-    public abstract string GenerateSql(T operation);
+    string GenerateSql(T operation);
 }
 public abstract class MigrationOperationHandler
 {
-    public string ConnectionString { get; protected set; }
-    public abstract SqlGenerator[] OperationHandlers { get; }
-    public MigrationOperationHandler(string connectionString)
+    public abstract ISqlGenerator<MigrationOperation>[] OperationHandlers { get; }
+
+    protected Dictionary<Type, ISqlGenerator<MigrationOperation>> operationHandlersDict = new Dictionary<Type, ISqlGenerator<MigrationOperation>>();
+
+    public Dictionary<Type, ISqlGenerator<MigrationOperation>> OperationHandlersDict
     {
-        ConnectionString = connectionString;
+        get
+        {
+            if (operationHandlersDict.Count == 0)
+            {
+                foreach (var handler in OperationHandlers)
+                {
+                    operationHandlersDict.Add(GetGenericTypeFromSqlGenerator(handler), handler);
+                }
+            }
+            return operationHandlersDict;
+        }
     }
-    
+    public static Type GetGenericTypeFromSqlGenerator(object generator)
+    {
+        var generatorType = generator.GetType();
+        var sqlGeneratorInterface = generatorType.GetInterfaces()
+            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISqlGenerator<>));
+        return sqlGeneratorInterface!.GetGenericArguments()[0];
+    }
     public abstract void HandleOperation(MigrationOperation operation);
 
 }
