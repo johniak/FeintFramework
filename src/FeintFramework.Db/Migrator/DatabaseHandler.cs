@@ -11,4 +11,8 @@ public abstract class DatabaseHandler
 
     public abstract void Connect();
     public abstract void Disconnect();
+
+    public abstract void BeginTransaction();
+    public abstract void CommitTransaction();
+    public abstract void RollbackTransaction();
 }

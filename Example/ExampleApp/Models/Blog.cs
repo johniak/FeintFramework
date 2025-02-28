@@ -4,7 +4,7 @@ using FeintFramework.Db;
 using LinqToDB.Mapping;
 
 
-[Table(Name = "Blogs")]
+[Table(Name = "blogs")]
 public partial class Blog : Model
 {
     [Column, NotNull]

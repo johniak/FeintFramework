@@ -23,7 +23,7 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
         this.databaseHandler = databaseHandler;
     }
 
-    public override void HandleOperation(MigrationOperation operation)
+    public override void HandleForwrdOperation(MigrationOperation operation)
     {
         var operationType = operation.GetType();
         if (!OperationHandlersDict.ContainsKey(operationType))
@@ -31,7 +31,19 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
             throw new Exception($"Operation {operationType.Name} not supported");
         }
         var handler = OperationHandlersDict[operationType];
-        var sql = handler.GenerateSql(operation);
+        var sql = handler.GenerateForwardSql(operation);
+        databaseHandler.ExecuteNonQuery(sql);
+    }
+
+    public override void HandleReverseOperation(MigrationOperation operation)
+    {
+        var operationType = operation.GetType();
+        if (!OperationHandlersDict.ContainsKey(operationType))
+        {
+            throw new Exception($"Operation {operationType.Name} not supported");
+        }
+        var handler = OperationHandlersDict[operationType];
+        var sql = handler.GenerateReverseSql(operation);
         databaseHandler.ExecuteNonQuery(sql);
     }
 }

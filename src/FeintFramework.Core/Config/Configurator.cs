@@ -14,6 +14,11 @@ public static class Configurator
 
     public static BaseSettings Settings;
 
+    public static void Migrate()
+    {
+        
+    }
+
     private static void Validate()
     {
         if (Settings == null)

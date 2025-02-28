@@ -1,5 +1,6 @@
 using System.Reflection.Metadata;
 using FeintFramework.Core.Routing;
+using FeintFramework.Db.Migrator;
 
 namespace FeintFramework.Core.Config.Settings
 {
@@ -22,5 +23,6 @@ namespace FeintFramework.Core.Config.Settings
                 return "Microsoft.Data.Sqlite";
             }
         }
+        public abstract DatabaseHandler DatabaseHandler { get; }
     }
 }

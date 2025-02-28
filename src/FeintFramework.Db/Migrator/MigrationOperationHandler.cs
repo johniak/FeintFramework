@@ -3,7 +3,8 @@ namespace FeintFramework.Db.Migrator;
 
 public interface ISqlGenerator<in T> where T : MigrationOperation
 {
-    string GenerateSql(T operation);
+    string GenerateForwardSql(T operation);
+    string GenerateReverseSql(T operation);
 }
 public abstract class MigrationOperationHandler
 {
@@ -32,6 +33,7 @@ public abstract class MigrationOperationHandler
             .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISqlGenerator<>));
         return sqlGeneratorInterface!.GetGenericArguments()[0];
     }
-    public abstract void HandleOperation(MigrationOperation operation);
+    public abstract void HandleForwrdOperation(MigrationOperation operation);
+    public abstract void HandleReverseOperation(MigrationOperation operation);
 
 }

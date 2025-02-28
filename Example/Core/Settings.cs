@@ -1,5 +1,7 @@
 using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Routing;
+using FeintFramework.Db.Migrator;
+using FeintFramework.Db.Sqlite.Migrator;
 
 namespace Example.Core
 {
@@ -14,5 +16,7 @@ namespace Example.Core
         public override List<Type> Middlewares => new List<Type>{
             
         };
+
+        public override DatabaseHandler DatabaseHandler => new SqliteDatabaseHandler(DatabaseConnectionString);
     }
 }

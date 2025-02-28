@@ -5,13 +5,12 @@ using Microsoft.Data.Sqlite;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
 
-CharField dateField = new CharField("date") { NotNull = true, Length = 10 };
-var fields = new CharField[] { dateField };
-SqlFieldRegistry.RegisterField(new SqliteCharField());
+
 
 
 Console.WriteLine("***************************************");
-// Configurator.Settings = new Example.Core.Settings();
+Configurator.Settings = new Example.Core.Settings();
+Configurator.Migrate();
 // Configurator.Configure(args);
 
 // using (var db = new MyDbConnection())

@@ -1,7 +1,10 @@
+using FeintFramework.Db.Migrator.Fields;
 namespace FeintFramework.Db.Migrator;
 public class ModelOperation : MigrationOperation
 {
+
     public string Name { get; set; }
+    public string TableName => Name.ToLower();
     public ModelOperation(string name)
     {
         Name = name;
@@ -10,7 +13,6 @@ public class ModelOperation : MigrationOperation
 
 public class CreateModel : ModelOperation
 {
-    public string Name { get; set; }
     public BaseField[] Fields { get; set; } = Array.Empty<BaseField>();
     public CreateModel(string name) : base(name)
     {
