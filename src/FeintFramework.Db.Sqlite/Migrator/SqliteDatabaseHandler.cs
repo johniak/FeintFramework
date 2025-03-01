@@ -28,6 +28,7 @@ public class SqliteDatabaseHandler : DatabaseHandler
         SqlFieldRegistry.RegisterField(new SqliteFloatField());
         SqlFieldRegistry.RegisterField(new SqliteIntegerField());
         SqlFieldRegistry.RegisterField(new SqliteTextField());
+        SqlFieldRegistry.RegisterField(new SqliteForeignKey());
     }
 
     public override void Connect()
@@ -94,13 +95,13 @@ public class SqliteDatabaseHandler : DatabaseHandler
     {
         if (transactionLevel == 0)
         {
-            this.outerTransaction = connection?.BeginTransaction()!;
+            outerTransaction = connection?.BeginTransaction()!;
         }
         else
         {
             transactionLevel++;
             string savepointName = "SP" + transactionLevel;
-            this.ExecuteNonQuery($"SAVEPOINT {savepointName};");
+            ExecuteNonQuery($"SAVEPOINT {savepointName};");
         }
     }
 
@@ -119,7 +120,7 @@ public class SqliteDatabaseHandler : DatabaseHandler
         else
         {
             string savepointName = "SP" + transactionLevel;
-            this.ExecuteNonQuery($"RELEASE SAVEPOINT {savepointName};");
+            ExecuteNonQuery($"RELEASE SAVEPOINT {savepointName};");
             transactionLevel--;
         }
     }
@@ -140,7 +141,7 @@ public class SqliteDatabaseHandler : DatabaseHandler
         {
             // Roll back to the nested savepoint, then release it.
             string savepointName = "SP" + transactionLevel;
-            this.ExecuteNonQuery($"ROLLBACK TO SAVEPOINT {savepointName}; RELEASE SAVEPOINT {savepointName};");
+            ExecuteNonQuery($"ROLLBACK TO SAVEPOINT {savepointName}; RELEASE SAVEPOINT {savepointName};");
             transactionLevel--;
         }
     }
@@ -163,12 +164,12 @@ public class SqliteDatabaseHandler : DatabaseHandler
 
     public override void CreateMigrationTable()
     {
-        this.ExecuteNonQuery("CREATE TABLE IF NOT EXISTS feint_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, application_name TEXT NOT NULL, migration_name TEXT NOT NULL, applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
+        ExecuteNonQuery("CREATE TABLE IF NOT EXISTS feint_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, application_name TEXT NOT NULL, migration_name TEXT NOT NULL, applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
     }
 
     public override List<(string MigrationName, string ApplicationName)> GetAppliedMigrations()
     {
-        var table = this.ExecuteQuery("SELECT application_name, migration_name FROM feint_migrations;");
+        var table = ExecuteQuery("SELECT application_name, migration_name FROM feint_migrations;");
         var appliedMigrations = new List<(string MigrationName, string ApplicationName)>();
         foreach (DataRow row in table.Rows)
         {
@@ -179,6 +180,6 @@ public class SqliteDatabaseHandler : DatabaseHandler
 
     public override void ApplyMigration(string applicationName, string migrationName)
     {
-        this.ExecuteNonQuery($"INSERT INTO feint_migrations (application_name, migration_name) VALUES ('{applicationName}', '{migrationName}');");
+        ExecuteNonQuery($"INSERT INTO feint_migrations (application_name, migration_name) VALUES ('{applicationName}', '{migrationName}');");
     }
 }

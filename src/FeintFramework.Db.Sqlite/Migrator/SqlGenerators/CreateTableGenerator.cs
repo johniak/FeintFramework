@@ -9,7 +9,7 @@ public class CreateModelGenerator : SqlGenerator<CreateModel>
     public override string GenerateForwardSql(CreateModel operation, string appName)
     {
         var builder = new StringBuilder();
-        builder.Append($"CREATE TABLE {ToUnderscoreCase(appName)}_{operation.Name.ToLowerInvariant()} (\n");
+        builder.Append($"CREATE TABLE {appName.ToUnderscoreCase()}_{operation.Name.ToLowerInvariant()} (\n");
         var columns = new List<string>();
         foreach (var field in operation.Fields)
         {
@@ -24,7 +24,7 @@ public class CreateModelGenerator : SqlGenerator<CreateModel>
 
     public override string GenerateReverseSql(CreateModel operation, string appName)
     {
-        return $"DROP TABLE {ToUnderscoreCase(appName)}_{operation.Name.ToLowerInvariant()};";
+        return $"DROP TABLE {appName.ToUnderscoreCase()}_{operation.Name.ToLowerInvariant()};";
     }
 
 }

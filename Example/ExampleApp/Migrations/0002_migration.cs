@@ -11,16 +11,22 @@ class _0002_migration : BaseMigration
     public override bool Initial => true;
 
     public override MigrationOperation[] Operations => [
-        new CreateModel("blogs2"){
+        new CreateModel("BlogPost"){
             Fields = [
                 new AutoField("id"){
                     PrimaryKey = true,
                     NotNull = true,
                 },
-                new CharField("url"){
+                new CharField("title"){
                     NotNull = true,
                     Length = 255,
-                }
+                },
+                new TextField("content"){
+                    NotNull = false,
+                },
+                new ForeignKey("author_id","ExampleApp.Author",ForeignKeyAction.Cascade){
+                    NotNull = true,
+                },
             ]
         }
     ];

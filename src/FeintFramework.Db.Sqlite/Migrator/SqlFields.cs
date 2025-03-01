@@ -117,3 +117,20 @@ public class SqliteTextField : BaseSqliteField<TextField>
         return $"TEXT";
     }
 }
+
+public class SqliteForeignKey : BaseSqliteField<ForeignKey>
+{
+    public override string GetSqlType(ForeignKey field)
+    {
+        return $"INTEGER";
+    }
+    public override List<string> GetSqlAttributes(ForeignKey field)
+    {
+        List<string> attributes = ["REFERENCES"];
+        var referenceTable = field.To.Replace(".", "").ToUnderscoreCase();
+        attributes.Add(referenceTable);
+        attributes.Add($"(id)");
+        attributes.Add($"ON DELETE {field.OnDelete}");
+        return attributes;
+    }
+}

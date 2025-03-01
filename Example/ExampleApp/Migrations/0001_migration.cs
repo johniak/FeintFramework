@@ -9,16 +9,16 @@ class _0001_migration : BaseMigration
     public override bool Initial => true;
 
     public override MigrationOperation[] Operations => [
-        new CreateModel("blogs"){
+        new CreateModel("Author"){
             Fields = [
                 new AutoField("id"){
                     PrimaryKey = true,
                     NotNull = true,
                 },
-                new CharField("url"){
+                new CharField("FullName"){
                     NotNull = true,
                     Length = 255,
-                }
+                },
             ]
         }
     ];

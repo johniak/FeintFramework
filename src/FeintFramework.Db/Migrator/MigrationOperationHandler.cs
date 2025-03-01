@@ -23,14 +23,6 @@ public abstract class SqlGenerator<T> : ISqlGenerator where T : MigrationOperati
     {
         return GenerateReverseSql((T)operation, appName);
     }
-
-    public static string ToUnderscoreCase(string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-        string result = Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2");
-        return result.ToLowerInvariant();
-    }
 }
 public abstract class MigrationOperationHandler
 {
