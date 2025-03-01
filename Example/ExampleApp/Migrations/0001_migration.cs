@@ -11,14 +11,14 @@ class _0001_migration : BaseMigration
     public override MigrationOperation[] Operations => [
         new CreateModel("Author"){
             Fields = [
-                new AutoField("id"){
+                ("id", new AutoField(){
                     PrimaryKey = true,
                     NotNull = true,
-                },
-                new CharField("FullName"){
+                }),
+                ("FullName",new CharField(){
                     NotNull = true,
                     Length = 255,
-                },
+                }),
             ]
         }
     ];

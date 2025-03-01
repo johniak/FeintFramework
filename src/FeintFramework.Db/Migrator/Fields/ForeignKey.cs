@@ -16,7 +16,7 @@ public class ForeignKey : BaseField<int>
 
     public ForeignKeyAction OnDelete { get; set; }
 
-    public ForeignKey(string name, string to, ForeignKeyAction onDelete) : base(name)
+    public ForeignKey(string to, ForeignKeyAction onDelete)
     {
         To = to;
         OnDelete = onDelete;

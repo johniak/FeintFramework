@@ -2,7 +2,7 @@ namespace FeintFramework.Db.Migrator.Fields;
 
 public class BinaryField : BaseField<byte[]>
 {
-    public BinaryField(string name) : base(name)
+    public BinaryField() 
     {
     }
 }

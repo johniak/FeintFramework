@@ -13,8 +13,8 @@ public class CreateModelGenerator : SqlGenerator<CreateModel>
         var columns = new List<string>();
         foreach (var field in operation.Fields)
         {
-            var sqlField = SqlFieldRegistry.GetField(field);
-            columns.Add($"{field.Name} {sqlField.GetSqlType(field)} {string.Join(" ", sqlField.GetSqlAttributes(field))}");
+            var sqlField = SqlFieldRegistry.GetField(field.Field);
+            columns.Add($"{field.Name} {sqlField.GetSqlType(field.Field)} {string.Join(" ", sqlField.GetSqlAttributes(field.Field))}");
         }
         builder.Append(string.Join(",\n", columns));
         builder.Append("\n);");

@@ -13,7 +13,7 @@ public class ModelOperation : MigrationOperation
 
 public class CreateModel : ModelOperation
 {
-    public BaseField[] Fields { get; set; } = Array.Empty<BaseField>();
+    public (string Name, BaseField Field)[] Fields { get; set; } = [];
     public CreateModel(string name) : base(name)
     {
     }

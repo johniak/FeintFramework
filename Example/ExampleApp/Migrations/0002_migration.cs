@@ -13,20 +13,20 @@ class _0002_migration : BaseMigration
     public override MigrationOperation[] Operations => [
         new CreateModel("BlogPost"){
             Fields = [
-                new AutoField("id"){
+                ("id",new AutoField(){
                     PrimaryKey = true,
                     NotNull = true,
-                },
-                new CharField("title"){
+                }),
+                ("title",new CharField(){
                     NotNull = true,
                     Length = 255,
-                },
-                new TextField("content"){
+                }),
+                ("content",new TextField(){
                     NotNull = false,
-                },
-                new ForeignKey("author_id","ExampleApp.Author",ForeignKeyAction.Cascade){
+                }),
+                ("author_id",new ForeignKey("ExampleApp.Author",ForeignKeyAction.Cascade){
                     NotNull = true,
-                },
+                }),
             ]
         }
     ];
