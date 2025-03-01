@@ -4,10 +4,12 @@ public class SingleMigrationRunner
 {
     protected BaseMigration migration;
     protected DatabaseHandler databaseHandler;
-    public SingleMigrationRunner(BaseMigration migration, DatabaseHandler databaseHandler)
+    protected string appName;
+    public SingleMigrationRunner(BaseMigration migration, DatabaseHandler databaseHandler, string appName)
     {
         this.migration = migration;
         this.databaseHandler = databaseHandler;
+        this.appName = appName;
     }
     public void RunMigration()
     {
@@ -17,12 +19,12 @@ public class SingleMigrationRunner
         {
             foreach (var operation in migration.Operations)
             {
-                databaseHandler.MigrationOperationHandler?.HandleForwrdOperation(operation);
+                databaseHandler.MigrationOperationHandler?.HandleForwrdOperation(operation, appName);
             }
             if (migration.Atomic)
                 databaseHandler?.CommitTransaction();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             if (migration.Atomic)
                 databaseHandler.RollbackTransaction();

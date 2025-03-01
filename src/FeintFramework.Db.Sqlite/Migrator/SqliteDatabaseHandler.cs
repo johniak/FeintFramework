@@ -56,7 +56,6 @@ public class SqliteDatabaseHandler : DatabaseHandler
         using (var command = connection!.CreateCommand())
         {
             Console.WriteLine(sql);
-            return 0;
             if (outerTransaction != null)
                 command.Transaction = outerTransaction;
             command.CommandText = sql;
@@ -162,5 +161,24 @@ public class SqliteDatabaseHandler : DatabaseHandler
         connection?.Dispose();
     }
 
+    public override void CreateMigrationTable()
+    {
+        this.ExecuteNonQuery("CREATE TABLE IF NOT EXISTS feint_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, application_name TEXT NOT NULL, migration_name TEXT NOT NULL, applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
+    }
 
+    public override List<(string MigrationName, string ApplicationName)> GetAppliedMigrations()
+    {
+        var table = this.ExecuteQuery("SELECT application_name, migration_name FROM feint_migrations;");
+        var appliedMigrations = new List<(string MigrationName, string ApplicationName)>();
+        foreach (DataRow row in table.Rows)
+        {
+            appliedMigrations.Add((row["application_name"].ToString()!, row["migration_name"].ToString()!));
+        }
+        return appliedMigrations;
+    }
+
+    public override void ApplyMigration(string applicationName, string migrationName)
+    {
+        this.ExecuteNonQuery($"INSERT INTO feint_migrations (application_name, migration_name) VALUES ('{applicationName}', '{migrationName}');");
+    }
 }

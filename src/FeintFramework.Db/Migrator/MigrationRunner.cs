@@ -1,84 +1,148 @@
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Microsoft.VisualBasic;
+using QuikGraph;
+using QuikGraph.Algorithms;
 
 namespace FeintFramework.Db.Migrator;
 
-class MigrationRunner
+public class MigrationRunner
 {
-    public List<BaseMigration> Migrations
+    protected DatabaseHandler databaseHandler;
+    protected Type[] installedApps;
+
+    protected Dictionary<Type, string> installedAppsNamespacesDict
     {
         get
         {
-            var migrationInstances = CreateAllMigrationInstances();
+            var dict = new Dictionary<Type, string>();
+            foreach (var app in installedApps)
+            {
+                dict[app] = app.Namespace!;
+            }
+            return dict;
+        }
+    }
+
+    public List<(string ApplicationName, BaseMigration Migration)> MigrationsWithApps
+    {
+        get
+        {
+            var migrationInstances = CreateAllMigrationInstancesWithAppInstances();
             return migrationInstances;
         }
     }
-    protected DatabaseHandler databaseHandler;
-    public MigrationRunner(DatabaseHandler databaseHandler)
+
+
+    public MigrationRunner(DatabaseHandler databaseHandler, Type[] installedApps)
     {
         this.databaseHandler = databaseHandler;
+        this.installedApps = installedApps;
     }
 
     public void RunMigrations()
     {
-        foreach (var migration in Migrations)
+        databaseHandler.Connect();
+        databaseHandler.CreateMigrationTable();
+        var migrationWithApps = SortMigrationsWithGraph(MigrationsWithApps, databaseHandler.GetAppliedMigrations());
+        foreach (var migrationWithApp in migrationWithApps)
         {
-            var runner = new SingleMigrationRunner(migration, databaseHandler);
+            var runner = new SingleMigrationRunner(migrationWithApp.Migration, databaseHandler, migrationWithApp.ApplicationName);
             runner.RunMigration();
+            databaseHandler.ApplyMigration(migrationWithApp.ApplicationName, migrationWithApp.Migration.Name);
         }
+        this.databaseHandler.Disconnect();
     }
 
 
-    public static List<Type> GetAllMigrationTypes()
+    public List<(Type AppicationType, Type MigrationType)> GetAllMigrationTypesWithAppTypes()
     {
-        var migrationTypes = new List<Type>();
-        var nullableTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(assembly =>
-            {
-                try
-                {
-                    return assembly.GetTypes();
-                }
-                catch (ReflectionTypeLoadException ex)
-                {
-                    return ex.Types.Where(t => t != null)!;
-                }
-            })
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(BaseMigration).IsAssignableFrom(t));
-        foreach (var type in nullableTypes)
+        var migrationTypesWithAppTypes = new List<(Type AppicationType, Type MigrationType)>();
+        foreach (var namespacedApp in this.installedAppsNamespacesDict)
         {
-            migrationTypes.Add(type!);
+            var allTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(assembly =>
+                {
+                    try
+                    {
+                        return assembly.GetTypes();
+                    }
+                    catch (ReflectionTypeLoadException ex)
+                    {
+                        return ex.Types.Where(t => t != null)!;
+                    }
+                });
+            var nullableTypes =  allTypes.Where(t => t!.IsClass && !t.IsAbstract && typeof(BaseMigration).IsAssignableFrom(t) && t.Namespace != null && t.Namespace.StartsWith(namespacedApp.Value));
+            foreach (var type in nullableTypes)
+            {
+                migrationTypesWithAppTypes.Add((namespacedApp.Key, type!));
+            }
         }
-        return migrationTypes;
+        return migrationTypesWithAppTypes;
     }
 
-    public static List<BaseMigration> CreateAllMigrationInstances()
+    public List<(string ApplicationName, BaseMigration Migration)> CreateAllMigrationInstancesWithAppInstances()
     {
-        var migrationTypes = GetAllMigrationTypes();
-        var instances = new List<BaseMigration>();
+        var migrationTypes = GetAllMigrationTypesWithAppTypes();
+        var instances = new List<(string ApplicationName, BaseMigration Migration)>();
 
-        foreach (var type in migrationTypes)
+        foreach (var migrationTypeWithAppType in migrationTypes)
         {
-            try
-            {
-                // Ensure the type has a parameterless constructor.
-                if (type.GetConstructor(Type.EmptyTypes) != null)
-                {
-                    var instance = (BaseMigration)Activator.CreateInstance(type)!;
-                    instances.Add(instance);
-                }
-                else
-                {
-                    Console.WriteLine($"Type {type.FullName} does not have a parameterless constructor.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Could not create instance of {type.FullName}: {ex.Message}");
-            }
+            var migrationType = migrationTypeWithAppType.MigrationType;
+            var appType = migrationTypeWithAppType.AppicationType;
+            var migrationInstance = (BaseMigration)Activator.CreateInstance(migrationType)!;
+            dynamic appInstance = Activator.CreateInstance(appType)!;
+            instances.Add((appInstance.Name, migrationInstance));
         }
-
         return instances;
+    }
+
+    public List<(string ApplicationName, BaseMigration Migration)> SortMigrationsWithGraph(
+        List<(string ApplicationName, BaseMigration Migration)> migrationsWithApps,
+        List<(string ApplicationName, string MigrationName)> appliedMigrations)
+    {
+        var appliedKeys = new HashSet<string>(
+            appliedMigrations.Select(m => $"{m.ApplicationName}|{m.MigrationName}"));
+
+        var pendingMigrations = migrationsWithApps
+            .Where(x => !appliedKeys.Contains($"{x.ApplicationName}|{x.Migration.Name}"))
+            .ToList();
+
+        var migrationDict = pendingMigrations.ToDictionary(
+            x => $"{x.ApplicationName}|{x.Migration.Name}",
+            x => x.Migration);
+
+        var graph = new AdjacencyGraph<string, Edge<string>>();
+
+        foreach (var key in migrationDict.Keys)
+        {
+            graph.AddVertex(key);
+        }
+
+        foreach (var migrationTuple in pendingMigrations)
+        {
+            string migrationKey = $"{migrationTuple.ApplicationName}|{migrationTuple.Migration.Name}";
+            foreach (var dependency in migrationTuple.Migration.Dependencies)
+            {
+                string dependencyKey = $"{dependency.ApplicationName}|{dependency.MigrationName}";
+                if (migrationDict.ContainsKey(dependencyKey))
+                {
+                    graph.AddEdge(new Edge<string>(dependencyKey, migrationKey));
+                }
+            }
+        }
+
+        IEnumerable<string> sortedKeys;
+        try
+        {
+            sortedKeys = graph.TopologicalSort();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Cycle detected in migration dependencies.", ex);
+        }
+
+        return sortedKeys.Select(key => (key.Split('|')[0], migrationDict[key])).ToList();
     }
 
 }

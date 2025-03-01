@@ -80,7 +80,7 @@ public class SqliteDateTimeField : BaseSqliteField<DateTimeField>
     public override string? GetSqlDefaultValue(DateTimeField field)
     {
         if (field.AutoNowAdd)
-            return "datetime('now')";
+            return "CURRENT_TIMESTAMP";
         if (field.DefaultValue == null)
             return null;
         return field.DefaultValue.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);

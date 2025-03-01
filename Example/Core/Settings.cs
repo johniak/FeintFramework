@@ -7,14 +7,16 @@ namespace Example.Core
 {
     public class Settings : BaseSettings
     {
-        public override List<Type> InstalledApps => new List<Type>{
+        public override Type[] InstalledApps => [
             typeof(ExampleApp.ExampleApp)
-        };
+        ];
+
 
         public override UrlPatterns RootUrlPatterns => new MainUrlPatterns();
 
-        public override List<Type> Middlewares => new List<Type>{
-            
+        public override List<Type> Middlewares => new List<Type>
+        {
+
         };
 
         public override DatabaseHandler DatabaseHandler => new SqliteDatabaseHandler(DatabaseConnectionString);

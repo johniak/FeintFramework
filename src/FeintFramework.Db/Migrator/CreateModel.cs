@@ -4,7 +4,7 @@ public class ModelOperation : MigrationOperation
 {
 
     public string Name { get; set; }
-    public string TableName => Name.ToLower();
+
     public ModelOperation(string name)
     {
         Name = name;

@@ -4,6 +4,7 @@ using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
 using FeintFramework.Db;
+using FeintFramework.Db.Migrator;
 using LinqToDB.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +17,8 @@ public static class Configurator
 
     public static void Migrate()
     {
-        
+        var runner = new MigrationRunner(Settings.DatabaseHandler, Settings.InstalledApps);
+        runner.RunMigrations();
     }
 
     private static void Validate()

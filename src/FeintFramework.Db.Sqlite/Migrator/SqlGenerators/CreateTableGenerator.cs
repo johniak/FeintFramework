@@ -4,12 +4,12 @@ using FeintFramework.Db.Migrator.Sql;
 
 namespace FeintFramework.Db.Sqlite.Migrator;
 
-public class CreateModelGenerator : ISqlGenerator<CreateModel>
+public class CreateModelGenerator : SqlGenerator<CreateModel>
 {
-    public string GenerateForwardSql(CreateModel operation)
+    public override string GenerateForwardSql(CreateModel operation, string appName)
     {
         var builder = new StringBuilder();
-        builder.Append($"CREATE TABLE {operation.TableName} (");
+        builder.Append($"CREATE TABLE {ToUnderscoreCase(appName)}_{operation.Name.ToLowerInvariant()} (\n");
         var columns = new List<string>();
         foreach (var field in operation.Fields)
         {
@@ -17,12 +17,14 @@ public class CreateModelGenerator : ISqlGenerator<CreateModel>
             columns.Add($"{field.Name} {sqlField.GetSqlType(field)} {string.Join(" ", sqlField.GetSqlAttributes(field))}");
         }
         builder.Append(string.Join(",\n", columns));
-        builder.Append(");");
+        builder.Append("\n);");
         return builder.ToString();
     }
 
-    public string GenerateReverseSql(CreateModel operation)
+
+    public override string GenerateReverseSql(CreateModel operation, string appName)
     {
-        return $"DROP TABLE {operation.TableName};";
+        return $"DROP TABLE {ToUnderscoreCase(appName)}_{operation.Name.ToLowerInvariant()};";
     }
+
 }

@@ -3,13 +3,15 @@ using FeintFramework.Db.Migrator;
 
 namespace Example.ExampleApp.Migrations;
 
-class _0001_migration : BaseMigration
+class _0002_migration : BaseMigration
 {
-    public override (string ApplicationName, string MigrationName)[] Dependencies => [];
+    public override (string ApplicationName, string MigrationName)[] Dependencies => [
+        ("ExampleApp", "_0001_migration")
+    ];
     public override bool Initial => true;
 
     public override MigrationOperation[] Operations => [
-        new CreateModel("blogs"){
+        new CreateModel("blogs2"){
             Fields = [
                 new AutoField("id"){
                     PrimaryKey = true,
