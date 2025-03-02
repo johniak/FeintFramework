@@ -16,6 +16,6 @@ public abstract class DatabaseHandler
     public abstract void CommitTransaction();
     public abstract void RollbackTransaction();
     public abstract void CreateMigrationTable();
-    public abstract List<(string MigrationName, string ApplicationName)> GetAppliedMigrations();
+    public abstract List<(string ApplicationName, string MigrationName)> GetAppliedMigrations();
     public abstract void ApplyMigration(string applicationName, string migrationName);
 }

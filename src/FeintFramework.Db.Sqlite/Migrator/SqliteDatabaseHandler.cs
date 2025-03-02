@@ -93,16 +93,15 @@ public class SqliteDatabaseHandler : DatabaseHandler
 
     public override void BeginTransaction()
     {
-        if (transactionLevel == 0)
-        {
+        if (transactionLevel == 0){
             outerTransaction = connection?.BeginTransaction()!;
         }
         else
         {
-            transactionLevel++;
             string savepointName = "SP" + transactionLevel;
             ExecuteNonQuery($"SAVEPOINT {savepointName};");
         }
+        transactionLevel++;
     }
 
     public override void CommitTransaction()
@@ -167,7 +166,7 @@ public class SqliteDatabaseHandler : DatabaseHandler
         ExecuteNonQuery("CREATE TABLE IF NOT EXISTS feint_migrations (id INTEGER PRIMARY KEY AUTOINCREMENT, application_name TEXT NOT NULL, migration_name TEXT NOT NULL, applied_at DATETIME DEFAULT CURRENT_TIMESTAMP);");
     }
 
-    public override List<(string MigrationName, string ApplicationName)> GetAppliedMigrations()
+    public override List<(string ApplicationName,string MigrationName)> GetAppliedMigrations()
     {
         var table = ExecuteQuery("SELECT application_name, migration_name FROM feint_migrations;");
         var appliedMigrations = new List<(string MigrationName, string ApplicationName)>();

@@ -1,27 +1,27 @@
 
 using System.Text.RegularExpressions;
-
+using FeintFramework.Db.Migrator.Operations;
 namespace FeintFramework.Db.Migrator;
 public interface ISqlGenerator
 {
-    string GenerateForwardSql(MigrationOperation operation, string appName);
-    string GenerateReverseSql(MigrationOperation operation, string appName);
+    string GenerateForwardSql(MigrationOperation operation, string appName, DatabaseState databaseState);
+    string GenerateReverseSql(MigrationOperation operation, string appName, DatabaseState databaseState);
 }
 
 public abstract class SqlGenerator<T> : ISqlGenerator where T : MigrationOperation
 {
-    public abstract string GenerateForwardSql(T operation, string appName);
+    public abstract string GenerateForwardSql(T operation, string appName, DatabaseState databaseState);
 
-    public string GenerateForwardSql(MigrationOperation operation, string appName)
+    public string GenerateForwardSql(MigrationOperation operation, string appName, DatabaseState databaseState)
     {
-        return GenerateForwardSql((T)operation, appName);
+        return GenerateForwardSql((T)operation, appName, databaseState);
     }
 
-    public abstract string GenerateReverseSql(T operation, string appName);
+    public abstract string GenerateReverseSql(T operation, string appName, DatabaseState databaseState);
 
-    public string GenerateReverseSql(MigrationOperation operation, string appName)
+    public string GenerateReverseSql(MigrationOperation operation, string appName, DatabaseState databaseState)
     {
-        return GenerateReverseSql((T)operation, appName);
+        return GenerateReverseSql((T)operation, appName, databaseState);
     }
 }
 public abstract class MigrationOperationHandler
@@ -50,7 +50,7 @@ public abstract class MigrationOperationHandler
         Type? baseType = generatorType.BaseType;
         return baseType!.GetGenericArguments()[0];
     }
-    public abstract void HandleForwrdOperation(MigrationOperation operation, string appName);
-    public abstract void HandleReverseOperation(MigrationOperation operation, string appName);
+    public abstract void HandleForwardOperation(MigrationOperation operation, string appName, DatabaseState databaseState);
+    public abstract void HandleReverseOperation(MigrationOperation operation, string appName, DatabaseState databaseState);
 
 }

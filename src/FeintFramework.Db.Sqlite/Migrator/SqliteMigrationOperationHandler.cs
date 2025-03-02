@@ -1,4 +1,5 @@
 using FeintFramework.Db.Migrator;
+using FeintFramework.Db.Migrator.Operations;
 
 namespace FeintFramework.Db.Sqlite.Migrator;
 
@@ -9,7 +10,11 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
         get
         {
             return [
-                new CreateModelGenerator()
+                new CreateModelGenerator(),
+                new AddFieldGenerator(),
+                new RemoveFieldGenerator(),
+                new AlterFieldGenerator(),
+                new RunSqlGenerator()
             ];
         }
     }
@@ -22,7 +27,7 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
         this.databaseHandler = databaseHandler;
     }
 
-    public override void HandleForwrdOperation(MigrationOperation operation, string appName)
+    public override void HandleForwardOperation(MigrationOperation operation, string appName, DatabaseState databaseState)
     {
         var operationType = operation.GetType();
         if (!OperationHandlersDict.ContainsKey(operationType))
@@ -30,11 +35,11 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
             throw new Exception($"Operation {operationType.Name} not supported");
         }
         var handler = OperationHandlersDict[operationType];
-        var sql = handler.GenerateForwardSql(operation, appName);
+        var sql = handler.GenerateForwardSql(operation, appName, databaseState);
         databaseHandler.ExecuteNonQuery(sql);
     }
 
-    public override void HandleReverseOperation(MigrationOperation operation, string appName)
+    public override void HandleReverseOperation(MigrationOperation operation, string appName, DatabaseState databaseState)
     {
         var operationType = operation.GetType();
         if (!OperationHandlersDict.ContainsKey(operationType))
@@ -42,7 +47,7 @@ class SqliteMigrationOperationHandler : MigrationOperationHandler
             throw new Exception($"Operation {operationType.Name} not supported");
         }
         var handler = OperationHandlersDict[operationType];
-        var sql = handler.GenerateReverseSql(operation, appName);
+        var sql = handler.GenerateReverseSql(operation, appName, databaseState);
         databaseHandler.ExecuteNonQuery(sql);
     }
 }

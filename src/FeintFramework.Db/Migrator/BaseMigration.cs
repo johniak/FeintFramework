@@ -1,4 +1,6 @@
 
+using FeintFramework.Db.Migrator.Operations;
+
 namespace FeintFramework.Db.Migrator;
 public abstract class BaseMigration
 {
@@ -7,7 +9,7 @@ public abstract class BaseMigration
     public abstract MigrationOperation[] Operations { get; }
 
     public virtual bool Initial { get; } = false;
-    public virtual bool Atomic { get; } = false;
+    public virtual bool Atomic { get; } = true;
 
     public virtual string Name
     {

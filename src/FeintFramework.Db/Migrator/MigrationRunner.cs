@@ -11,6 +11,8 @@ public class MigrationRunner
     protected DatabaseHandler databaseHandler;
     protected Type[] installedApps;
 
+    protected Dictionary<string, ModelState> models = new Dictionary<string, ModelState>();
+
     protected Dictionary<Type, string> installedAppsNamespacesDict
     {
         get
@@ -34,6 +36,7 @@ public class MigrationRunner
     }
 
 
+
     public MigrationRunner(DatabaseHandler databaseHandler, Type[] installedApps)
     {
         this.databaseHandler = databaseHandler;
@@ -44,12 +47,13 @@ public class MigrationRunner
     {
         databaseHandler.Connect();
         databaseHandler.CreateMigrationTable();
-        var migrationWithApps = SortMigrationsWithGraph(MigrationsWithApps, databaseHandler.GetAppliedMigrations());
-        foreach (var migrationWithApp in migrationWithApps)
+        var pendingMigrationWithApps = SortMigrationsWithGraph(MigrationsWithApps, databaseHandler.GetAppliedMigrations());
+        var allMigrationsWithApps = SortMigrationsWithGraph(MigrationsWithApps, databaseHandler.GetAppliedMigrations(), onlyPending: false);
+        foreach (var migrationWithApp in pendingMigrationWithApps)
         {
-            var runner = new SingleMigrationRunner(migrationWithApp.Migration, databaseHandler, migrationWithApp.ApplicationName);
+            var databaseState = new DatabaseState(databaseHandler, allMigrationsWithApps);
+            var runner = new SingleMigrationRunner(migrationWithApp.Migration, databaseHandler, migrationWithApp.ApplicationName,databaseState);
             runner.RunMigration();
-            databaseHandler.ApplyMigration(migrationWithApp.ApplicationName, migrationWithApp.Migration.Name);
         }
         this.databaseHandler.Disconnect();
     }
@@ -72,7 +76,7 @@ public class MigrationRunner
                         return ex.Types.Where(t => t != null)!;
                     }
                 });
-            var nullableTypes =  allTypes.Where(t => t!.IsClass && !t.IsAbstract && typeof(BaseMigration).IsAssignableFrom(t) && t.Namespace != null && t.Namespace.StartsWith(namespacedApp.Value));
+            var nullableTypes = allTypes.Where(t => t!.IsClass && !t.IsAbstract && typeof(BaseMigration).IsAssignableFrom(t) && t.Namespace != null && t.Namespace.StartsWith(namespacedApp.Value));
             foreach (var type in nullableTypes)
             {
                 migrationTypesWithAppTypes.Add((namespacedApp.Key, type!));
@@ -99,16 +103,19 @@ public class MigrationRunner
 
     public List<(string ApplicationName, BaseMigration Migration)> SortMigrationsWithGraph(
         List<(string ApplicationName, BaseMigration Migration)> migrationsWithApps,
-        List<(string ApplicationName, string MigrationName)> appliedMigrations)
+        List<(string ApplicationName, string MigrationName)> appliedMigrations,
+        bool onlyPending = true)
     {
         var appliedKeys = new HashSet<string>(
             appliedMigrations.Select(m => $"{m.ApplicationName}|{m.MigrationName}"));
 
-        var pendingMigrations = migrationsWithApps
+        List<(string ApplicationName, BaseMigration Migration)> filtredMigrations = migrationsWithApps;
+        if (onlyPending)
+            filtredMigrations = migrationsWithApps
             .Where(x => !appliedKeys.Contains($"{x.ApplicationName}|{x.Migration.Name}"))
             .ToList();
 
-        var migrationDict = pendingMigrations.ToDictionary(
+        var migrationDict = filtredMigrations.ToDictionary(
             x => $"{x.ApplicationName}|{x.Migration.Name}",
             x => x.Migration);
 
@@ -119,7 +126,7 @@ public class MigrationRunner
             graph.AddVertex(key);
         }
 
-        foreach (var migrationTuple in pendingMigrations)
+        foreach (var migrationTuple in filtredMigrations)
         {
             string migrationKey = $"{migrationTuple.ApplicationName}|{migrationTuple.Migration.Name}";
             foreach (var dependency in migrationTuple.Migration.Dependencies)
