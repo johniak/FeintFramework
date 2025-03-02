@@ -1,19 +1,12 @@
-
-
-using System.Runtime.InteropServices.Marshalling;
-using FeintFramework.Db;
+using FeintFramework.Db.Migrator.Fields;
 using LinqToDB;
 using LinqToDB.Mapping;
 
 namespace FeintFramework.Db;
 public class Model
 {
-    [PrimaryKey, Identity]
+    [PrimaryKey, Identity, AutoField]
     public int? Id { get; set; }
-    // public static ITable<T> Objects<T>() where T : class
-    // {
-    //     return Connections.Connection!.GetTable<T>();
-    // }
 
     public virtual void Save()
     {

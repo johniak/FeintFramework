@@ -11,7 +11,7 @@ using FeintFramework.Db.Sqlite.Migrator;
 Console.WriteLine("***************************************");
 Configurator.Settings = new Example.Core.Settings();
 Configurator.Migrate();
-// Configurator.Configure(args);
+Configurator.Configure(args);
 
 // using (var db = new MyDbConnection())
 // {

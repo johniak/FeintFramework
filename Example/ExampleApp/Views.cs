@@ -8,15 +8,17 @@ using LinqToDB.Data;
 class ExampleView{
     public FeintHttpResponse AsView(FeintHttpRequest request){
 
-        Connections.Connection!.GetTable<Blog>();
-        var blog = new Blog{
-            Url = "https://example.com"
-        };
+        // Connections.Connection!.GetTable<Blog>();
+        // var blog = new Blog{
+        //     Url = "https://example.com"
+        // };
+
+        var author = Author.Objects.ToArray().First();
         
 
         return new FeintHttpResponse{
             StatusCode = 200,
-            Content = "OK"
+            Content = $"{author?.FullName} authors found"
         };
     }
 }

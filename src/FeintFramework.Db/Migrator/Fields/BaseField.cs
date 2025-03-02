@@ -1,5 +1,6 @@
 namespace FeintFramework.Db.Migrator.Fields;
-public class BaseField
+
+public class BaseField : Attribute
 {
     public bool NotNull { get; set; }
     public bool PrimaryKey { get; set; }
@@ -14,6 +15,9 @@ public class BaseField
 
 
 }
+[AttributeUsage(
+		AttributeTargets.Field | AttributeTargets.Property,
+		AllowMultiple = true, Inherited = true)]
 public class BaseField<T> : BaseField
 {
     public T? DefaultValue { get; set; }
