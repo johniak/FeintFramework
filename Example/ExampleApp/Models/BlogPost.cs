@@ -4,6 +4,7 @@ using FeintFramework.Db;
 using FeintFramework.Db.Migrator.Fields;
 using LinqToDB.Mapping;
 
+namespace Example.ExampleApp.Models;
 
 [Table(Name = "example_app_blog_post")]
 public partial class BlogPost : Model

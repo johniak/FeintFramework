@@ -14,7 +14,16 @@ public class DatabaseState
         var appliedKeys = new HashSet<string>(
              appliedMigrationsFromDb.Select(m => $"{m.ApplicationName}|{m.MigrationName}"));
         var appliedMigrations = allMigrations.Where(m => appliedKeys.Contains($"{m.ApplicationName}|{m.Migration.Name}"));
+        Initialize(allMigrations, appliedMigrations);
+    }
 
+    public DatabaseState(List<(String ApplicationName, BaseMigration Migration)> allMigrations)
+    {
+        Initialize(allMigrations, []);
+    }
+
+    public void Initialize(List<(String ApplicationName, BaseMigration Migration)> allMigrations ,IEnumerable<(string ApplicationName, BaseMigration Migration)> appliedMigrations)
+    {
         foreach (var migration in appliedMigrations)
         {
             foreach (var operation in migration.Migration.Operations)
@@ -30,9 +39,13 @@ public class DatabaseState
         }
     }
 
-    public ModelState GetModelState(string appName, string modelName)
+    public ModelState? GetModelState(string appName, string modelName)
     {
         var key = $"{appName}|{modelName}";
-        return ModelStates[key];
+        if (ModelStates.ContainsKey(key))
+        {
+            return ModelStates[key];
+        }
+        return null;
     }
 }
