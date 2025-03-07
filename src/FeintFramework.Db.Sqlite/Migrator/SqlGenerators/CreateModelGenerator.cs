@@ -15,7 +15,7 @@ public class CreateModelGenerator : SqlGenerator<CreateModel>
         foreach (var field in operation.Fields)
         {
             var sqlField = SqlFieldRegistry.GetField(field.Field);
-            columns.Add($"{field.Name.ToUnderscoreCase()} {sqlField.GetSqlType(field.Field)} {string.Join(" ", sqlField.GetSqlAttributes(field.Field))}");
+            columns.Add($"{GetColumnName(field.Name, field.Field)} {sqlField.GetSqlType(field.Field)} {string.Join(" ", sqlField.GetSqlAttributes(field.Field))}");
         }
         builder.Append(string.Join(",\n", columns));
         builder.Append("\n);");

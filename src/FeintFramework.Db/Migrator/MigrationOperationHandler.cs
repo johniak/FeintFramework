@@ -1,5 +1,6 @@
 
 using System.Text.RegularExpressions;
+using FeintFramework.Db.Migrator.Fields;
 using FeintFramework.Db.Migrator.Operations;
 namespace FeintFramework.Db.Migrator;
 public interface ISqlGenerator
@@ -22,6 +23,20 @@ public abstract class SqlGenerator<T> : ISqlGenerator where T : MigrationOperati
     public string GenerateReverseSql(MigrationOperation operation, string appName, DatabaseState databaseState)
     {
         return GenerateReverseSql((T)operation, appName, databaseState);
+    }
+    public static string GetTableName(string appName, ModelOperation operation)
+    {
+        return $"{appName.ToUnderscoreCase()}_{operation.ModelName.ToUnderscoreCase()}";
+    }
+
+    public static string GetColumnName(string fieldName, BaseField field)
+    {
+        var columnName = fieldName.ToUnderscoreCase();
+        if (field is ForeignKey)
+        {
+            return $"{columnName}_id";
+        }
+        return columnName;
     }
 }
 public abstract class MigrationOperationHandler

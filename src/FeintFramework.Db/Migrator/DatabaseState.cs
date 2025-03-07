@@ -22,9 +22,14 @@ public class DatabaseState
         Initialize(allMigrations, []);
     }
 
-    public void Initialize(List<(String ApplicationName, BaseMigration Migration)> allMigrations ,IEnumerable<(string ApplicationName, BaseMigration Migration)> appliedMigrations)
+    public void Initialize(List<(String ApplicationName, BaseMigration Migration)> allMigrations, IEnumerable<(string ApplicationName, BaseMigration Migration)> appliedMigrations)
     {
-        foreach (var migration in appliedMigrations)
+        IEnumerable<(string ApplicationName, BaseMigration Migration)> migrations = allMigrations;
+        if (appliedMigrations.Any())
+        {
+            migrations = appliedMigrations;
+        }
+        foreach (var migration in migrations)
         {
             foreach (var operation in migration.Migration.Operations)
             {
@@ -47,5 +52,10 @@ public class DatabaseState
             return ModelStates[key];
         }
         return null;
+    }
+
+    public string[] GetExistingModels()
+    {
+        return ModelStates.Keys.ToArray();
     }
 }

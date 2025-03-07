@@ -1,4 +1,5 @@
 using FeintFramework.Db.Migrator.Fields;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FeintFramework.Db.Migrator.Operations;
 
@@ -8,4 +9,10 @@ public class RemoveField : FieldOperation
     {
 
     }
+
+    public override ExpressionSyntax GenerateOperation()
+    {
+        throw new NotImplementedException();
+    }
+
 }

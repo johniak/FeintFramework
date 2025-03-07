@@ -5,7 +5,7 @@ using LinqToDB.Mapping;
 namespace FeintFramework.Db;
 public class Model
 {
-    [PrimaryKey, Identity, AutoField]
+    [PrimaryKey, Identity, AutoField(PrimaryKey = true)]
     public int? Id { get; set; }
 
     public virtual void Save()

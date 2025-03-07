@@ -83,7 +83,7 @@ public class SqliteDateTimeField : BaseSqliteField<DateTimeField>
             return "CURRENT_TIMESTAMP";
         if (field.DefaultValue == null)
             return null;
-        return field.DefaultValue.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+        return field.DefaultValue;
     }
 
 }

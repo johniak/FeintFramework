@@ -20,13 +20,14 @@ public class ClassGenerator
     public InitializerExpressionSyntax DependenciesInitializer { get; private set; }
         = InitializerExpression(SyntaxKind.ArrayInitializerExpression);
 
+
     protected BaseApplication app;
-    protected string className;
+    public string ClassName { get; protected set; }
 
     public ClassGenerator(BaseApplication app, string className)
     {
         this.app = app;
-        this.className = className;
+        this.ClassName = className;
     }
     protected void InitClass()
     {
@@ -40,14 +41,15 @@ public class ClassGenerator
         var applicationNameSpace = app.GetType().Namespace;
         Namespace = FileScopedNamespaceDeclaration(ParseName($"{applicationNameSpace}.Migrations"));
 
-       
 
-        Class = ClassDeclaration(className)
+
+        Class = ClassDeclaration(ClassName)
             .AddModifiers(Token(SyntaxKind.PublicKeyword))
             .AddBaseListTypes(SimpleBaseType(ParseTypeName("BaseMigration")));
     }
 
-    protected void AddProperties(){
+    protected void AddProperties()
+    {
         var dependenciesProperty = PropertyDeclaration(
             ParseTypeName("(string ApplicationName, string MigrationName)[]"),
             "Dependencies")
@@ -73,8 +75,27 @@ public class ClassGenerator
         OperationsInitializer = OperationsInitializer.AddExpressions(operationExpression);
     }
 
-    public void AddDependency(ExpressionSyntax dependencyExpression)
+    public void AddDependency(string appName, string migrationName)
     {
+        var dependencyExpression = TupleExpression(
+        SeparatedList<ArgumentSyntax>(
+            new SyntaxNodeOrToken[]{
+                Argument(
+                    LiteralExpression(
+                        SyntaxKind.StringLiteralExpression,
+                        Literal(appName)
+                    )
+                ),
+                Token(SyntaxKind.CommaToken),
+                Argument(
+                    LiteralExpression(
+                        SyntaxKind.StringLiteralExpression,
+                        Literal(migrationName)
+                    )
+                )
+            }
+        )
+        );
         DependenciesInitializer = DependenciesInitializer.AddExpressions(dependencyExpression);
     }
 

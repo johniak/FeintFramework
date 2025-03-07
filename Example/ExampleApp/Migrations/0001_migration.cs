@@ -12,7 +12,7 @@ class _0001_migration : BaseMigration
     public override MigrationOperation[] Operations => [
         new CreateModel("Author"){
             Fields = [
-                ("id", new AutoField(){
+                ("Id", new AutoField(){
                     PrimaryKey = true,
                     NotNull = true,
                 }),

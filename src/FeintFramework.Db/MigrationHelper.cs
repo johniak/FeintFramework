@@ -145,4 +145,22 @@ public class MigrationHelper
 
         return sortedKeys.Select(key => (key.Split('|')[0], migrationDict[key])).ToList();
     }
+
+    public int GetCurrentMigrationNumber(string applicationName)
+    {
+        var migriationsWithTypes = GetAllMigrationTypesWithAppTypes();
+        var migrations = migriationsWithTypes.Where(m => m.AppicationType.Name == applicationName);
+        return migrations.Count();
+    }
+    public Dictionary<string, int> GetCurrentMigrationNumbers()
+    {
+        var migriationsWithTypes = GetAllMigrationTypesWithAppTypes();
+        var migrationNumbers = new Dictionary<string, int>();
+        foreach (var app in installedApps)
+        {
+            var migrations = migriationsWithTypes.Where(m => m.AppicationType.Name == app.Name);
+            migrationNumbers[app.Name] = migrations.Count();
+        }
+        return migrationNumbers;
+    }
 }

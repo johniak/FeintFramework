@@ -1,6 +1,8 @@
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace FeintFramework.Db.Migrator.Operations;
 
-public class FieldOperation : ModelOperation
+public abstract class FieldOperation : ModelOperation
 {
     public string Name { get; set; }
 
@@ -8,4 +10,5 @@ public class FieldOperation : ModelOperation
     {
         Name = name;
     }
+
 }
