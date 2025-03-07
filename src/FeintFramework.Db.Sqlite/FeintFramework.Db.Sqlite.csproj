@@ -5,11 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
- <ItemGroup>
-    <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
+  <ItemGroup>
+      <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
   </ItemGroup>
-
 </Project>

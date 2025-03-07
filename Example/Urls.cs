@@ -2,25 +2,20 @@
 
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
-namespace Example{
-class MainUrlPatterns : UrlPatterns
+namespace Example
 {
-    public override List<UrlPattern> Urls
+    class MainUrlPatterns : UrlPatterns
     {
-        get
+        public override List<UrlPattern> Urls
         {
-            return new List<UrlPattern>
+            get
             {
-                new UrlPattern("/example", (request) =>
-                {
-                    return new FeintHttpResponse
-                    {
-                        StatusCode = 200,
-                        Content = "OK"
-                    };
-                }),
+                return new List<UrlPattern>
+            {
+                new UrlPattern("/example",
+                new ExampleView().AsView),
             };
+            }
         }
     }
-}
 }

@@ -3,6 +3,9 @@
 using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
+using FeintFramework.Db;
+using FeintFramework.Db.Migrator;
+using LinqToDB.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +14,12 @@ public static class Configurator
 {
 
     public static BaseSettings Settings;
+
+    public static void Migrate()
+    {
+        var runner = new MigrationRunner(Settings.DatabaseHandler, Settings.InstalledApps);
+        runner.RunMigrations();
+    }
 
     private static void Validate()
     {
@@ -38,8 +47,23 @@ public static class Configurator
         var serverHanler = new KestrelServerHandler(router.HandleRequest);
         app.Use(async (HttpContext context, RequestDelegate next) =>
         {
-            serverHanler.HandleRequest(context);
-            await context.Response.CompleteAsync();
+            using (var db = new DataConnection(Settings.DatabaseProvider, Settings.DatabaseConnectionString))
+            {
+                Connections.Connection = db;
+                try
+                {
+                    serverHanler.HandleRequest(context);
+                    await context.Response.CompleteAsync();
+                }
+                catch (Exception)
+                {
+                    throw;
+                }
+                finally
+                {
+                    Connections.Connection = null;
+                }
+            }
         });
         app.Run("http://0.0.0.0:9000");
     }
