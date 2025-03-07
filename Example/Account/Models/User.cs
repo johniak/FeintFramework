@@ -4,7 +4,7 @@ using FeintFramework.Db;
 using FeintFramework.Db.Migrator.Fields;
 using LinqToDB.Mapping;
 
-namespace Example.ExampleApp.Models;
+namespace Example.Account.Models;
 
 [Table(Name = "example_app_user")]
 public partial class User : Model

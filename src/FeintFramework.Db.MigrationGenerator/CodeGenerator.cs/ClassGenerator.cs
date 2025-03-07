@@ -6,6 +6,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Formatting;
+using Microsoft.CodeAnalysis.Options;
 
 namespace FeintFramework.Db.MigrationGenerator;
 public class ClassGenerator
@@ -55,7 +59,7 @@ public class ClassGenerator
             "Dependencies")
             .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword))
             .WithExpressionBody(ArrowExpressionClause(
-                ImplicitArrayCreationExpression(DependenciesInitializer)
+                buildTypedArrayExpression(DependenciesInitializer)
             ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
 
@@ -64,7 +68,7 @@ public class ClassGenerator
             "Operations")
             .AddModifiers(Token(SyntaxKind.PublicKeyword), Token(SyntaxKind.OverrideKeyword))
             .WithExpressionBody(ArrowExpressionClause(
-                ImplicitArrayCreationExpression(OperationsInitializer)
+                buildTypedArrayExpression(OperationsInitializer)
             ))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
         Class = Class.AddMembers(dependenciesProperty, operationsProperty);
@@ -98,6 +102,21 @@ public class ClassGenerator
         );
         DependenciesInitializer = DependenciesInitializer.AddExpressions(dependencyExpression);
     }
+    protected ExpressionSyntax buildTypedArrayExpression(InitializerExpressionSyntax expression)
+    {
+        if (!expression.Expressions.Any())
+        {
+            return ParseExpression("[]");
+        }
+        else
+        {
+
+            var expressions = expression.Expressions.Select(e => e.NormalizeWhitespace().ToFullString());
+            var joined = string.Join(", ", expressions);
+            var code = $"[{joined}]";
+            return ParseExpression(code).NormalizeWhitespace();
+        }
+    }
 
     public override string ToString()
     {
@@ -111,3 +130,5 @@ public class ClassGenerator
         return compilationUnit.ToFullString();
     }
 }
+
+

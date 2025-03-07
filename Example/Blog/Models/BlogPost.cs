@@ -1,10 +1,11 @@
 
 
+using Example.Account.Models;
 using FeintFramework.Db;
 using FeintFramework.Db.Migrator.Fields;
 using LinqToDB.Mapping;
 
-namespace Example.ExampleApp.Models;
+namespace Example.Blog.Models;
 
 [Table(Name = "example_app_blog_post")]
 public partial class BlogPost : Model
@@ -15,8 +16,11 @@ public partial class BlogPost : Model
     [Column, TextField()]
     public string Content { get; set; }
 
-    [Association(ThisKey = nameof(Author), OtherKey=nameof(Author.Id)), ForeignKey("ExampleApp.Author", ForeignKeyAction.Cascade)]
+    [Association(ThisKey = nameof(Author), OtherKey = nameof(Author.Id)), ForeignKey("BlogApp.Author", ForeignKeyAction.Cascade)]
     public Author Author { get; set; }
+    
+    [Association(ThisKey = nameof(User), OtherKey = nameof(Author.Id)), ForeignKey("AccountApp.User", ForeignKeyAction.Cascade)]
+    public User CreatedBy { get; set; }
 }
 
 

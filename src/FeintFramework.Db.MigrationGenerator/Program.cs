@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FeintFramework.Core.Config.Settings;
+using System.Reflection.Metadata;
+using System.Reflection.PortableExecutable;
 
 namespace FeintFramework.Db.MigrationGenerator;
 class Program
@@ -67,12 +69,14 @@ class Program
             return 1;
         }
         string[] assemblyFiles = Directory.GetFiles(binDebugFolder, projectName + ".dll", SearchOption.AllDirectories);
+        string[] pdbFiles = Directory.GetFiles(binDebugFolder, projectName + ".pdb", SearchOption.AllDirectories);
         if (assemblyFiles.Length == 0)
         {
             Console.WriteLine($"No assembly file '{projectName}.dll' found in bin/Debug.");
             return 1;
         }
         string assemblyPath = assemblyFiles[0];
+        string pdbPath = pdbFiles[0];
         Console.WriteLine("Loading assembly: " + assemblyPath);
         Assembly asm = Assembly.LoadFrom(assemblyPath);
         Type settingsType = asm.GetType(settingsClassFullName);
@@ -90,7 +94,7 @@ class Program
 
         Console.WriteLine($"Instance of '{settingsType.FullName}' created successfully.");
         Console.WriteLine("Instance: " + settingsInstance.ToString());
-        var migrationGenerator = new MigrationGenerator(settingsInstance);
+        var migrationGenerator = new MigrationGenerator(settingsInstance, projectFolder);
         migrationGenerator.GenerateMigration();
         return 0;
     }

@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -25,35 +26,38 @@ public class ForeignKey : BaseField<int>
         OnDelete = onDelete;
     }
 
-    public override List<ExpressionSyntax> GetInitializerExpressions()
-    {
-        var expressions = base.GetInitializerExpressions();
-
-        expressions.Add(
-            AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName("To"),
-                LiteralExpression(
-                    SyntaxKind.StringLiteralExpression,
-                    Literal(To)
+public override ExpressionSyntax GetExpression()
+{
+    return ObjectCreationExpression(ParseTypeName(this.GetType().Name))
+        .WithArgumentList(
+            ArgumentList(
+                SeparatedList<ArgumentSyntax>(
+                    new SyntaxNodeOrToken[]
+                    {
+                        Argument(
+                            LiteralExpression(
+                                SyntaxKind.StringLiteralExpression,
+                                Literal(To)
+                            )
+                        ),
+                        Token(SyntaxKind.CommaToken),
+                        Argument(
+                            MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                ParseTypeName("ForeignKeyAction"),
+                                IdentifierName(OnDelete.ToString())
+                            )
+                        )
+                    }
                 )
             )
-        );
+        ).WithInitializer(
+                InitializerExpression(SyntaxKind.ObjectInitializerExpression)
+                    .AddExpressions(GetInitializerExpressions().ToArray())
+            );;
+}
 
-        expressions.Add(
-            AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                IdentifierName("OnDelete"),
-                MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    ParseTypeName("ForeignKeyAction"),
-                    IdentifierName(OnDelete.ToString())
-                )
-            )
-        );
 
-        return expressions;
-    }
 
 
     public override ExpressionSyntax? GetDefaultValueAssignment()

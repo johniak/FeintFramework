@@ -8,7 +8,8 @@ namespace Example.Core
     public class Settings : BaseSettings
     {
         public override Type[] InstalledApps => [
-            typeof(ExampleApp.ExampleApp)
+            typeof(Blog.BlogApp),
+            typeof(Account.AccountApp)
         ];
 
 

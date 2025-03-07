@@ -44,10 +44,7 @@ public class CreateModel : ModelOperation
                 AssignmentExpression(
                     SyntaxKind.SimpleAssignmentExpression,
                     IdentifierName("Fields"),
-                    ImplicitArrayCreationExpression(
-                        InitializerExpression(SyntaxKind.ArrayInitializerExpression)
-                            .AddExpressions(fieldExpressions)
-                    )
+                    BuildTypedArrayExpression(fieldExpressions)
                 )
             );
         return createModelExpression.WithInitializer(initializer);

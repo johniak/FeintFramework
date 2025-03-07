@@ -1,13 +1,15 @@
 
 
-using Example.ExampleApp.Models;
+using Example.Blog.Models;
 using FeintFramework.Core.Http;
 using FeintFramework.Db;
 using LinqToDB;
 using LinqToDB.Data;
 
-class ExampleView{
-    public FeintHttpResponse AsView(FeintHttpRequest request){
+class ExampleView
+{
+    public FeintHttpResponse AsView(FeintHttpRequest request)
+    {
 
         // Connections.Connection!.GetTable<Blog>();
         // var blog = new Blog{
@@ -15,9 +17,10 @@ class ExampleView{
         // };
 
         var author = Author.Objects.ToArray().First();
-        
 
-        return new FeintHttpResponse{
+
+        return new FeintHttpResponse
+        {
             StatusCode = 200,
             Content = $"{author?.FullName} authors found"
         };

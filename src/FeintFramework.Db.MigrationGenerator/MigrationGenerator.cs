@@ -16,12 +16,20 @@ public class MigrationGenerator
     MigrationHelper migrationHelper;
     Dictionary<string, (ExpressionSyntax OperationExpression, string[] Dependencies)?> operationsDependenciesDict = new Dictionary<string, (ExpressionSyntax OperationExpression, string[] Dependencies)?>();
     Type[] installedApps;
-    public MigrationGenerator(BaseSettings settings)
+
+    Dictionary<string, string> migrationsPath = new Dictionary<string, string>();
+    public MigrationGenerator(BaseSettings settings, string projectDirectory)
     {
         installedApps = settings.InstalledApps;
         migrationHelper = new MigrationHelper(installedApps);
         databaseState = new DatabaseState(migrationHelper.CreateAllMigrationInstancesWithAppInstances());
-        
+        var installedAppWithPaths = settings.InstalledApps.Select(a => (a.Name, a.FullName)).ToDictionary(a => a.Name, a => SourceFileSearcher.FindSourceFileForType(projectDirectory, a.FullName!));
+        foreach (var app in installedAppWithPaths)
+        {
+            var baseDirectory = Path.GetDirectoryName(app.Value);
+            string migrationDirectory = Path.Combine(baseDirectory!, "migrations");
+            migrationsPath[app.Key] = migrationDirectory;
+        }
     }
 
     public void GenerateMigration()
@@ -47,7 +55,7 @@ public class MigrationGenerator
         var sortedOperations = getOperationsGraphSorted();
         var currentMigrationsNumbers = migrationHelper.GetCurrentMigrationNumbers();
 
-        var migrations = new List<ClassGenerator>();
+        var migrations = new List<(string AppName, ClassGenerator MigrationClassGenerator)>();
         string? currentAppName = null;
         ClassGenerator? classGenerator = null;
         foreach (var operation in sortedOperations)
@@ -59,7 +67,7 @@ public class MigrationGenerator
                 var initial = lastMigrationNumber == 0;
                 var migrationClassName = $"_{(lastMigrationNumber + 1).ToString("D4")}_migration";
                 classGenerator = new ClassGenerator(installedAppsByName[currentAppName], migrationClassName);
-                migrations.Add(classGenerator);
+                migrations.Add((currentAppName, classGenerator));
                 if (!initial)
                 {
                     classGenerator.AddDependency(currentAppName, $"_{(lastMigrationNumber).ToString("D4")}_migration");
@@ -80,13 +88,9 @@ public class MigrationGenerator
         }
         foreach (var migration in migrations)
         {
-            Console.WriteLine(migration.ClassName);
-            Console.WriteLine(migration.ToString());
+            saveMigration(migration.AppName, migration.MigrationClassGenerator.ClassName, migration.MigrationClassGenerator.ToString());
         }
     }
-
-
-
 
     protected void generateModelMigration(BaseApplication appInstance, Type model)
     {
@@ -199,7 +203,6 @@ public class MigrationGenerator
     }
 
 
-
     protected (string FieldName, BaseField Field)[] getModelFields(Type modelType)
     {
         var fields = modelType.GetProperties();
@@ -215,4 +218,10 @@ public class MigrationGenerator
         return fieldList.ToArray();
     }
 
+    protected void saveMigration(string appName, string migrationName, string migrationContent)
+    {
+        var migrationPath = migrationsPath[appName];
+        var migrationFilePath = Path.Combine(migrationPath, $"{migrationName}.g.cs");
+        File.WriteAllText(migrationFilePath, migrationContent);
+    }
 }
