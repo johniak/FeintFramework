@@ -1,9 +1,9 @@
 using System.Text.Json;
-using FeintFramework.Core.Contrib.Sessions.Models;
+using FeintFramework.Contrib.Sessions.Models;
 
-namespace FeintFramework.Core.Contrib.Sessions;
+namespace FeintFramework.Contrib.Sessions;
 
-class SessionStore
+public class SessionStore
 {
 
     protected Session session;

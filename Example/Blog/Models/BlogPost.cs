@@ -8,7 +8,7 @@ using LinqToDB.Mapping;
 namespace Example.Blog.Models;
 
 [Table(Name = "example_app_blog_post")]
-public partial class BlogPost : Model
+public partial class BlogPost : Model<BlogPost>
 {
     [Column, NotNull, CharField(Length = 255)]
     public string Title { get; set; }

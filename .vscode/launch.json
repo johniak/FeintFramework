@@ -2,14 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "My debug config",
+            "name": "C#: Example Debug",
+            "type": "dotnet",
+            "request": "launch",
+            "projectPath": "${workspaceFolder}/Example/Example.csproj"
+        },
+        {
+            "name": "Migrations Generator",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
             "program": "${workspaceFolder}/src/FeintFramework.Db.MigrationGenerator/bin/Debug/net9.0/FeintFramework.Db.MigrationGenerator.dll",
             "args": [
                 "--project",
-                "${workspaceFolder}/src/FeintFramework.Core",
+                "${workspaceFolder}/src/FeintFramework.Contrib",
                 "--app",
                 "SessionsApp"
             ],

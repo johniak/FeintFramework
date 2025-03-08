@@ -1,7 +1,7 @@
 
 using FeintFramework.Core.Apps;
 
-namespace FeintFramework.Core.Contrib.Sessions
+namespace FeintFramework.Contrib.Sessions
 {
     public class SessionsApp : BaseApplication
     {

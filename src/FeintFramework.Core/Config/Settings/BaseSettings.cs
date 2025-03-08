@@ -6,6 +6,10 @@ namespace FeintFramework.Core.Config.Settings
 {
     public abstract class BaseSettings
     {
+        public BaseSettings()
+        {
+            ConfigureAdditionalSettings();
+        }
         public abstract Type[] InstalledApps { get; }
         public abstract UrlPatterns RootUrlPatterns { get; }
         public abstract List<Type> Middlewares { get; }
@@ -24,5 +28,10 @@ namespace FeintFramework.Core.Config.Settings
             }
         }
         public abstract DatabaseHandler DatabaseHandler { get; }
+
+        public Dictionary<string, object> AdditionalSettings { get; set; } = new Dictionary<string, object>();
+
+        protected abstract void ConfigureAdditionalSettings();
+
     }
 }

@@ -2,9 +2,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\FeintFramework.Core\FeintFramework.Core.csproj" />
+    <ProjectReference Include="..\src\FeintFramework.Contrib\FeintFramework.Contrib.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Db\FeintFramework.Db.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Db.Sqlite\FeintFramework.Db.Sqlite.csproj" />
-  <ProjectReference Include="..\src\FeintFramework.SourceGenerators\FeintFramework.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  <!-- <ProjectReference Include="..\src\FeintFramework.SourceGenerators\FeintFramework.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> -->
   </ItemGroup>
 
   <ItemGroup>

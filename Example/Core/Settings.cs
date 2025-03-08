@@ -2,6 +2,7 @@ using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Routing;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
+using FeintFramework.Contrib.Sessions;
 
 namespace Example.Core
 {
@@ -9,7 +10,8 @@ namespace Example.Core
     {
         public override Type[] InstalledApps => [
             typeof(Blog.BlogApp),
-            typeof(Account.AccountApp)
+            typeof(Account.AccountApp),
+            typeof(SessionsApp)
         ];
 
 
@@ -17,9 +19,14 @@ namespace Example.Core
 
         public override List<Type> Middlewares => new List<Type>
         {
-
+            typeof(SessionMiddleware)
         };
 
         public override DatabaseHandler DatabaseHandler => new SqliteDatabaseHandler(DatabaseConnectionString);
+
+        protected override void ConfigureAdditionalSettings()
+        {
+
+        }
     }
 }

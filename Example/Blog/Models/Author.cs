@@ -7,7 +7,7 @@ using LinqToDB.Mapping;
 namespace Example.Blog.Models;
 
 [Table(Name = "example_app_author")]
-public partial class Author : Model
+public partial class Author : Model<Author>
 {
     [Column(Name = "full_name"), CharField(Length = 200, NotNull = false)]
     public string FullName { get; set; }

@@ -19,7 +19,7 @@ public class KestrelServerHandler : BaseServerHandler
     protected void handleRequest(HttpContext context)
     {
         var feintRequest = convertToFeintRequest(context.Request);
-        convertToKestrelResponse(routerHandler(feintRequest), context);
+        convertToKestrelResponse(handler(feintRequest), context);
     }
     protected FeintHttpRequest convertToFeintRequest(HttpRequest kestrelRequest)
     {

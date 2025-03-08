@@ -7,7 +7,7 @@ using LinqToDB.Mapping;
 namespace Example.Account.Models;
 
 [Table(Name = "example_app_user")]
-public partial class User : Model
+public partial class User : Model<User>
 {
     [Column, NotNull, CharField(Length = 255)]
     public string Username { get; set; }

@@ -16,13 +16,13 @@ class ExampleView
         //     Url = "https://example.com"
         // };
 
-        var author = Author.Objects.ToArray().First();
+        // var author = Author.Objects.ToArray().First();
 
 
         return new FeintHttpResponse
         {
             StatusCode = 200,
-            Content = $"{author?.FullName} authors found"
+            Content = "Hello World"
         };
     }
 }

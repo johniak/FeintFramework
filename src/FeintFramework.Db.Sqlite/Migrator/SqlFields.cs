@@ -24,9 +24,10 @@ public abstract class BaseSqliteField<T> : SqlField<T> where T : BaseField
         {
             attributes.Add("INDEX");
         }
-        if (this.GetSqlDefaultValue(field) != null)
+        var defaultValue = this.GetSqlDefaultValue(field);
+        if ( defaultValue!= null)
         {
-            attributes.Add($"DEFAULT {field.DefaultValue}");
+            attributes.Add($"DEFAULT {defaultValue}");
         }
         return attributes;
     }
@@ -81,7 +82,7 @@ public class SqliteDateTimeField : BaseSqliteField<DateTimeField>
     {
         if (field.AutoNowAdd)
             return "CURRENT_TIMESTAMP";
-        if (field.DefaultValue == null)
+        if (String.IsNullOrEmpty(field.DefaultValue))
             return null;
         return field.DefaultValue;
     }
