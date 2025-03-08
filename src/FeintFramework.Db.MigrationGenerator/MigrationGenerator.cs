@@ -15,15 +15,15 @@ public class MigrationGenerator
     DatabaseState databaseState;
     MigrationHelper migrationHelper;
     Dictionary<string, (ExpressionSyntax OperationExpression, string[] Dependencies)?> operationsDependenciesDict = new Dictionary<string, (ExpressionSyntax OperationExpression, string[] Dependencies)?>();
-    Type[] installedApps;
+    Type[] appTypes;
 
     Dictionary<string, string> migrationsPath = new Dictionary<string, string>();
-    public MigrationGenerator(BaseSettings settings, string projectDirectory)
+    public MigrationGenerator(Type[] appTypes, string projectDirectory)
     {
-        installedApps = settings.InstalledApps;
-        migrationHelper = new MigrationHelper(installedApps);
+        this.appTypes = appTypes;
+        migrationHelper = new MigrationHelper(appTypes);
         databaseState = new DatabaseState(migrationHelper.CreateAllMigrationInstancesWithAppInstances());
-        var installedAppWithPaths = settings.InstalledApps.Select(a => (a.Name, a.FullName)).ToDictionary(a => a.Name, a => SourceFileSearcher.FindSourceFileForType(projectDirectory, a.FullName!));
+        var installedAppWithPaths = appTypes.Select(a => (a.Name, a.FullName)).ToDictionary(a => a.Name, a => SourceFileSearcher.FindSourceFileForType(projectDirectory, a.FullName!));
         foreach (var app in installedAppWithPaths)
         {
             var baseDirectory = Path.GetDirectoryName(app.Value);
@@ -36,7 +36,7 @@ public class MigrationGenerator
     {
         var installedModels = migrationHelper.GetAllModelTypesWithAppTypes();
         var modelsGroupedByApp = installedModels.GroupBy(m => m.AppicationType);
-        var installedAppsByName = installedApps.ToDictionary(a => a.Name, a => (BaseApplication)Activator.CreateInstance(a)!);
+        var installedAppsByName = appTypes.ToDictionary(a => a.Name, a => (BaseApplication)Activator.CreateInstance(a)!);
         var existingModels = databaseState.GetExistingModels();
         foreach (var model in existingModels)
         {

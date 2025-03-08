@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "My debug config",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/src/FeintFramework.Db.MigrationGenerator/bin/Debug/net9.0/FeintFramework.Db.MigrationGenerator.dll",
+            "args": [
+                "--project",
+                "${workspaceFolder}/Example",
+                "--settings",
+                "Example.Core.Settings"
+            ],
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        }
+    ]
+}

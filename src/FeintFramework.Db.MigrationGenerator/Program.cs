@@ -7,28 +7,63 @@ using System.Reflection;
 using FeintFramework.Core.Config.Settings;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.Threading.Tasks;
+using FeintFramework.Core.Apps;
 
 namespace FeintFramework.Db.MigrationGenerator;
 class Program
 {
-    static int Main(string[] args)
+    static async Task<int> Main(string[] args)
     {
-        args = ["../../../../../Example", "Example.Core.Settings"];
-        if (args.Length < 2)
+        var projectOption = new Option<string>(new[] { "--project", "-p" }, "The project directory path.");
+        var appOption = new Option<string>(new[] { "--app", "-a" }, "The app name.");
+        var settingsOption = new Option<string>(new[] { "--settings", "-s" }, "The full settings class name.");
+
+        // Create the root command and add options
+        var rootCommand = new RootCommand("This command will generate migration files for the given project, or app.")
+            {
+                projectOption,
+                appOption,
+                settingsOption
+            };
+        rootCommand.SetHandler((string project, string app, string settings) =>
         {
-            Console.WriteLine("Usage: MigrationTool <projectFolder> <fullSettingsClassName>");
+            var exitCode = RunMigration(project, app, settings);
+            return Task.FromResult(exitCode);
+        }, projectOption, appOption, settingsOption);
+
+        rootCommand.AddValidator(result =>
+        {
+            var appValue = result.GetValueForOption(appOption);
+            var settingsValue = result.GetValueForOption(settingsOption);
+            if (string.IsNullOrEmpty(appValue) && string.IsNullOrEmpty(settingsValue))
+            {
+                result.ErrorMessage = "Either --app or --settings must be provided.";
+            }
+        });
+
+        return await rootCommand.InvokeAsync(args);
+    }
+    static int RunMigration(string projectPath = ".", string? appName = null, string? settingsClassFullName = null)
+    {
+        // args = ["", "Example.Core.Settings"];
+        // if (args.Length < 2)
+        // {
+        //     Console.WriteLine("Usage: MigrationTool <projectFolder> <fullSettingsClassName>");
+        //     return 1;
+        // }
+
+        string projectDirectory = Path.GetFullPath(projectPath);
+
+        if (!Directory.Exists(projectDirectory))
+        {
+            Console.WriteLine($"Project folder does not exist: {projectDirectory}");
             return 1;
         }
-
-        string projectFolder = Path.GetFullPath(args[0]);
-        string settingsClassFullName = args[1];
-
-        if (!Directory.Exists(projectFolder))
-        {
-            Console.WriteLine($"Project folder does not exist: {projectFolder}");
-            return 1;
-        }
-        var csprojFiles = Directory.GetFiles(projectFolder, "*.csproj", SearchOption.TopDirectoryOnly);
+        var csprojFiles = Directory.GetFiles(projectDirectory, "*.csproj", SearchOption.TopDirectoryOnly);
         if (csprojFiles.Length == 0)
         {
             Console.WriteLine("No .csproj file found in the project folder.");
@@ -38,7 +73,7 @@ class Program
         Console.WriteLine("Found project file: " + csprojFile);
         ProcessStartInfo psi = new ProcessStartInfo("dotnet", $"build \"{csprojFile}\"")
         {
-            WorkingDirectory = projectFolder,
+            WorkingDirectory = projectDirectory,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
@@ -62,7 +97,7 @@ class Program
         }
 
         string projectName = Path.GetFileNameWithoutExtension(csprojFile);
-        string binDebugFolder = Path.Combine(projectFolder, "bin", "Debug");
+        string binDebugFolder = Path.Combine(projectDirectory, "bin", "Debug");
         if (!Directory.Exists(binDebugFolder))
         {
             Console.WriteLine("No bin/Debug folder found.");
@@ -79,24 +114,53 @@ class Program
         string pdbPath = pdbFiles[0];
         Console.WriteLine("Loading assembly: " + assemblyPath);
         Assembly asm = Assembly.LoadFrom(assemblyPath);
-        Type settingsType = asm.GetType(settingsClassFullName);
-        if (settingsType == null)
+        Type[] applicationTypes = [];
+        if (settingsClassFullName != null && appName == null)
         {
-            Console.WriteLine($"Type '{settingsClassFullName}' not found in assembly.");
-            return 1;
-        }
-        var settingsInstance = (BaseSettings)Activator.CreateInstance(settingsType);
-        if (settingsInstance == null)
-        {
-            Console.WriteLine("Failed to create an instance of type: " + settingsType.FullName);
-            return 1;
-        }
 
-        Console.WriteLine($"Instance of '{settingsType.FullName}' created successfully.");
-        Console.WriteLine("Instance: " + settingsInstance.ToString());
-        var migrationGenerator = new MigrationGenerator(settingsInstance, projectFolder);
+
+            Type settingsType = asm.GetType(settingsClassFullName);
+
+            if (settingsType == null)
+            {
+                Console.WriteLine($"Type '{settingsClassFullName}' not found in assembly.");
+                return 1;
+            }
+
+            var settingsInstance = (BaseSettings)Activator.CreateInstance(settingsType);
+            if (settingsInstance == null)
+            {
+                Console.WriteLine("Failed to create an instance of type: " + settingsType.FullName);
+                return 1;
+            }
+            applicationTypes = settingsInstance.InstalledApps;
+        }
+        else if (appName != null)
+        {
+            applicationTypes = [getApplicationType(appName, asm)!];
+        }
+        if (applicationTypes.Length == 0)
+        {
+            Console.WriteLine("You have to pass valid app name or settings class full name");
+            return 1;
+        }
+        var migrationGenerator = new MigrationGenerator(applicationTypes, projectDirectory);
         migrationGenerator.GenerateMigration();
         return 0;
+    }
+
+    static Type? getApplicationType(string appName, Assembly assembly)
+    {
+        var types = assembly.GetTypes();
+        foreach (var type in types)
+        {
+            if (!type.IsAssignableTo(typeof(BaseApplication)))
+                continue;
+            var applicationInstance = (BaseApplication)Activator.CreateInstance(type)!;
+            if (applicationInstance.Name == appName)
+                return type;
+        }
+        return null;
     }
 }
 
