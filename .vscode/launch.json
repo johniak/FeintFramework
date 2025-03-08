@@ -9,9 +9,9 @@
             "program": "${workspaceFolder}/src/FeintFramework.Db.MigrationGenerator/bin/Debug/net9.0/FeintFramework.Db.MigrationGenerator.dll",
             "args": [
                 "--project",
-                "${workspaceFolder}/Example",
-                "--settings",
-                "Example.Core.Settings"
+                "${workspaceFolder}/src/FeintFramework.Core",
+                "--app",
+                "SessionsApp"
             ],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",

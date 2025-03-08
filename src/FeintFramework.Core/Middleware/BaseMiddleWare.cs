@@ -1,6 +1,7 @@
 
 using FeintFramework.Core.Http;
 
+namespace FeintFramework.Core.Middleware;
 public abstract class BaseMiddleware
 {
     RequestHandler handler;

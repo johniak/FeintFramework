@@ -1,4 +1,5 @@
 using System.Text.Json;
+using FeintFramework.Core.Contrib.Sessions;
 using Microsoft.AspNetCore.Http;
 
 namespace FeintFramework.Core.Http;
@@ -25,6 +26,8 @@ public class FeintHttpRequest
     public long? ContentLength { get; set; }
 
     public required string Host { get; set; }
+
+    public Dictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
 
 
     public bool IsHttps

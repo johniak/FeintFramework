@@ -221,6 +221,7 @@ public class MigrationGenerator
     protected void saveMigration(string appName, string migrationName, string migrationContent)
     {
         var migrationPath = migrationsPath[appName];
+        Directory.CreateDirectory(migrationPath);
         var migrationFilePath = Path.Combine(migrationPath, $"{migrationName}.g.cs");
         File.WriteAllText(migrationFilePath, migrationContent);
     }

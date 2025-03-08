@@ -1,4 +1,5 @@
 using FeintFramework.Core.Config;
+using FeintFramework.Core.Middleware;
 
 namespace FeintFramework.Core.Http;
 
