@@ -20,8 +20,10 @@ public class FeintHttpRequest
 {
 
     public string? ContentType { get; set; }
-    public required System.IO.Stream Body { get; set; }
+    public required Stream Body { get; set; }
     public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
+
+    public required IRequestCookieCollection Cookies { get; set; } 
     public string Method { get; set; } = HttpMethods.Get;
     public long? ContentLength { get; set; }
 

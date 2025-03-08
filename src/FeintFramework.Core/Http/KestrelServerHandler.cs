@@ -35,7 +35,8 @@ public class KestrelServerHandler : BaseServerHandler
             Protocol = kestrelRequest.Protocol,
             QueryString = kestrelRequest.QueryString.ToString(),
             Query = kestrelRequest.Query,
-            Scheme = kestrelRequest.Scheme
+            Scheme = kestrelRequest.Scheme,
+            Cookies = kestrelRequest.Cookies
         };
 
         return feintRequest;
@@ -46,6 +47,10 @@ public class KestrelServerHandler : BaseServerHandler
         var kestrelResponse = context.Response;
         kestrelResponse.StatusCode = feintResponse.StatusCode;
         kestrelResponse.ContentType = feintResponse.ContentType;
+        foreach (var cookie in feintResponse.Cookies)
+        {
+            kestrelResponse.Cookies.Append(cookie.Key, cookie.Value, cookie.Options);
+        }
 
         for (var i = 0; i < feintResponse.Headers.Count; i++)
         {

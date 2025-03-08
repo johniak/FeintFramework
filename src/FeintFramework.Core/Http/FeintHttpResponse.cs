@@ -8,4 +8,6 @@ public class FeintHttpResponse
     public string Content { get; set; } = "";
     public IHeaderDictionary Headers { get; protected set; } = new HeaderDictionary();
 
+    public FeintFrameworkResponseCookies Cookies { get; protected set; } = new FeintFrameworkResponseCookies();
+
 }
