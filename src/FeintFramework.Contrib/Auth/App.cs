@@ -1,0 +1,10 @@
+
+using FeintFramework.Core.Apps;
+
+namespace FeintFramework.Contrib.Auth
+{
+    public class AuthApp : BaseApplication
+    {
+        
+    }
+}
