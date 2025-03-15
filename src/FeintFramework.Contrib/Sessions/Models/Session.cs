@@ -9,7 +9,7 @@ using LinqToDB.Mapping;
 namespace FeintFramework.Contrib.Sessions.Models;
 
 [Table(Name = "sessions_app_session")]
-public partial class Session : Model<Session>
+public partial class Session : IntModel
 {
     public Session()
     {

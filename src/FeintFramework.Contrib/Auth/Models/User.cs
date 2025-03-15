@@ -1,9 +1,13 @@
 using System;
 using System.Security.Cryptography;
 using FeintFramework.Contrib.Auth.Models;
+using LinqToDB.Mapping;
 
 namespace FeintFramework.Contrib.Auth;
-public class User : AbstractUser<User>
+
+
+[Table(Name = "auth_user")]
+public partial class User : AbstractUser
 {
    
     protected virtual string PasswordHash(string password)

@@ -10,7 +10,6 @@ namespace Example.Core
     {
         public override Type[] InstalledApps => [
             typeof(Blog.BlogApp),
-            typeof(Account.AccountApp),
             typeof(SessionsApp)
         ];
 

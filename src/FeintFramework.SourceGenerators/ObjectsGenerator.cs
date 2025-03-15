@@ -71,6 +71,18 @@ using LinqToDB.Data;
 public partial class {className}
 {{
     public static LinqToDB.ITable<{className}> Objects => FeintFramework.Db.Connections.Connection!.GetTable<{className}>();
+
+    public virtual void Save()
+    {{
+        if (Id == null)
+        {{
+            FeintFramework.Db.Connections.Connection!.Insert(({className})this);
+        }}
+        else
+        {{
+            FeintFramework.Db.Connections.Connection!.Update(({className})this);
+        }}
+    }}
 }}
 ";
                     spc.AddSource($"{className}_ObjectsProperty.g.cs", SourceText.From(sourceText, Encoding.UTF8));

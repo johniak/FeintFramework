@@ -27,6 +27,11 @@ public class SessionStore
         }
     }
 
+    public bool ContainsKey(string key)
+    {
+        return _data.ContainsKey(key);
+    }
+
     public T GetValue<T>(string key)
     {
         return (T)_data[key];
@@ -35,6 +40,12 @@ public class SessionStore
     public void SetValue(string key, object value)
     {
         _data[key] = value;
+        session.SessionData = JsonSerializer.Serialize(_data);
+        session.Save();
+    }
+    public void Remove(string key)
+    {
+        _data.Remove(key);
         session.SessionData = JsonSerializer.Serialize(_data);
         session.Save();
     }

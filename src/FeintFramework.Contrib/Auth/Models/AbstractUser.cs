@@ -4,7 +4,7 @@ using LinqToDB.Mapping;
 namespace FeintFramework.Contrib.Auth.Models
 {
 
-    public abstract class AbstractUser<T> : FeintFramework.Db.Model<T>, IUser where T : AbstractUser<T>
+    public abstract class AbstractUser: FeintFramework.Db.IntModel, IUser
     {
         [Column(Name = "username"), CharField(Length = 255, NotNull = true, Unique = true)]
         public virtual string Username { get; set; }
