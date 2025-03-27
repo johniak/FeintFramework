@@ -2,7 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 
 namespace FeintFramework.Core.Http;
-static class HttpMethods
+public static class HttpMethods
 {
     public const string Get = "GET";
     public const string Post = "POST";

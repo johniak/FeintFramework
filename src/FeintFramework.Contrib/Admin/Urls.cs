@@ -1,0 +1,22 @@
+using FeintFramework.Core.Routing;
+using FeintFramework.Core.Config;
+
+namespace FeintFramework.Contrib.Admin;
+
+public class AdminUrls : UrlPatterns
+{
+    public  List<UrlPattern> PrefixedUrls = new List<UrlPattern>(){
+        new UrlPattern("/login",)
+    }
+
+    public override List<UrlPattern> Urls
+    {
+        get
+        {
+            return new List<UrlPattern>
+            {
+                new UrlPattern($"/{Configurator.Settings.AdminUrlPrefix()}",
+            };
+        }
+    }
+}

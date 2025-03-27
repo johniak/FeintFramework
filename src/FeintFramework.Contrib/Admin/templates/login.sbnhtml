@@ -1,0 +1,12 @@
+<html>
+<head>
+</head>
+<body>
+    <div>
+        <form methond="POST" action="">
+            {{form.asP}}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>

@@ -25,7 +25,7 @@ namespace Example.Core
 
         protected override void ConfigureAdditionalSettings()
         {
-
+            
         }
     }
 }

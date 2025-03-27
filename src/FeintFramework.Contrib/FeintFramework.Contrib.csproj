@@ -9,7 +9,14 @@
       <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
       <ProjectReference Include="..\FeintFramework.Core\FeintFramework.Core.csproj" />
       <ProjectReference Include="..\FeintFramework.SourceGenerators\FeintFramework.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+      <ProjectReference Include="..\FeintFramework.Forms\FeintFramework.Forms.csproj" />
   </ItemGroup>
   <ItemGroup>
+      <None Update="**\*.sbnhtml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Watch Include="**\*.sbnhtml" />
   </ItemGroup>
 </Project>
