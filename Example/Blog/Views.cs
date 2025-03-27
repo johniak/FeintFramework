@@ -5,11 +5,24 @@ using FeintFramework.Core.Http;
 using FeintFramework.Db;
 using LinqToDB;
 using LinqToDB.Data;
+using FeintFramework.Forms.Widgets;
+using FeintFramework.Forms;
+using FeintFramework.Forms.Fields;
+
+class AuthForm: Form
+{
+    public CharFormField Username = new CharFormField(){Label = "Username"};
+    public CharFormField Password = new CharFormField(){Label = "Password"};
+}
 
 class ExampleView
 {
     public FeintHttpResponse AsView(FeintHttpRequest request)
     {
+        var input = new TextInput();
+        var html = input.Render();
+        Console.WriteLine(html);
+        
 
         // Connections.Connection!.GetTable<Blog>();
         // var blog = new Blog{
@@ -22,7 +35,8 @@ class ExampleView
         return new FeintHttpResponse
         {
             StatusCode = 200,
-            Content = "Hello World"
+            Content = new AuthForm().AsP(),
+            ContentType = "text/html"
         };
     }
 }

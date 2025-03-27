@@ -1,0 +1,10 @@
+{{if label}}
+<label for="{{name}}">{{label}}: </label>
+{{end}}
+<input  
+type="{{type}}"
+name="{{name}}"
+{{if value}} value="{{value}}" {{end}}
+{{if required}} required {{end}}
+{{if disabled}} disabled {{end}}
+/>

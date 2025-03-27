@@ -4,8 +4,14 @@
         {
             "name": "C#: Example Debug",
             "type": "dotnet",
-            "request": "launch",
+            "request": "watch",
             "projectPath": "${workspaceFolder}/Example/Example.csproj"
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
         },
         {
             "name": "Migrations Generator",

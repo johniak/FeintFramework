@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+      <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
+      <ProjectReference Include="..\FeintFramework.Core\FeintFramework.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Scriban" Version="6.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+      <None Update="**\*.sbnhtml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Watch Include="**\*.sbnhtml" />
+  </ItemGroup>
+</Project>

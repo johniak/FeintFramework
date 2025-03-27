@@ -4,6 +4,7 @@
     <ProjectReference Include="..\src\FeintFramework.Core\FeintFramework.Core.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Contrib\FeintFramework.Contrib.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Db\FeintFramework.Db.csproj" />
+    <ProjectReference Include="..\src\FeintFramework.Forms\FeintFramework.Forms.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Db.Sqlite\FeintFramework.Db.Sqlite.csproj" />
   <ProjectReference Include="..\src\FeintFramework.SourceGenerators\FeintFramework.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
@@ -13,6 +14,15 @@
     <PackageReference Include="linq2db.SQLite" Version="5.4.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <None Update="**\*.sbnhtml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Watch Include="**\*.sbnhtml" />
   </ItemGroup>
 
   <PropertyGroup>

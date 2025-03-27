@@ -1,5 +1,8 @@
 {
-  "image": "mcr.microsoft.com/dotnet/sdk:9.0",
+  "build":{
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
   "appPort": [
     "9000:9000"
   ],
