@@ -10,7 +10,7 @@ public class FeintTemplateResponse : FeintHttpResponse
 
     public FeintTemplateResponse(string templateFilePath, TemplateContext Context) : base()
     {
-        initialize(templateFilePath, Context)
+        initialize(templateFilePath, Context);
     }
 
     public FeintTemplateResponse(string templateFilePath) : base(){
