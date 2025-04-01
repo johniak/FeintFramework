@@ -28,6 +28,9 @@ public class Form
                     var value = p.GetValue(this) as BaseFormField;
                     if (value != null && string.IsNullOrEmpty(value.Name))
                         value.Name = p.Name;
+                    if(Initial.ContainsKey(p.Name)){
+                        value.Initial= Initial[p.Name];
+                    }
                     return value;
                 })
                 .Where(value => value != null);
@@ -40,6 +43,9 @@ public class Form
                     var value = p.GetValue(this) as BaseFormField;
                     if (value != null && string.IsNullOrEmpty(value.Name))
                         value.Name = p.Name;
+                    if(Initial.ContainsKey(p.Name)){
+                        value.Initial= Initial[p.Name];
+                    }
                     return value;
                 })
                 .Where(value => value != null);

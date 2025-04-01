@@ -14,13 +14,13 @@ public class QueryDict : IEnumerable<KeyValuePair<string, StringValues>>
             if (postDict.ContainsKey(keyValue.Key))
             {
                 var stringValues = postDict[keyValue.Key];
-                var strings  = new List<string>(stringValues)
+                var strings = new List<string>(stringValues)
                 {
                     keyValue.Value!
                 };
                 postDict[keyValue.Key] = strings.ToArray();
             }
-            else  
+            else
             {
                 postDict[keyValue.Key] = keyValue.Value;
             }
@@ -45,5 +45,15 @@ public class QueryDict : IEnumerable<KeyValuePair<string, StringValues>>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public static implicit operator Dictionary<string, string>(QueryDict value)
+    {
+        var dict = new Dictionary<string, string>();
+        foreach (var keyValue in value)
+        {
+            dict[keyValue.Key] = keyValue.Value!;
+        }
+        return dict;
     }
 }

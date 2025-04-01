@@ -30,3 +30,9 @@ public class TextInput : Input
     public override string Type => "text";
 }
 
+
+public class PasswordInput : Input
+{
+    public override string Type => "password";
+}
+

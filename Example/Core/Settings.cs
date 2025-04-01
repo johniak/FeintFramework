@@ -3,6 +3,7 @@ using FeintFramework.Core.Routing;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
 using FeintFramework.Contrib.Sessions;
+using FeintFramework.Contrib.Auth;
 
 namespace Example.Core
 {
@@ -10,7 +11,8 @@ namespace Example.Core
     {
         public override Type[] InstalledApps => [
             typeof(Blog.BlogApp),
-            typeof(SessionsApp)
+            typeof(SessionsApp),
+            typeof(AuthApp)
         ];
 
 
