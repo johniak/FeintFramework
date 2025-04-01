@@ -1,13 +1,14 @@
 using FeintFramework.Core.Routing;
 using FeintFramework.Core.Config;
+using FeintFramework.Contrib.Admin.Views;
 
 namespace FeintFramework.Contrib.Admin;
 
 public class AdminUrls : UrlPatterns
 {
     public  List<UrlPattern> PrefixedUrls = new List<UrlPattern>(){
-        new UrlPattern("/login",)
-    }
+        new UrlPattern("/login",AuthViews.Login)
+    };
 
     public override List<UrlPattern> Urls
     {
@@ -15,7 +16,7 @@ public class AdminUrls : UrlPatterns
         {
             return new List<UrlPattern>
             {
-                new UrlPattern($"/{Configurator.Settings.AdminUrlPrefix()}",
+                new UrlPattern($"/{Configurator.Settings.AdminUrlPrefix()}",PrefixedUrls)
             };
         }
     }

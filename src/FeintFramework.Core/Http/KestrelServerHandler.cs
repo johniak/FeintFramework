@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Primitives;
 
 namespace FeintFramework.Core.Http;
 
@@ -23,6 +24,26 @@ public class KestrelServerHandler : BaseServerHandler
     }
     protected FeintHttpRequest convertToFeintRequest(HttpRequest kestrelRequest)
     {
+        
+        var postList = new List<(string Key, StringValues Values)>();
+        try
+        {
+            foreach (var item in kestrelRequest.Form)
+            {
+                postList.Add((item.Key, item.Value));
+            }
+        }
+        catch (InvalidOperationException)
+        {
+
+        }
+        var postParameters = new QueryDict(postList);
+        var getList = new List<(string Key, StringValues Values)>();
+        foreach (var item in kestrelRequest.Query)
+        {
+            getList.Add((item.Key, item.Value));
+        }
+        var getParameters = new QueryDict(getList);
         var feintRequest = new FeintHttpRequest()
         {
             Body = kestrelRequest.Body,
@@ -36,7 +57,9 @@ public class KestrelServerHandler : BaseServerHandler
             QueryString = kestrelRequest.QueryString.ToString(),
             Query = kestrelRequest.Query,
             Scheme = kestrelRequest.Scheme,
-            Cookies = kestrelRequest.Cookies
+            Cookies = kestrelRequest.Cookies,
+            Post = postParameters,
+            Get = getParameters,
         };
 
         return feintRequest;

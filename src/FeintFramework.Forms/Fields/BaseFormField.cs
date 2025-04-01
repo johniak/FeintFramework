@@ -28,4 +28,9 @@ public abstract class BaseFormField
     {
         return widget.Render();
     }
+
+    public override string ToString()
+    {
+        return widget.Render();
+    }
 }

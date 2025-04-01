@@ -13,25 +13,30 @@ public class FeintTemplateResponse : FeintHttpResponse
         initialize(templateFilePath, Context);
     }
 
-    public FeintTemplateResponse(string templateFilePath) : base(){
+    public FeintTemplateResponse(string templateFilePath) : base()
+    {
         var context = new TemplateContext();
         initialize(templateFilePath, context);
     }
 
-    public FeintTemplateResponse(string templateFilePath, Dictionary<string,object> context){
+    public FeintTemplateResponse(string templateFilePath, Dictionary<string, object> context)
+    {
         var scriptObject = new ScriptObject();
-            foreach (var item in context)
-            {
-                scriptObject.Add(item.Key, item.Value); 
-            }
-            var templateContext = new TemplateContext();
-            templateContext.PushGlobal(scriptObject);
+        foreach (var item in context)
+        {
+            scriptObject.Add(item.Key, item.Value);
+        }
+        var templateContext = new TemplateContext();
+        templateContext.PushGlobal(scriptObject);
+        initialize(templateFilePath, templateContext);
     }
 
-    public FeintTemplateResponse(string templateFilePath, object context){
+    public FeintTemplateResponse(string templateFilePath, object context)
+    {
 
         var template = Template.Parse(File.ReadAllText(templateFilePath));
         Content = template.Render(context);
+        ContentType = "text/html";
     }
 
     protected void initialize(string templateFilePath, TemplateContext Context)
@@ -39,5 +44,6 @@ public class FeintTemplateResponse : FeintHttpResponse
 
         var template = Template.Parse(File.ReadAllText(templateFilePath));
         Content = template.Render(Context);
+        ContentType = "text/html";
     }
 }

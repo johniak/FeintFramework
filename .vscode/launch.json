@@ -4,7 +4,7 @@
         {
             "name": "C#: Example Debug",
             "type": "dotnet",
-            "request": "watch",
+            "request": "launch",
             "projectPath": "${workspaceFolder}/Example/Example.csproj"
         },
         {

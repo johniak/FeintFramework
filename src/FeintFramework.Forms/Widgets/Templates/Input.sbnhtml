@@ -6,5 +6,5 @@ type="{{type}}"
 name="{{name}}"
 {{if value}} value="{{value}}" {{end}}
 {{if required}} required {{end}}
-{{if disabled}} disabled {{end}}
+
 />

@@ -1,5 +1,6 @@
 
 
+using FeintFramework.Contrib.Admin;
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
 namespace Example
@@ -12,8 +13,8 @@ namespace Example
             {
                 return new List<UrlPattern>
             {
-                new UrlPattern("/example",
-                new ExampleView().AsView),
+                new UrlPattern("/example", new ExampleView().AsView),
+                new UrlPattern("",new AdminUrls().Urls)
             };
             }
         }

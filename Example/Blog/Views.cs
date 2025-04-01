@@ -35,7 +35,7 @@ class ExampleView
         return new FeintHttpResponse
         {
             StatusCode = 200,
-            Content = new AuthForm().AsP(),
+            Content = new AuthForm().AsP,
             ContentType = "text/html"
         };
     }

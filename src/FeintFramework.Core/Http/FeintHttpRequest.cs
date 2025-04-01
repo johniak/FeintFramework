@@ -28,6 +28,10 @@ public class FeintHttpRequest
 
     public required string Host { get; set; }
 
+    public required QueryDict Get { get; set;}
+
+    public required QueryDict Post { get; set;}
+
     public Dictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
 
 
@@ -59,7 +63,7 @@ public class FeintHttpRequest
             }
             using var reader = new StreamReader(this.Body);
             var text = reader.ReadToEnd();
-            this.Body.Seek(0, SeekOrigin.Begin);
+            // this.Body.Seek(0, SeekOrigin.Begin);
             return text;
         }
     }
@@ -83,7 +87,7 @@ public class FeintHttpRequest
                 return null;
             }
             using var jsonDoc = JsonDocument.Parse(Body);
-            Body.Seek(0, SeekOrigin.Begin);
+            // Body.Seek(0, SeekOrigin.Begin);
             json = jsonDoc.RootElement;
             return json;
         }

@@ -20,9 +20,9 @@ public class SessionMiddleware : BaseMiddleware
         if (request.Cookies.ContainsKey(sessionCookieName))
         {
             var sessionId = request.Cookies[sessionCookieName];
-            session = Session.Objects.First(s => s.SessionKey == sessionId);
-        }
-        if (session == null)
+            session = Session.Objects.FirstOrDefault(s => s.SessionKey == sessionId);
+        } 
+        if (session == null) 
         {
             session = new Session();
             session.Save();

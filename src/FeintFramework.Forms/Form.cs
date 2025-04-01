@@ -72,14 +72,18 @@ public class Form
 
     //     return builder.ToString();
     // }
-    public string AsP(){
-        var context = new TemplateContext();
-        var scriptObject = new ScriptObject
+    public string AsP
+    {
+        get
+        {
+            var context = new TemplateContext();
+            var scriptObject = new ScriptObject
         {
             { "fields", Fields }
         };
-        context.PushGlobal(scriptObject);
-        var template = Template.Parse(File.ReadAllText("Templates/form_as_p.sbnhtml"));
-        return template.Render(context);
+            context.PushGlobal(scriptObject);
+            var template = Template.Parse(File.ReadAllText("Templates/form_as_p.sbnhtml"));
+            return template.Render(context);
+        }
     }
 }
