@@ -16,11 +16,11 @@ public abstract class BaseFormField
 
     protected abstract BaseWidget widget { get; }
 
-    public object toCSharpValue(string value)
+    public virtual object toCSharpValue(string? value)
     {
         return value;
     }
-    public object prepareValue(object value)
+    public virtual object? prepareValue(object? value)
     {
         return value;
     }
@@ -32,5 +32,10 @@ public abstract class BaseFormField
     public override string ToString()
     {
         return widget.Render();
+    }
+
+    public virtual object Clean(string? value)
+    {
+        return toCSharpValue(value);
     }
 }

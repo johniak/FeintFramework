@@ -11,6 +11,7 @@ public class AuthViews
     public static FeintHttpResponse Login(FeintHttpRequest request)
     {
         var form = new LoginForm();
+        Console.WriteLine( form.Errors);
         if (request.Method == HttpMethods.Post)
         {
             Dictionary<string, string> initial = request.Post;

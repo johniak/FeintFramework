@@ -1,5 +1,11 @@
 
-{{for field in fields }}
+{{errors}}
+{{for item in fields }}
 
-<p> {{field}}</p>
+<p> 
+    <div>
+        {{field[1]}}
+    </div>
+    {{field[0]}}
+</p>
 {{end}}
