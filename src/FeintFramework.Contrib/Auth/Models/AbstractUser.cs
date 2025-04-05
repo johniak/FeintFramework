@@ -8,7 +8,7 @@ namespace FeintFramework.Contrib.Auth.Models
     {
         [Column(Name = "username"), CharField(Length = 255, NotNull = true, Unique = true)]
         public virtual string Username { get; set; }
-        [Column(Name = "email"), CharField(Length = 255, NotNull = true)]
+        [Column(Name = "password"), CharField(Length = 255, NotNull = true)]
         public virtual  string Password { get; protected set; }
         [Column(Name = "email"), CharField(Length = 255, NotNull = true)]
         public  virtual string? Email { get; set; }

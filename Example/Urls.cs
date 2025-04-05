@@ -13,7 +13,9 @@ namespace Example
             {
                 return new List<UrlPattern>
             {
-                new UrlPattern("/example", new ExampleView().AsView),
+                new UrlPattern("/example", new ExampleView().AsView, "example"),
+                new FeintFramework.Core.Routing.Path("/example2/<int:test>", new ExampleView().AsView, "example2"),
+            
                 new UrlPattern("",new AdminUrls().Urls)
             };
             }

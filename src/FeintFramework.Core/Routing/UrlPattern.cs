@@ -12,13 +12,13 @@ public class UrlPattern
         {
             if (this.Patterns == null)
             {
-                return $"^{this.regexPattern}$";
+                return $"{this.regexPattern}";
             }
-            return $"^{this.regexPattern}";
+            return $"{this.regexPattern}";
         }
         protected set
         {
-            regexPattern = value.TrimStart('^').TrimEnd('$');
+            regexPattern = value;
         }
     }
     public string? Name { get; protected set; }

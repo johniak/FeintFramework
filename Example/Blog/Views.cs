@@ -8,11 +8,13 @@ using LinqToDB.Data;
 using FeintFramework.Forms.Widgets;
 using FeintFramework.Forms;
 using FeintFramework.Forms.Fields;
+using FeintFramework.Contrib.Auth;
+using FeintFramework.Core.Routing;
 
-class AuthForm: Form
+class AuthForm : Form
 {
-    public CharFormField Username = new CharFormField(){Label = "Username"};
-    public CharFormField Password = new CharFormField(){Label = "Password"};
+    public CharFormField Username = new CharFormField() { Label = "Username" };
+    public CharFormField Password = new CharFormField() { Label = "Password" };
 }
 
 class ExampleView
@@ -21,8 +23,22 @@ class ExampleView
     {
         var input = new TextInput();
         var html = input.Render();
+        var parameters = new Dictionary<string, object>
+        {
+            { "test", "21" }
+        };
+        var url = Router.Reverse("example2", parameters);
         Console.WriteLine(html);
-        
+        // var user = new User(){
+        //     Username="root",
+        //     IsStaff=true,
+        //     IsSuperuser=true,
+        //     Email="root@root.com"
+        // };
+        // user.SetPassword("root1234");
+        // Console.WriteLine("Pass");
+        // Console.WriteLine(user.Password);
+        // user.Save();
 
         // Connections.Connection!.GetTable<Blog>();
         // var blog = new Blog{

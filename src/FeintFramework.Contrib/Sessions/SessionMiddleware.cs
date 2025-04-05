@@ -21,12 +21,14 @@ public class SessionMiddleware : BaseMiddleware
         {
             var sessionId = request.Cookies[sessionCookieName];
             session = Session.Objects.FirstOrDefault(s => s.SessionKey == sessionId);
-        } 
-        if (session == null) 
+        }
+        if (session == null)
         {
             session = new Session();
             session.Save();
         }
+        var sessionStore = new SessionStore(session);
+        request.AdditionalData[SessionConsts.REQUEST_SESSION_STORE_KEY] = sessionStore;
         var respnonse = handler(request);
         respnonse.Cookies.Append(sessionCookieName, session.SessionKey, Configurator.Settings.SessionCookieOptions());
         return respnonse;

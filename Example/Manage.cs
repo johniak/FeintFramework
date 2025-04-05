@@ -4,6 +4,7 @@ using LinqToDB;
 using Microsoft.Data.Sqlite;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
+using FeintFramework.Contrib.Auth;
 
 
 
@@ -11,8 +12,9 @@ using FeintFramework.Db.Sqlite.Migrator;
 Console.WriteLine("***************************************");
 Configurator.Settings = new Example.Core.Settings();
 Configurator.Migrate();
-Configurator.Configure(args);
 
+
+Configurator.Configure(args);
 // using (var db = new MyDbConnection())
 // {
 //     // This will create the Blogs table if it doesn't exist.

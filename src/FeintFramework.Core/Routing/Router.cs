@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
+using FeintFramework.Core.Config;
 using FeintFramework.Core.Http;
+using QuikGraph;
 
 namespace FeintFramework.Core.Routing;
 public class Router
@@ -39,5 +41,60 @@ public class Router
             return matchPath(newPath, url.Patterns!);
         }
         return null;
+    }
+
+    public static string? Reverse(string urlName,Dictionary<string,object>? parameters=null)
+    {
+        var urlPatterns = Configurator.Settings.RootUrlPatterns.Urls;
+        var reversedUrls = new Dictionary<string, string>();
+        BuildReversedUrls(urlPatterns, reversedUrls, new List<string>(), "");
+        if (reversedUrls.ContainsKey(urlName))
+        {
+            var regex = reversedUrls[urlName];
+            if(parameters==null)
+            return regex;
+            return FillPattern(regex,parameters);
+        }
+        return null;
+    }
+    public static string FillPattern(string pattern, Dictionary<string, object> replacements)
+    {
+        string namedGroupPattern = @"\(\?<(?<name>\w+)>[^)]+\)";
+        string filled = Regex.Replace(pattern, namedGroupPattern, match =>
+        {
+            string groupName = match.Groups["name"].Value;
+            if (replacements.TryGetValue(groupName, out object? replacement))
+            {
+                return replacement!.ToString()!;
+            }
+            return match.Value;
+        });
+        
+        return filled;
+    }
+
+    private static void BuildReversedUrls(List<UrlPattern> urlPatterns, Dictionary<string, string> reversedUrls, List<string> baseNames, string baseUrl)
+    {
+        var names = new List<string>();
+        names.AddRange(baseNames);
+        foreach (var urlPattern in urlPatterns)
+        {
+            var url = $"{baseUrl}{urlPattern.RegexPattern}";
+            if (urlPattern.Patterns != null)
+            {
+                if (urlPattern.Name != null)
+                {
+                    names.Add(urlPattern.Name!);
+                }
+                BuildReversedUrls(urlPattern.Patterns!, reversedUrls, names, url);
+                continue;
+            }
+            if (urlPattern.Name == null)
+                continue;
+            var finalNameList = new List<string>();
+            finalNameList.AddRange(names);
+            finalNameList.Add(urlPattern.Name);
+            reversedUrls[String.Join(":", finalNameList)] = url;
+        }
     }
 }
