@@ -2,14 +2,15 @@ using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Primitives;
+using FeintFramework.Core;
 
 namespace FeintFramework.Forms;
 
 public class ValidationException : Exception
 {
-    public Dictionary<string, StringValues>? ErrorsDict { get; protected set; }
-    public StringValues Errors { get; protected set; }
-    public ValidationException(Dictionary<string, StringValues> errors)
+    public Dictionary<string, Strings>? ErrorsDict { get; protected set; }
+    public Strings Errors { get; protected set; }
+    public ValidationException(Dictionary<string, Strings> errors)
     {
         ErrorsDict = errors;
     }

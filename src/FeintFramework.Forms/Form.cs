@@ -1,6 +1,8 @@
 using System.Reflection;
 using System.Text;
+using FeintFramework.Core;
 using FeintFramework.Core.Http;
+using FeintFramework.Db.Migrator.Fields;
 using FeintFramework.Forms.Fields;
 using Microsoft.Extensions.Primitives;
 using Scriban;
@@ -12,8 +14,8 @@ public class Form
 {
     public const string NON_FIELD_ERRORS = "__all__";
     public Dictionary<string, string>? Data { get; set; }
-    protected Dictionary<string, StringValues>? errors = null;
-    public Dictionary<string, StringValues> Errors
+    protected Dictionary<string, Strings>? errors = null;
+    public Dictionary<string, Strings> Errors
     {
         get
         {
@@ -81,7 +83,7 @@ public class Form
 
     public void FullClean()
     {
-        errors = new Dictionary<string, StringValues>();
+        errors = new Dictionary<string, Strings>();
         CleanedData = new Dictionary<string, object>();
         cleanFields();
         clean();
@@ -90,7 +92,8 @@ public class Form
 
     protected virtual void cleanFields()
     {
-        if (Data == null){
+        if (Data == null)
+        {
             return;
         }
         foreach (var field in Fields)
@@ -121,15 +124,18 @@ public class Form
     {
         var key = fieldName ?? NON_FIELD_ERRORS;
         var errorAlreadyExists = Errors!.TryGetValue(key, out var currentErrors);
-        StringValues newErrors;
+        Strings newErrors;
         if (errorAlreadyExists)
-            newErrors = new StringValues(currentErrors.Concat(e.Errors).ToArray());
+        {
+            currentErrors!.Concat(e.Errors);
+            newErrors = currentErrors!;
+        }
         else
             newErrors = e.Errors;
         errors![key] = newErrors;
     }
 
-    public StringValues? GetFieldError(string fieldName)
+    public Strings? GetFieldError(string fieldName)
     {
         Errors.TryGetValue(fieldName, out var error);
         return error;
@@ -140,15 +146,15 @@ public class Form
         get
         {
             var context = new TemplateContext();
-            var fieldsWithErrors = Fields.Select(f => (f, GetFieldError(f.Name)));
-            var scriptObject = new ScriptObject
-            {
-                { "fields", fieldsWithErrors },
-                {"errors", Errors[NON_FIELD_ERRORS]}
-            };
-            context.PushGlobal(scriptObject);
+            var fieldsWithErrors = Fields.Select(f => new FieldError() { Field = f, Errors = GetFieldError(f.Name) });
             var template = Template.Parse(File.ReadAllText("Templates/form_as_p.sbnhtml"));
-            return template.Render(context);
+            Errors.TryGetValue(NON_FIELD_ERRORS, out var nonFieldErrors);
+
+            return template.Render(new
+            {
+                errors = nonFieldErrors,
+                fields = fieldsWithErrors
+            });
         }
     }
 }

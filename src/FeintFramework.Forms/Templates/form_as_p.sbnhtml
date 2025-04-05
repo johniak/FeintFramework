@@ -3,9 +3,7 @@
 {{for item in fields }}
 
 <p> 
-    <div>
-        {{field[1]}}
-    </div>
-    {{field[0]}}
+    {{item.errors}}
+    {{item.field}}
 </p>
 {{end}}
