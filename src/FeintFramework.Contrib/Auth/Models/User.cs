@@ -6,7 +6,7 @@ using LinqToDB.Mapping;
 namespace FeintFramework.Contrib.Auth;
 
 
-[Table(Name = "auth_user")]
+[Table(Name = "auth_app_user")]
 public partial class User : AbstractUser
 {
    

@@ -77,14 +77,14 @@ public static class AuthExtensions
         settings.AdditionalSettings[AuthConsts.SETTINGS_AUTH_BACKEND] = backend;
     }
 
-    public static BaseBackend AuthBackend(this BaseSettings settings,FeintHttpRequest request)
+    public static BaseBackend AuthBackend(this BaseSettings settings)
     {
         if (!settings.AdditionalSettings.ContainsKey(AuthConsts.SETTINGS_AUTH_BACKEND))
         {
-            return new UserModelBackend(request);
+            return new UserModelBackend();
         }
         var authBackendType = (Type)settings.AdditionalSettings[AuthConsts.SETTINGS_AUTH_BACKEND];
-        return (BaseBackend)Activator.CreateInstance(authBackendType, request)!;
+        return (BaseBackend)Activator.CreateInstance(authBackendType)!;
     }
 
     public static Type FindClosestSubclassByNamespace(Type startType, Type baseType)

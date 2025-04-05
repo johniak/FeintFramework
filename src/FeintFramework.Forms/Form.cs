@@ -19,9 +19,9 @@ public class Form
     {
         get
         {
-            if (errors == null)
+            if (this.errors == null)
             {
-                FullClean();
+                return new Dictionary<string, Strings>();
             }
             return errors!;
         }
@@ -34,6 +34,7 @@ public class Form
     {
         get
         {
+            if (errors == null) FullClean();
             return Errors.Keys.Count == 0;
         }
     }
@@ -122,16 +123,21 @@ public class Form
 
     public void AddError(ValidationException e, string? fieldName = null)
     {
+        AddError(e.Errors, fieldName);
+    }
+
+    public void AddError(Strings e, string? fieldName = null)
+    {
         var key = fieldName ?? NON_FIELD_ERRORS;
         var errorAlreadyExists = Errors!.TryGetValue(key, out var currentErrors);
         Strings newErrors;
         if (errorAlreadyExists)
         {
-            currentErrors!.Concat(e.Errors);
+            currentErrors!.Concat(e);
             newErrors = currentErrors!;
         }
         else
-            newErrors = e.Errors;
+            newErrors = e;
         errors![key] = newErrors;
     }
 

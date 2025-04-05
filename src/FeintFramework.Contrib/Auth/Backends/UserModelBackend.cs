@@ -4,18 +4,17 @@ namespace FeintFramework.Contrib.Auth.Backends;
 
 public class UserModelBackend : BaseBackend
 {
-    public UserModelBackend(FeintHttpRequest request) : base(request)
+    public UserModelBackend() : base()
     {
     }
 
-    public override bool Authenticate(string username, string password)
+    public override User? Authenticate(string username, string password)
     {
-        var user =User.Objects.FirstOrDefault(u => u.Username == username);
-        if (user == null)
-        {
-            return false;
-        }
-        return user.VerifyPassword(password);
+        var user = User.Objects.FirstOrDefault(u => u.Username == username);
+        if (user == null) return null;
+        var passwordCorrect = user.VerifyPassword(password);
+        if (!passwordCorrect) return null;
+        return user;
     }
 
     public override User? GetUser(int userId)
