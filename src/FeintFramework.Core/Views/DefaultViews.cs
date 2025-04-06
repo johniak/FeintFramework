@@ -22,8 +22,8 @@ public static class DefaultViews
     {
         var stackTrace = new StackTrace(e, true);
         var dotnetVersion = Environment.Version;
-        Assembly assembly = Assembly.GetAssembly(typeof(Configurator));
-        Version frameworkVersion = assembly.GetName().Version;
+        Assembly assembly = Assembly.GetAssembly(typeof(Configurator))!;
+        Version frameworkVersion = assembly.GetName().Version!;
         var exceptionName = e.GetType().Name;
         var stackTraceList = new List<(string? ClassName, string? MethodName, string? File, int Line, int Column, string? HtmlCode, string? lineContent)>();
         foreach (var frame in stackTrace.GetFrames())

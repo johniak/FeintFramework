@@ -167,18 +167,14 @@
   </footer>
   <script>
 document.addEventListener("DOMContentLoaded", function() {
-  // Find all toggle elements
   var toggles = document.querySelectorAll('.toggle');
   toggles.forEach(function(toggle) {
     toggle.addEventListener('click', function() {
-      // Find the closest list item and its child elements
       var li = toggle.closest('li');
       var collapsed = li.querySelector('.collapsed');
       var expanded = li.querySelector('.expanded');
       var arrowCollapsed = toggle.querySelector('.arrow-collapsed');
       var arrowExpanded = toggle.querySelector('.arrow-expanded');
-      
-      // Toggle visibility: if expanded is hidden, show it and hide collapsed, and vice versa
       if (expanded.style.display === 'none') {
         expanded.style.display = 'block';
         collapsed.style.display = 'none';
