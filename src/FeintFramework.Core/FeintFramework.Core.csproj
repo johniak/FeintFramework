@@ -15,5 +15,13 @@
   <ItemGroup>
     <PackageReference Include="Scriban" Version="6.0.0" />
   </ItemGroup>
+  <ItemGroup>
+      <None Update="**\*.sbnhtml">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Watch Include="**\*.sbnhtml" />
+  </ItemGroup>
 
 </Project>

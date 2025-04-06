@@ -17,6 +17,7 @@ public abstract class BaseServerHandler
         {
             var middlewares = new List<Type>(Configurator.Settings.Middlewares);
             middlewares.Reverse();
+            middlewares.Add(typeof(ErrorHandlingMiddleware));
             var handler = this.routerHandler;
             foreach (var middlewareType in middlewares)
             {

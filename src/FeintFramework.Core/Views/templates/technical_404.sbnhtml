@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>404 - Not Found: {{ request.path }}</title>
+  <meta name="robots" content="noindex, noarchive">
+  <style>
+    /* Reset some default spacing */
+    html, body, div, h1, p, table, th, td, code, pre { margin: 0; padding: 0; }
+    
+    /* Ensure the viewport is fully utilized */
+    html, body {
+      height: 100%;
+    }
+    
+    /* Set the body as a flex container in column direction */
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      color: #333;
+      line-height: 1.6;
+      padding: 0;
+    }
+
+    header, main, footer {
+      background: #ffffff;
+      border: 1px solid #ccc;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 15px;
+    }
+
+    header {
+      background: #f0e1cc;
+    }
+    
+    header h1 {
+      font-size: 2em;
+      color: #b30000;
+      margin-bottom: 10px;
+    }
+    
+    header h1 small {
+      font-size: 0.6em;
+      color: #777;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    
+    th {
+      text-align: right;
+      padding: 5px 10px;
+      color: #555;
+      white-space: nowrap;
+    }
+    
+    td {
+      padding: 5px 10px;
+    }
+
+    main {
+      background-color: #fff;
+      flex: 1; /* Expand main to take available vertical space */
+    }
+    
+    main p {
+      margin-bottom: 15px;
+    }
+    
+    main ol {
+      margin-left: 30px;
+      list-style: decimal;
+    }
+    
+    main li code {
+      font-family: Consolas, monospace;
+      color: #555;
+    }
+    
+    footer p {
+      font-size: 0.9em;
+      color: #666;
+    }
+    
+    code {
+      background: #eef;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+    
+    pre {
+      font-family: Consolas, monospace;
+      background: #eee;
+      padding: 10px;
+      border-radius: 3px;
+      overflow: auto;
+    }
+    
+    /* Push footer to the bottom */
+    footer {
+      margin-top: auto;
+      margin-bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>404 - Page Not Found <small>(Error)</small></h1>
+    <table>
+      <tr>
+        <th>Request Method:</th>
+        <td>{{ request.method }}</td>
+      </tr>
+      <tr>
+        <th>Request URL:</th>
+        <td>{{ request.absolute_url }}</td>
+      </tr>
+    </table>
+  </header>
+  
+  <main>
+    {{ if patterns }}
+      <p>
+        The URL patterns defined in <code>{{ urlconf }}</code> were tested in the following order:
+      </p>
+      <ol>
+        {{ for pattern in patterns }}
+          <li>
+            <code>{{ pattern.item1 }}{{ if pattern.item2 }} [name='{{ pattern.item2 }}']{{ end }}</code>
+          </li>
+        {{ end }}
+      </ol>
+      <p>
+        {{ if request.path }}
+          The requested path <code>{{ request.path }}</code> did not match any of these patterns.
+        {{ else }}
+          No path was provided.
+        {{ end }}
+      </p>
+    {{ end }}
+  </main>
+  
+  <footer>
+    <p>
+      This error page is displayed because your settings have <code>Debug = true</code>.
+      Change it to <code>false</code> in your configuration to see the standard 404 page.
+    </p>
+  </footer>
+</body>
+</html>

@@ -10,8 +10,11 @@ namespace FeintFramework.Core.Config.Settings
         {
             ConfigureAdditionalSettings();
         }
+
+        public bool Debug { get; }
+
         public abstract Type[] InstalledApps { get; }
-        public abstract UrlPatterns RootUrlPatterns { get; }
+        public abstract RootUrlPatterns RootUrlPatterns { get; }
         public abstract List<Type> Middlewares { get; }
         public virtual String DatabaseConnectionString
         {

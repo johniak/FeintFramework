@@ -5,7 +5,7 @@ using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
 namespace Example
 {
-    class MainUrlPatterns : UrlPatterns
+    class MainUrlPatterns : RootUrlPatterns
     {
         public override List<UrlPattern> Urls
         {

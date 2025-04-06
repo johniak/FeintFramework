@@ -22,15 +22,15 @@ public class FeintHttpRequest
     public required Stream Body { get; set; }
     public IHeaderDictionary Headers { get; set; } = new HeaderDictionary();
 
-    public required IRequestCookieCollection Cookies { get; set; } 
+    public required IRequestCookieCollection Cookies { get; set; }
     public string Method { get; set; } = HttpMethods.Get;
     public long? ContentLength { get; set; }
 
     public required string Host { get; set; }
 
-    public required QueryDict Get { get; set;}
+    public required QueryDict Get { get; set; }
 
-    public required QueryDict Post { get; set;}
+    public required QueryDict Post { get; set; }
 
     public Dictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
 
@@ -48,6 +48,15 @@ public class FeintHttpRequest
     public required string Protocol { get; set; }
 
     public required string QueryString { get; set; }
+
+    public String AbsoluteUrl
+    {
+        get
+        {
+            var queryString = (!String.IsNullOrEmpty(QueryString)) ? $"?{QueryString}" : "";
+            return $"{Scheme}://{Host}{Path}{queryString}";
+        }
+    }
 
     public required IQueryCollection Query { get; set; }
 

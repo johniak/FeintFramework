@@ -16,7 +16,7 @@ namespace Example.Core
         ];
 
 
-        public override UrlPatterns RootUrlPatterns => new MainUrlPatterns();
+        public override RootUrlPatterns RootUrlPatterns => new MainUrlPatterns();
 
         public override List<Type> Middlewares => new List<Type>
         {
