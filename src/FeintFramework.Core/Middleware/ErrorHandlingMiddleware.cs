@@ -21,5 +21,8 @@ internal class ErrorHandlingMiddleware : BaseMiddleware
         {
             return Configurator.Settings.RootUrlPatterns.handler404(request, e);
         }
+        catch(Exception e){
+            return Configurator.Settings.RootUrlPatterns.handler500(request, e);
+        }
     }
 }

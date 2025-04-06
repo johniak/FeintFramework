@@ -29,6 +29,8 @@ class ExampleView
         };
         var url = Router.Reverse("example2", parameters);
         Console.WriteLine(html);
+        var lo2 = 0;
+        var lol = 200/lo2;
         // var user = new User(){
         //     Username="root",
         //     IsStaff=true,
