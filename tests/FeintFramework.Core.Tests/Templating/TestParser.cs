@@ -466,6 +466,67 @@ public sealed class TestParser
         Assert.AreEqual("Not Equal", output);
     }
 
+    [TestMethod]
+    public void ParserAndRenderer_IfCondition_ComparisonOperators()
+    {
+        string template = "{% if x == 5 %}Equal{% else %}Not Equal{% endif %}";
+        Assert.AreEqual("Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+        Assert.AreEqual("Not Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 10 } }));
+
+        template = "{% if x != 5 %}Not Equal{% else %}Equal{% endif %}";
+        Assert.AreEqual("Not Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 10 } }));
+        Assert.AreEqual("Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+
+        template = "{% if x < 5 %}Less{% else %}Not Less{% endif %}";
+        Assert.AreEqual("Less", RenderTemplate(template, new Dictionary<string, object> { { "x", 3 } }));
+        Assert.AreEqual("Not Less", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+
+        template = "{% if x <= 5 %}Less or Equal{% else %}Greater{% endif %}";
+        Assert.AreEqual("Less or Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+        Assert.AreEqual("Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", 6 } }));
+
+        template = "{% if x > 5 %}Greater{% else %}Not Greater{% endif %}";
+        Assert.AreEqual("Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", 6 } }));
+        Assert.AreEqual("Not Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+
+        template = "{% if x >= 5 %}Greater or Equal{% else %}Less{% endif %}";
+        Assert.AreEqual("Greater or Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
+        Assert.AreEqual("Less", RenderTemplate(template, new Dictionary<string, object> { { "x", 4 } }));
+
+        template = "{% if x == 'apple' %}Equal{% else %}Not Equal{% endif %}";
+        Assert.AreEqual("Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "apple" } }));
+        Assert.AreEqual("Not Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+
+        template = "{% if x != 'apple' %}Not Equal{% else %}Equal{% endif %}";
+        Assert.AreEqual("Not Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+        Assert.AreEqual("Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "apple" } }));
+
+        template = "{% if x < 'banana' %}Less{% else %}Not Less{% endif %}";
+        Assert.AreEqual("Less", RenderTemplate(template, new Dictionary<string, object> { { "x", "apple" } }));
+        Assert.AreEqual("Not Less", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+
+        template = "{% if x <= 'banana' %}Less or Equal{% else %}Greater{% endif %}";
+        Assert.AreEqual("Less or Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+        Assert.AreEqual("Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", "cherry" } }));
+
+        template = "{% if x > 'apple' %}Greater{% else %}Not Greater{% endif %}";
+        Assert.AreEqual("Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+        Assert.AreEqual("Not Greater", RenderTemplate(template, new Dictionary<string, object> { { "x", "apple" } }));
+
+        template = "{% if x >= 'banana' %}Greater or Equal{% else %}Less{% endif %}";
+        Assert.AreEqual("Greater or Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", "banana" } }));
+        Assert.AreEqual("Less", RenderTemplate(template, new Dictionary<string, object> { { "x", "apple" } }));
+    }
+
+    private string RenderTemplate(string template, Dictionary<string, object> context)
+    {
+        Lexer lexer = new Lexer();
+        List<Token> tokens = lexer.Tokenize(template);
+        Parser parser = new Parser(tokens);
+        TemplateNode ast = parser.ParseTemplate();
+        return ast.Render(context);
+    }
+
     private class TestObjectWithField
     {
         public string field;

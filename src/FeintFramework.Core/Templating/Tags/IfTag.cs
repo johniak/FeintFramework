@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using FeintFramework.Core.Templating.Node;
 
 namespace FeintFramework.Core.Templating.Tags;
@@ -156,32 +153,6 @@ public class ConditionParser
         {
             return false;
         }
-    }
-
-    public static List<ConditionToken> TokenizeCondition(string condition)
-    {
-        var tokens = new List<ConditionToken>();
-        var parts = condition.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-        foreach (var part in parts)
-        {
-            if (part == "and")
-                tokens.Add(new ConditionToken(ConditionTokenType.And, part));
-            else if (part == "or")
-                tokens.Add(new ConditionToken(ConditionTokenType.Or, part));
-            else if (part == "==" || part == "!=" || part == "<" || part == "<=" || part == ">" || part == ">=")
-                tokens.Add(new ConditionToken(ConditionTokenType.Operator, part));
-            else if ((part.StartsWith("\"") && part.EndsWith("\"")) ||
-                     (part.StartsWith("'") && part.EndsWith("'")))
-                tokens.Add(new ConditionToken(ConditionTokenType.StringLiteral, part));
-            else if (int.TryParse(part, out _))
-                tokens.Add(new ConditionToken(ConditionTokenType.Number, part));
-            else
-                tokens.Add(new ConditionToken(ConditionTokenType.Identifier, part));
-        }
-
-        tokens.Add(new ConditionToken(ConditionTokenType.End, string.Empty));
-        return tokens;
     }
 }
 
