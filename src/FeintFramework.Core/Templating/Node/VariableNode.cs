@@ -10,10 +10,10 @@ public class VariableNode : BaseNode
     public string VariableName { get; }
     public VariableNode(string variableName) => VariableName = variableName;
 
-    public override string Render(Dictionary<string, object> context)
+    public static object? GetVariableValue(string variableName, Dictionary<string, object> context)
     {
-        object value = null;
-        var parts = VariableName.Split('.');
+        object? value = null;
+        var parts = variableName.Split('.');
         if (!context.TryGetValue(parts[0], out value))
             return "";
 
@@ -41,7 +41,7 @@ public class VariableNode : BaseNode
                     else if (value is IEnumerable enumerable)
                     {
                         int currentIndex = 0;
-                        object found = null;
+                        object? found = null;
                         bool foundFlag = false;
                         foreach (var item in enumerable)
                         {
@@ -81,6 +81,12 @@ public class VariableNode : BaseNode
                 }
             }
         }
+        return value;
+    }
+
+    public override string Render(Dictionary<string, object> context)
+    {
+        object? value = GetVariableValue(VariableName, context);
         return value?.ToString() ?? "";
     }
 }

@@ -22,7 +22,7 @@ public class BlockTagNode : BaseNode
 
     public override string Render(Dictionary<string, object> context)
     {
-        if(context.TryGetValue("childblock_" + Name, out object childObj) && childObj is BlockTagNode childBlock){
+        if(context.TryGetValue("childblock_" + Name, out object? childObj) && childObj is BlockTagNode childBlock){
             var localContext = new Dictionary<string, object>(context);
             localContext["block"] = new { super = RenderChildren(context) };
             return childBlock.RenderChildren(localContext);

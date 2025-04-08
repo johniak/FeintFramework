@@ -41,7 +41,7 @@ public partial class Parser
                 return new VariableNode(token.Content);
             case TokenType.Comment:
                 Advance();
-                return new CommentNode(token.Content);
+                return new CommentNode();
             case TokenType.Block:
                 return ParseBlock();
             default:
@@ -61,9 +61,8 @@ public partial class Parser
             {
                 return handler(this, token);
             }
-            return new BlockNode(token.Content);
         }
-        return new BlockNode(token.Content);
+        throw new Exception($"Unknown tag: {token.Content}");
     }
 
     public Token Peek() => tokens[position];
