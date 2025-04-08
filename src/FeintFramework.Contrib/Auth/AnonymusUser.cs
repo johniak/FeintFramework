@@ -8,5 +8,6 @@ namespace FeintFramework.Contrib.Auth
         public bool IsActive { get; set; } = false;
         public bool IsStaff { get; set; } = false;
         public bool IsSuperuser { get; set; } = false;
+        public bool IsAuthenticated { get; set; } = false;
     }
 }

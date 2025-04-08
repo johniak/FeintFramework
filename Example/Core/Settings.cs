@@ -20,7 +20,8 @@ namespace Example.Core
 
         public override List<Type> Middlewares => new List<Type>
         {
-            typeof(SessionMiddleware)
+            typeof(SessionMiddleware),
+            typeof(AuthMiddleware),
         };
 
         public override DatabaseHandler DatabaseHandler => new SqliteDatabaseHandler(DatabaseConnectionString);

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title | default "Admin Panel" }}</title>
+  <style>
+    /* Base styling with an orange theme */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    header {
+      background-color: #FF6600; /* Primary orange */
+      color: white;
+      padding: 1rem;
+    }
+    nav {
+      background-color: #FF9933; /* Lighter orange for navigation */
+      padding: 0.5rem;
+    }
+    main {
+      padding: 1rem;
+      flex-grow: 1;
+    }
+    footer {
+      background-color: #FF6600;
+      color: white;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .admin-sidebar {
+      background-color: #FFE5CC; /* Soft orange for sidebar */
+      padding: 1rem;
+      min-width: 200px;
+    }
+    .container {
+      display: flex;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+  {{ block extrahead }}
+  <!-- Additional head content can be inserted here -->
+  {{ end }}
+</head>
+<body>
+  <header>
+    <h1>{{Feint Administration}}</h1>
+  </header>
+  <nav>
+    {{ block navigation }}
+    <!-- Default Navigation -->
+    <ul style="list-style: none; margin: 0; padding: 0; display: flex;">
+      <li style="margin-right: 1rem;"><a href="/" style="color: white;">Home</a></li>
+      <li style="margin-right: 1rem;"><a href="/users" style="color: white;">Users</a></li>
+      <li><a href="/settings" style="color: white;">Settings</a></li>
+    </ul>
+    {{ end }}
+  </nav>
+  <div class="container">
+    <aside class="admin-sidebar">
+      {{ block sidebar }}
+      <!-- Default Sidebar Content -->
+      <ul style="list-style: none; padding: 0;">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="/reports">Reports</a></li>
+        <li><a href="/logs">Logs</a></li>
+      </ul>
+      {{ end }}
+    </aside>
+    <main>
+      {{ block content }}
+      <!-- Default Content -->
+      <p>Welcome to the admin panel.</p>
+      {{ end }}
+    </main>
+  </div>
+  <footer>
+    {{ block footer }}
+    <!-- Default Footer -->
+    <p>2025 Feint Framework</p>
+    {{ end }}
+  </footer>
+</body>
+</html>

@@ -7,5 +7,7 @@ namespace FeintFramework.Contrib.Auth
         bool IsActive { get; set; }
         bool IsStaff { get; set; }
         bool IsSuperuser { get; set; }
+
+        bool IsAuthenticated { get; set; }
     }
 }

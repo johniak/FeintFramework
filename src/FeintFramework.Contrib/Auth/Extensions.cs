@@ -26,7 +26,7 @@ public static class AuthExtensions
 
     public static IUser User(this FeintHttpRequest request)
     {
-        var user = request.AdditionalData[AuthConsts.REQUEST_USER_STORE_KEY];
+        request.AdditionalData.TryGetValue(AuthConsts.REQUEST_USER_STORE_KEY, out var user);
         if (user == null)
         {
             return new AnonymusUser();
@@ -34,7 +34,7 @@ public static class AuthExtensions
         return (IUser)user!;
     }
 
-    
+
 
     public static Type GetUserType(this BaseSettings settings, IUser user)
     {
@@ -46,7 +46,7 @@ public static class AuthExtensions
         settings.AdditionalSettings[AuthConsts.REQUEST_USER_STORE_KEY] = userType;
     }
 
-    public static dynamic GetUsersTable(this BaseSettings settings) 
+    public static dynamic GetUsersTable(this BaseSettings settings)
     {
         if (!settings.AdditionalSettings.ContainsKey(AuthConsts.SETTINGS_USER_MANAGER))
         {
@@ -59,7 +59,7 @@ public static class AuthExtensions
     {
         settings.AdditionalSettings[AuthConsts.SETTINGS_USER_MANAGER] = table;
     }
-    
+
 
     public static string GetUserModelName(this BaseSettings settings)
     {

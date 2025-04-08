@@ -14,9 +14,11 @@ public static class DefaultViews
 
     public static FeintHttpResponse NotFound(FeintHttpRequest request, Exception e)
     {
-        var patterns = Router.BuildFullUrlPatternList(Configurator.Settings.RootUrlPatterns.Urls);
+        List<(string Pattern, string? Name)>? patterns = null;
+        if (!string.IsNullOrEmpty(e.Message))
+            Router.BuildFullUrlPatternList(Configurator.Settings.RootUrlPatterns.Urls);
         var urlconf = Configurator.Settings.RootUrlPatterns.GetType().FullName;
-        return new FeintTemplateResponse("Views/Templates/technical_404.sbnhtml", new { request, patterns, urlconf });
+        return new FeintTemplateResponse("Views/Templates/technical_404.sbnhtml", new { request, patterns, urlconf, message = e.Message });
     }
     public static FeintHttpResponse ServerError(FeintHttpRequest request, Exception e)
     {
@@ -34,7 +36,7 @@ public static class DefaultViews
             var line = frame.GetFileLineNumber();
             var columnNumber = frame.GetFileColumnNumber();
             var code = GetHighlightedSource(frame);
-            stackTraceList.Add((className, method, file, line, columnNumber, code?.html,code?.line));
+            stackTraceList.Add((className, method, file, line, columnNumber, code?.html, code?.line));
         }
         if (stackTraceList.Count > 0 && stackTraceList[0].File == null)
         {

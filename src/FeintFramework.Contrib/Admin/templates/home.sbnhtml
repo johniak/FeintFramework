@@ -1,0 +1,6 @@
+{{ extends "Admin/templates/base.sbnhtml" }}
+
+{{ block content }}
+  <h2>Custom Admin Content</h2>
+  <p>This content replaces the default content from the base template.</p>
+{{ end }}

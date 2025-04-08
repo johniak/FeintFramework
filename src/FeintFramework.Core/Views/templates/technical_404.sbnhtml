@@ -142,6 +142,8 @@
           No path was provided.
         {{ end }}
       </p>
+      {{else}}
+        {{message}}
     {{ end }}
   </main>
   

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FeintFramework.Contrib.Sessions.Models;
+using Newtonsoft.Json;
 
 namespace FeintFramework.Contrib.Sessions;
 
@@ -12,7 +13,7 @@ public class SessionStore
     public SessionStore(Session session)
     {
         this.session = session;
-        _data = JsonSerializer.Deserialize<Dictionary<string, object>>(session.SessionData)!;
+        _data = JsonConvert.DeserializeObject<Dictionary<string, object>>(session.SessionData)!;
     }
 
     public object this[string key]
@@ -23,7 +24,7 @@ public class SessionStore
         }
         set
         {
-            _data[key] = value;
+            SetValue(key,value);
         }
     }
 
@@ -40,13 +41,13 @@ public class SessionStore
     public void SetValue(string key, object value)
     {
         _data[key] = value;
-        session.SessionData = JsonSerializer.Serialize(_data);
+        session.SessionData = System.Text.Json.JsonSerializer.Serialize(_data);
         session.Save();
     }
     public void Remove(string key)
     {
         _data.Remove(key);
-        session.SessionData = JsonSerializer.Serialize(_data);
+        session.SessionData = System.Text.Json.JsonSerializer.Serialize(_data);
         session.Save();
     }
 }

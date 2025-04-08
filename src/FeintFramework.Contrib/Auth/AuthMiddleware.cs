@@ -25,7 +25,7 @@ public class AuthMiddleware : BaseMiddleware
 
         if (session.ContainsKey(userIdKey))
         {
-            var userId = (int)session[userIdKey];
+            var userId = (int)(long)session[userIdKey];
             var authBackend = Configurator.Settings.AuthBackend();
             var user = authBackend.GetUser(userId);
             if (user == null)
