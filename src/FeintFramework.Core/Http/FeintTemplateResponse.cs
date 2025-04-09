@@ -1,4 +1,7 @@
+using System.Reflection;
 using System.Threading.Tasks.Dataflow;
+using FeintFramework.Core.Templating;
+using FeintFramework.Core.Templating.Node;
 using Scriban;
 using Scriban.Runtime;
 using Scriban.Syntax;
@@ -7,43 +10,36 @@ namespace FeintFramework.Core.Http;
 
 public class FeintTemplateResponse : FeintHttpResponse
 {
-
-    public FeintTemplateResponse(string templateFilePath, TemplateContext Context) : base()
-    {
-        initialize(templateFilePath, Context);
-    }
-
     public FeintTemplateResponse(string templateFilePath) : base()
     {
-        var context = new TemplateContext();
-        initialize(templateFilePath, context);
+        initialize(templateFilePath);
     }
 
     public FeintTemplateResponse(string templateFilePath, Dictionary<string, object> context)
     {
-        var scriptObject = new ScriptObject();
-        foreach (var item in context)
-        {
-            scriptObject.Add(item.Key, item.Value);
-        }
-        var templateContext = new TemplateContext();
-        templateContext.PushGlobal(scriptObject);
-        initialize(templateFilePath, templateContext);
+        initialize(templateFilePath, context);
     }
 
     public FeintTemplateResponse(string templateFilePath, object context)
     {
-
-        var template = Template.Parse(File.ReadAllText(templateFilePath));
-        Content = template.Render(context);
-        ContentType = "text/html";
+        var contextDictionary = context.GetType()
+                  .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                  .ToDictionary(prop => prop.Name, prop => prop.GetValue(context))!;
+        initialize(templateFilePath, contextDictionary!);
     }
 
-    protected void initialize(string templateFilePath, TemplateContext Context)
+    protected void initialize(string templateFilePath, Dictionary<string, object>? context=null)
     {
-
-        var template = Template.Parse(File.ReadAllText(templateFilePath));
-        Content = template.Render(Context);
+        var template= File.ReadAllText(templateFilePath);
+        Lexer lexer = new Lexer();
+        List<Token> tokens = lexer.Tokenize(template);
+        Parser parser = new Parser(tokens);
+        TemplateNode ast = parser.ParseTemplate();
+        if (context == null)
+        {
+            context = new Dictionary<string, object>();
+        }
+        Content = ast.Render(context);
         ContentType = "text/html";
     }
 }

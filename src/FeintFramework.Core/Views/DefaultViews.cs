@@ -8,6 +8,7 @@ using FeintFramework.Core.Routing;
 
 namespace FeintFramework.Core.Views;
 
+public record StackData(string? ClassName, string? MethodName, string? File, int Line, int Column, string? HtmlCode, string? LineContent);
 
 public static class DefaultViews
 {
@@ -16,9 +17,9 @@ public static class DefaultViews
     {
         List<(string Pattern, string? Name)>? patterns = null;
         if (!string.IsNullOrEmpty(e.Message))
-            Router.BuildFullUrlPatternList(Configurator.Settings.RootUrlPatterns.Urls);
+            patterns = Router.BuildFullUrlPatternList(Configurator.Settings.RootUrlPatterns.Urls);
         var urlconf = Configurator.Settings.RootUrlPatterns.GetType().FullName;
-        return new FeintTemplateResponse("Views/Templates/technical_404.sbnhtml", new { request, patterns, urlconf, message = e.Message });
+        return new FeintTemplateResponse("Views/Templates/technical_404.html", new { request, patterns, urlconf, message = e.Message });
     }
     public static FeintHttpResponse ServerError(FeintHttpRequest request, Exception e)
     {
@@ -27,7 +28,7 @@ public static class DefaultViews
         Assembly assembly = Assembly.GetAssembly(typeof(Configurator))!;
         Version frameworkVersion = assembly.GetName().Version!;
         var exceptionName = e.GetType().Name;
-        var stackTraceList = new List<(string? ClassName, string? MethodName, string? File, int Line, int Column, string? HtmlCode, string? lineContent)>();
+        var stackTraceList = new List<StackData>();
         foreach (var frame in stackTrace.GetFrames())
         {
             var method = frame.GetMethod()?.Name;
@@ -36,14 +37,14 @@ public static class DefaultViews
             var line = frame.GetFileLineNumber();
             var columnNumber = frame.GetFileColumnNumber();
             var code = GetHighlightedSource(frame);
-            stackTraceList.Add((className, method, file, line, columnNumber, code?.html, code?.line));
+            stackTraceList.Add(new StackData(className, method, file, line, columnNumber, code?.html, code?.line));
         }
         if (stackTraceList.Count > 0 && stackTraceList[0].File == null)
         {
             stackTraceList.RemoveAt(0);
         }
 
-        return new FeintTemplateResponse("Views/Templates/technical_500.sbnhtml", new { request, e, dotnetVersion, frameworkVersion, exceptionName, stackTraceList });
+        return new FeintTemplateResponse("Views/Templates/technical_500.html", new { request, e, dotnetVersion, frameworkVersion, exceptionName, stackTraceList });
     }
 
     public static (string html, string line)? GetHighlightedSource(StackFrame frame, int contextLines = 5)

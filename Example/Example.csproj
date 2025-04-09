@@ -17,12 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-      <None Update="**\*.sbnhtml">
+      <None Update="**\*.html">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
   </ItemGroup>
   <ItemGroup>
-    <Watch Include="**\*.sbnhtml" />
+    <Watch Include="**\*.html" />
   </ItemGroup>
 
   <PropertyGroup>

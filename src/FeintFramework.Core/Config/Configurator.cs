@@ -3,6 +3,8 @@
 using FeintFramework.Core.Config.Settings;
 using FeintFramework.Core.Http;
 using FeintFramework.Core.Routing;
+using FeintFramework.Core.Templating;
+using FeintFramework.Core.Templating.Tags;
 using FeintFramework.Db;
 using FeintFramework.Db.Migrator;
 using LinqToDB.Data;
@@ -35,6 +37,11 @@ public static class Configurator
 
     public static void Configure(string[] args)
     {
+        TagRegistry.Register("if", IfTag.ParseIfTag);
+        TagRegistry.Register("for", ForTag.ParseForTag);
+        TagRegistry.Register("extends", ExtendsTag.ParseExtendsTag);
+        TagRegistry.Register("block", BlockTag.ParseBlockTag);
+        TagRegistry.Register("include", IncludeTag.ParseIncludeTag);
         var builder = WebApplication.CreateBuilder(args);
         builder.WebHost.ConfigureKestrel(options =>
         {

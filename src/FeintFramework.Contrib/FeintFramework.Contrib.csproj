@@ -12,12 +12,12 @@
       <ProjectReference Include="..\FeintFramework.Forms\FeintFramework.Forms.csproj" />
   </ItemGroup>
   <ItemGroup>
-      <None Update="**\*.sbnhtml">
+      <None Update="**\*.html">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
   </ItemGroup>
   <ItemGroup>
-    <Watch Include="**\*.sbnhtml" />
+    <Watch Include="**\*.html" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

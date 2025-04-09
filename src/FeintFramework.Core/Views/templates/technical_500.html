@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>404 - Not Found: {{ request.path }}</title>
+  <title>{{exceptionName}}</title>
   <meta name="robots" content="noindex, noarchive">
   <style>
     /* Reset some default spacing */
@@ -19,8 +19,9 @@
       flex-direction: column;
       font-family: Arial, sans-serif;
       background-color: #f2f2f2;
+      font-size: 0.9em
       color: #333;
-      line-height: 1.6;
+      line-height: 1.2;
       padding: 0;
     }
 
@@ -110,48 +111,84 @@
 </head>
 <body>
   <header>
-    <h1>404 - Page Not Found <small>(Error)</small></h1>
+    <h1>{{e.Message}} <small>(Error)</small></h1>
     <table>
       <tr>
         <th>Request Method:</th>
-        <td>{{ request.method }}</td>
+        <td>{{ request.Method }}</td>
       </tr>
       <tr>
         <th>Request URL:</th>
-        <td>{{ request.absolute_url }}</td>
+        <td>{{ request.AbsoluteUrl }}</td>
+      </tr>
+      <tr>
+        <th>Exception Type:</th>
+        <td>{{ exceptionName }}</td>
+      </tr>
+      <tr>
+        <th>.NET Version:</th>
+        <td>{{ dotnetVersion }}</td>
+      </tr>
+      <tr>
+        <th>Feint Framework Version:</th>
+        <td>{{ frameworkVersion }}</td>
       </tr>
     </table>
   </header>
   
   <main>
-    {{ if patterns }}
-      <p>
-        The URL patterns defined in <code>{{ urlconf }}</code> were tested in the following order:
-      </p>
-      <ol>
-        {{ for pattern in patterns }}
-          <li>
-            <code>{{ pattern.item1 }}{{ if pattern.item2 }} [name='{{ pattern.item2 }}']{{ end }}</code>
-          </li>
-        {{ end }}
-      </ol>
-      <p>
-        {{ if request.path }}
-          The requested path <code>{{ request.path }}</code> did not match any of these patterns.
-        {{ else }}
-          No path was provided.
-        {{ end }}
-      </p>
-      {{else}}
-        {{message}}
-    {{ end }}
+    <h2>
+      Trackback
+    </h2>
+    <ul>
+   {% for frame in stackTraceList %}
+    <li>
+    <code>{{frame.File}}:{{frame.Line}},{{frame.Column}}</code> in  <code>{{frame.ClassName}}.{{frame.MethodName}}</code>
+    <div class="toggle" style="cursor:pointer; display:inline-block; margin-left:10px;">
+      <span class="arrow-collapsed">&#9650;</span><!-- ▲ arrow shown when collapsed -->
+      <span class="arrow-expanded" style="display:none;">&#9660;</span><!-- ▼ arrow shown when expanded -->
+    </div>
+      <div class="collapsed">  
+        <pre>{{frame.Line}}: {{frame.LineContent}}</pre>
+      </div>
+      <div class="expanded" style="display: none;">
+{{frame.HtmlCode}}
+      </div>
+    </li>
+   {%endfor%}
+  </ul>
   </main>
   
   <footer>
     <p>
       This error page is displayed because your settings have <code>Debug = true</code>.
-      Change it to <code>false</code> in your configuration to see the standard 404 page.
+      Change it to <code>false</code> in your configuration to see the standard 500 page.
     </p>
   </footer>
+  <script>
+document.addEventListener("DOMContentLoaded", function() {
+  var toggles = document.querySelectorAll('.toggle');
+  toggles.forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      var li = toggle.closest('li');
+      var collapsed = li.querySelector('.collapsed');
+      var expanded = li.querySelector('.expanded');
+      var arrowCollapsed = toggle.querySelector('.arrow-collapsed');
+      var arrowExpanded = toggle.querySelector('.arrow-expanded');
+      if (expanded.style.display === 'none') {
+        expanded.style.display = 'block';
+        collapsed.style.display = 'none';
+        arrowCollapsed.style.display = 'none';
+        arrowExpanded.style.display = 'inline';
+      } else {
+        expanded.style.display = 'none';
+        collapsed.style.display = 'block';
+        arrowCollapsed.style.display = 'inline';
+        arrowExpanded.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>

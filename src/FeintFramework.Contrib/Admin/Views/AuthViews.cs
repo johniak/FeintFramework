@@ -31,7 +31,7 @@ public class AuthViews
 
 
         }
-        return new FeintTemplateResponse("Admin/Templates/login.sbnhtml", new { form });
+        return new FeintTemplateResponse("Admin/Templates/login.html", new { form });
     }
 
 }

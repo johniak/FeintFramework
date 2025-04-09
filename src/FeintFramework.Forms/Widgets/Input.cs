@@ -10,7 +10,7 @@ public abstract class Input : BaseWidget
 {
     public abstract string Type { get; }
 
-    public override string TemplateFilePath => "Widgets/Templates/Input.sbnhtml";
+    public override string TemplateFilePath => "Widgets/Templates/Input.html";
 
     protected override TemplateContext Context
     {

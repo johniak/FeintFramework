@@ -1,4 +1,4 @@
-{{ extends "Admin/templates/base.sbnhtml" }}
+{{ extends "Admin/templates/base.html" }}
 
 {{ block content }}
   <h2>Custom Admin Content</h2>

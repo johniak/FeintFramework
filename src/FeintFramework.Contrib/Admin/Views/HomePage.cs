@@ -16,7 +16,7 @@ public class Homepage
     {
         if (request.User() == null)
             return Redirect("admin:login");
-        return new FeintTemplateResponse("Admin/templates/home.sbnhtml");
+        return new FeintTemplateResponse("Admin/templates/home.html");
     }
 
     public static FeintHttpResponse AsView(FeintHttpRequest request)

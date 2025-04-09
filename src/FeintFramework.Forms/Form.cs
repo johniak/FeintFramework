@@ -153,7 +153,7 @@ public class Form
         {
             var context = new TemplateContext();
             var fieldsWithErrors = Fields.Select(f => new FieldError() { Field = f, Errors = GetFieldError(f.Name) });
-            var template = Template.Parse(File.ReadAllText("Templates/form_as_p.sbnhtml"));
+            var template = Template.Parse(File.ReadAllText("Templates/form_as_p.html"));
             Errors.TryGetValue(NON_FIELD_ERRORS, out var nonFieldErrors);
 
             return template.Render(new
