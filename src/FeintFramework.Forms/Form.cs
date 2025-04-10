@@ -1,12 +1,8 @@
 using System.Reflection;
-using System.Text;
 using FeintFramework.Core;
 using FeintFramework.Core.Http;
-using FeintFramework.Db.Migrator.Fields;
 using FeintFramework.Forms.Fields;
-using Microsoft.Extensions.Primitives;
-using Scriban;
-using Scriban.Runtime;
+using static FeintFramework.Core.Shortcuts;
 
 namespace FeintFramework.Forms;
 
@@ -151,12 +147,9 @@ public class Form
     {
         get
         {
-            var context = new TemplateContext();
             var fieldsWithErrors = Fields.Select(f => new FieldError() { Field = f, Errors = GetFieldError(f.Name) });
-            var template = Template.Parse(File.ReadAllText("Templates/form_as_p.html"));
             Errors.TryGetValue(NON_FIELD_ERRORS, out var nonFieldErrors);
-
-            return template.Render(new
+            return RenderTemplate("Templates/form_as_p.html", new
             {
                 errors = nonFieldErrors,
                 fields = fieldsWithErrors

@@ -1,9 +1,9 @@
 
 {{errors}}
-{{for item in fields }}
+{% for item in fields %}
 
 <p> 
-    {{item.errors}}
-    {{item.field}}
+    {{item.Errors}}
+    {{item.Field}}
 </p>
-{{end}}
+{% endfor %}

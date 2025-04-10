@@ -1,10 +1,10 @@
-{{if label}}
-<label for="{{name}}">{{label}}: </label>
-{{end}}
+{%if attributes.label%}
+<label for="{{attributes.name}}">{{attributes.label}}: </label>
+{%endif%}
 <input  
-type="{{type}}"
-name="{{name}}"
-{{if value}} value="{{value}}" {{end}}
-{{if required}} required {{end}}
+type="{{attributes.type}}"
+name="{{attributes.name}}"
+{%if attributes.value%} value="{{attributes.value}}" {%endif%}
+{%if attributes.required%} required {%endif%}
 
 />

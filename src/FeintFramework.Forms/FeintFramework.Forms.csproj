@@ -10,9 +10,6 @@
       <ProjectReference Include="..\FeintFramework.Core\FeintFramework.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="6.0.0" />
-  </ItemGroup>
-  <ItemGroup>
       <None Update="**\*.html">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

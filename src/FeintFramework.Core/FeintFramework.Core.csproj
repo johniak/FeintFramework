@@ -13,9 +13,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Scriban" Version="6.0.0" />
-  </ItemGroup>
-  <ItemGroup>
       <None Update="**\*.html">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

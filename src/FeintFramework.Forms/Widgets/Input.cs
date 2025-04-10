@@ -1,8 +1,5 @@
 
 
-using FeintFramework.Forms.Widgets;
-using Scriban;
-using Scriban.Runtime;
 
 namespace FeintFramework.Forms.Widgets;
 
@@ -12,27 +9,26 @@ public abstract class Input : BaseWidget
 
     public override string TemplateFilePath => "Widgets/Templates/Input.html";
 
-    protected override TemplateContext Context
+    public Input(): base()
     {
-        get
-        {
-            var context = base.Context;
-            var obj = (ScriptObject) context.PopGlobal();
-            obj.Add("type", Type);
-            context.PushGlobal(obj);
-            return context;
-        }
+        Attributes["type"] = Type;
     }
 }
 
 public class TextInput : Input
 {
+    public TextInput(): base()
+    {
+    }
     public override string Type => "text";
 }
 
 
 public class PasswordInput : Input
 {
+    public PasswordInput(): base()
+    {
+    }
     public override string Type => "password";
 }
 

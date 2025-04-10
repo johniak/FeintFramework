@@ -1,10 +1,5 @@
 using System.Reflection;
-using System.Threading.Tasks.Dataflow;
-using FeintFramework.Core.Templating;
-using FeintFramework.Core.Templating.Node;
-using Scriban;
-using Scriban.Runtime;
-using Scriban.Syntax;
+using static FeintFramework.Core.Shortcuts;
 
 namespace FeintFramework.Core.Http;
 
@@ -30,16 +25,7 @@ public class FeintTemplateResponse : FeintHttpResponse
 
     protected void initialize(string templateFilePath, Dictionary<string, object>? context=null)
     {
-        var template= File.ReadAllText(templateFilePath);
-        Lexer lexer = new Lexer();
-        List<Token> tokens = lexer.Tokenize(template);
-        Parser parser = new Parser(tokens);
-        TemplateNode ast = parser.ParseTemplate();
-        if (context == null)
-        {
-            context = new Dictionary<string, object>();
-        }
-        Content = ast.Render(context);
+        Content = RenderTemplate(templateFilePath, context);
         ContentType = "text/html";
     }
 }

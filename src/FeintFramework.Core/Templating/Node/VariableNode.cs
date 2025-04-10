@@ -22,10 +22,16 @@ public class VariableNode : BaseNode
             if (value == null)
                 return "";
 
-            if (value is IDictionary<string, object> dict)
+            if (value is IDictionary genericDict)
             {
-                if (!dict.TryGetValue(parts[i], out value))
+                try
+                {
+                    value = genericDict[parts[i]];
+                }
+                catch (KeyNotFoundException)
+                {
                     return "";
+                }
             }
             else
             {
