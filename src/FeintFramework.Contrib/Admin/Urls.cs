@@ -6,7 +6,7 @@ namespace FeintFramework.Contrib.Admin;
 
 public class AdminUrls : UrlPatterns
 {
-    public List<UrlPattern> PrefixedUrls = new List<UrlPattern>(){
+    public static List<UrlPattern> PrefixedUrls = new List<UrlPattern>(){
         new UrlPattern("/login", AuthViews.Login, "login"),
         new UrlPattern("/", Homepage.AsView, "home"),
     };

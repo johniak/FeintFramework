@@ -9,7 +9,7 @@ public abstract class Model
 
 }
 
-public abstract class IntModel
+public abstract class IntModel : Model
 {
     [PrimaryKey, Identity, AutoField(PrimaryKey = true)]
     public int? Id { get; set; }

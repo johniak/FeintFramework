@@ -8,9 +8,13 @@ namespace FeintFramework.Core;
 
 public static class Shortcuts
 {
-    public static FeintHttpResponse Redirect(string urlName, Dictionary<string, object>? parameters=null)
+    public static string? ReverseUrl(string urlName, Dictionary<string, object>? parameters = null)
     {
-        var path = Router.Reverse(urlName);
+        return Router.Reverse(urlName, parameters);
+    }
+    public static FeintHttpResponse Redirect(string urlName, Dictionary<string, object>? parameters = null)
+    {
+        var path = Router.Reverse(urlName, parameters);
         if (path == null)
         {
             throw new Http404($"Reverse not found for {urlName}");

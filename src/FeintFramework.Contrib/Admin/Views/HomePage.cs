@@ -16,7 +16,10 @@ public class Homepage
     {
         if (request.User() == null)
             return Redirect("admin:login");
-        return new FeintTemplateResponse("Admin/templates/home.html");
+        var appRecords = AdminHelpers.AppRecords;
+        var context = new Dictionary<string, object>();
+        context["appRecords"] = appRecords;
+        return new FeintTemplateResponse("Admin/templates/home.html", context);
     }
 
     public static FeintHttpResponse AsView(FeintHttpRequest request)

@@ -1,6 +1,7 @@
 
 using System.Reflection;
 using FeintFramework.Db.Migrator;
+using FeintFramework.Db.Migrator.Fields;
 using QuikGraph;
 using QuikGraph.Algorithms;
 
@@ -162,5 +163,20 @@ public class MigrationHelper
             migrationNumbers[app.Name] = migrations.Count();
         }
         return migrationNumbers;
+    }
+
+    public (string FieldName, BaseField Field)[] GetModelFields(Type modelType)
+    {
+        var fields = modelType.GetProperties();
+        var fieldList = new List<(string FieldName, BaseField Field)>();
+        foreach (var field in fields)
+        {
+            var baseField = field.GetCustomAttribute<BaseField>();
+            if (baseField != null)
+            {
+                fieldList.Add((field.Name, baseField));
+            }
+        }
+        return fieldList.ToArray();
     }
 }

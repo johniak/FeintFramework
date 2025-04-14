@@ -99,7 +99,7 @@ public class MigrationGenerator
         if (modelState == null)
         {
             var operation = new CreateModel(model.Name);
-            var fields = getModelFields(model);
+            var fields = migrationHelper.GetModelFields(model);
             var dependencies = getOperationDependeciesFromFields(fields.Select(f => f.Field));
             operation.Fields = fields;
             var operationExpression = operation.GenerateOperation();
@@ -108,7 +108,7 @@ public class MigrationGenerator
             return;
         }
 
-        var currentFields = getModelFields(model);
+        var currentFields = migrationHelper.GetModelFields(model);
         var deletedFields = modelState?.Fields.Where(f => !currentFields.Any(cf => cf.FieldName == f.Key));
         foreach (var field in currentFields)
         {
@@ -200,22 +200,6 @@ public class MigrationGenerator
             }
         }
         return dependencies;
-    }
-
-
-    protected (string FieldName, BaseField Field)[] getModelFields(Type modelType)
-    {
-        var fields = modelType.GetProperties();
-        var fieldList = new List<(string FieldName, BaseField Field)>();
-        foreach (var field in fields)
-        {
-            var baseField = field.GetCustomAttribute<BaseField>();
-            if (baseField != null)
-            {
-                fieldList.Add((field.Name, baseField));
-            }
-        }
-        return fieldList.ToArray();
     }
 
     protected void saveMigration(string appName, string migrationName, string migrationContent)

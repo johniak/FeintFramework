@@ -20,8 +20,7 @@ public class ForNode : BaseNode
 
     public override string Render(Dictionary<string, object> context)
     {
-        if (!context.TryGetValue(IterableName, out var collectionObj))
-            return "";
+        var collectionObj = VariableNode.GetVariableValue(IterableName, context);
 
         if (!(collectionObj is IEnumerable collection))
             return "";

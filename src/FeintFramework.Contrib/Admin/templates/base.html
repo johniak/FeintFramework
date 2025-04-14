@@ -2,88 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>{{ title | default "Admin Panel" }}</title>
+  <title>{{ title }}</title>
   <style>
-    /* Base styling with an orange theme */
-    body {
-      font-family: Arial, sans-serif;
+    /* Ensure the page takes the full viewport height */
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
+    }
+    /* Set up the page as a vertical flex container */
+    body {
+      display: flex;
+      flex-direction: column;
+      font-family: Arial, sans-serif;
+      background-color: #FAF9F7; /* very light pastel background */
     }
     header {
-      background-color: #FF6600; /* Primary orange */
-      color: white;
+      background-color: #FFCBA4; /* pastel peach */
+      color: #333; /* dark text for readability */
       padding: 1rem;
     }
     nav {
-      background-color: #FF9933; /* Lighter orange for navigation */
+      background-color: #FFE4C4; /* lighter pastel peach */
       padding: 0.5rem;
+    }
+    /* Ensure navigation links contrast well */
+    nav a {
+      color: #333;
+      text-decoration: none;
+    }
+    /* This container now fills the available vertical space */
+    .container {
+      display: flex;
+      flex: 1; /* expands to push the footer to the bottom */
+    }
+    .admin-sidebar {
+      background-color: #FFF2E5; /* very soft pastel */
+      padding: 1rem;
+      min-width: 200px;
     }
     main {
       padding: 1rem;
       flex-grow: 1;
     }
     footer {
-      background-color: #FF6600;
-      color: white;
+      background-color: #FFCBA4; /* matching the header for cohesion */
+      color: #333;
       padding: 0.5rem;
       text-align: center;
-    }
-    .admin-sidebar {
-      background-color: #FFE5CC; /* Soft orange for sidebar */
-      padding: 1rem;
-      min-width: 200px;
-    }
-    .container {
-      display: flex;
     }
     a {
       text-decoration: none;
       color: inherit;
     }
   </style>
-  {{ block extrahead }}
+  {% block extrahead %}
   <!-- Additional head content can be inserted here -->
-  {{ end }}
+  {% endblock %}
 </head>
 <body>
   <header>
-    <h1>{{Feint Administration}}</h1>
+    <h1>Feint Administration</h1>
   </header>
   <nav>
-    {{ block navigation }}
+    {% block navigation %}
     <!-- Default Navigation -->
     <ul style="list-style: none; margin: 0; padding: 0; display: flex;">
-      <li style="margin-right: 1rem;"><a href="/" style="color: white;">Home</a></li>
-      <li style="margin-right: 1rem;"><a href="/users" style="color: white;">Users</a></li>
-      <li><a href="/settings" style="color: white;">Settings</a></li>
+      <li style="margin-right: 1rem;"><a href="/">Home</a></li>
+      <li style="margin-right: 1rem;"><a href="/users">Users</a></li>
+      <li><a href="/settings">Settings</a></li>
     </ul>
-    {{ end }}
+    {% endblock %}
   </nav>
   <div class="container">
     <aside class="admin-sidebar">
-      {{ block sidebar }}
+      {% block sidebar %}
       <!-- Default Sidebar Content -->
       <ul style="list-style: none; padding: 0;">
         <li><a href="/dashboard">Dashboard</a></li>
         <li><a href="/reports">Reports</a></li>
         <li><a href="/logs">Logs</a></li>
       </ul>
-      {{ end }}
+      {% endblock %}
     </aside>
     <main>
-      {{ block content }}
+      {% block content %}
       <!-- Default Content -->
       <p>Welcome to the admin panel.</p>
-      {{ end }}
+      {% endblock %}
     </main>
   </div>
   <footer>
-    {{ block footer }}
+    {% block footer %}
     <!-- Default Footer -->
     <p>2025 Feint Framework</p>
-    {{ end }}
+    {% endblock %}
   </footer>
 </body>
 </html>

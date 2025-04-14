@@ -20,6 +20,10 @@
       <None Update="**\*.html">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+  </ItemGroup><ItemGroup>
+      <None Update="**\*.ico">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
   </ItemGroup>
   <ItemGroup>
     <Watch Include="**\*.html" />
