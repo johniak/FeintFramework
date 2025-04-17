@@ -17,6 +17,14 @@ class AuthForm : Form
     public CharFormField Password = new CharFormField() { Label = "Password" };
 }
 
+class BlogPostForm : ModelForm<BlogPost>
+{
+    public static class Meta
+    {
+        public static string[] Fields = ["__all__"];
+    }
+}
+
 class ExampleView
 {
     public FeintHttpResponse AsView(FeintHttpRequest request)
@@ -29,9 +37,9 @@ class ExampleView
         };
         var url = Router.Reverse("example2", parameters);
         Console.WriteLine(html);
-        var lo2 = 0;
-        var lol = 200/lo2;
-        User.Objects.Where(x=>x.Username == "root").ToArray();
+        // var lo2 = 0;
+        // var lol = 200 / lo2;
+        User.Objects.Where(x => x.Username == "root").ToArray();
         // var user = new User(){
         //     Username="root",
         //     IsStaff=true,
@@ -54,7 +62,7 @@ class ExampleView
         return new FeintHttpResponse
         {
             StatusCode = 200,
-            Content = new AuthForm().AsP,
+            Content = new BlogPostForm().AsP,
             ContentType = "text/html"
         };
     }

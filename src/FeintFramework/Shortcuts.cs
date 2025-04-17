@@ -36,6 +36,6 @@ public static class Shortcuts
         var contextDictionary = context.GetType()
                   .GetProperties(BindingFlags.Instance | BindingFlags.Public)
                   .ToDictionary(prop => prop.Name, prop => prop.GetValue(context))!;
-        return RenderTemplate(templateFilePath, contextDictionary);
+        return RenderTemplate(templateFilePath, contextDictionary!);
     }
 }

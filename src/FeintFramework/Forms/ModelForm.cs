@@ -1,10 +1,7 @@
 using System.Reflection;
-using FeintFramework;
-using FeintFramework.Http;
 using FeintFramework.Db;
 using FeintFramework.Db.Migrator.Fields;
 using FeintFramework.Forms.Fields;
-using static FeintFramework.Shortcuts;
 
 namespace FeintFramework.Forms;
 
@@ -34,8 +31,20 @@ public class ModelForm<T> : Form where T : Model
                 fieldsToPull = fieldsNames;
             }
             fieldsToPull!.Where(f => !excludedNames.Contains(f)).ToArray();
+            var fieldsFromModel = extractModelFields().Where(f => f.Value.FormField != null)
+                .Where(f => fieldsToPull.Contains(f.Key))
+                .ToList().Select(f =>
+                {
+                    var dbField = f.Value;
+                    var field = dbField.FormField!;
+                    field.Name = f.Key;
+                    field.Label = f.Key;
+                    return field;
+                });
 
-            var type = typeof(T);
+            fields.AddRange(
+                fieldsFromModel
+            );
             return fields;
         }
     }

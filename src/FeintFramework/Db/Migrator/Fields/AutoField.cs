@@ -1,3 +1,5 @@
+using FeintFramework.Forms.Fields;
+
 namespace FeintFramework.Db.Migrator.Fields;
 
 public class AutoField : IntegerField
@@ -7,4 +9,5 @@ public class AutoField : IntegerField
         AutoIncrement = true;
         NotNull = true;
     }
+    public override BaseFormField? FormField => null;
 }

@@ -1,3 +1,4 @@
+using FeintFramework.Forms.Fields;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -18,19 +19,19 @@ public class BaseField : Attribute
     }
 
     public virtual ExpressionSyntax? GetDefaultValueAssignment()
-{
-    if (DefaultValue == null)
-        return null;
+    {
+        if (DefaultValue == null)
+            return null;
 
-    return AssignmentExpression(
-        SyntaxKind.SimpleAssignmentExpression,
-        IdentifierName("DefaultValue"),
-        LiteralExpression(
-            SyntaxKind.StringLiteralExpression,
-            Literal(DefaultValue.ToString()!)
-        )
-    );
-}
+        return AssignmentExpression(
+            SyntaxKind.SimpleAssignmentExpression,
+            IdentifierName("DefaultValue"),
+            LiteralExpression(
+                SyntaxKind.StringLiteralExpression,
+                Literal(DefaultValue.ToString()!)
+            )
+        );
+    }
 
     public virtual List<ExpressionSyntax> GetInitializerExpressions()
     {
@@ -57,7 +58,7 @@ public class BaseField : Attribute
                 LiteralExpression(DbIndex ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression)
             ),
         };
-        var defaultAssigment = 
+        var defaultAssigment =
             GetDefaultValueAssignment();
         if (defaultAssigment != null)
         {
@@ -89,7 +90,7 @@ public class BaseField : Attribute
                left.DbIndex == right.DbIndex &&
                Equals(left.DefaultValue, right.DefaultValue);
     }
-    
+
     public static bool operator !=(BaseField? left, BaseField? right)
     {
         return !(left == right);
@@ -107,6 +108,18 @@ public class BaseField : Attribute
     {
         return HashCode.Combine(NotNull, PrimaryKey, Unique, DbIndex, DefaultValue);
     }
+
+    public virtual BaseFormField? FormField
+    {
+        get
+        {
+            var field = new CharFormField(){
+                Required = NotNull,
+            };
+            return field;
+        }
+    }
+    
 }
 
 [AttributeUsage(
