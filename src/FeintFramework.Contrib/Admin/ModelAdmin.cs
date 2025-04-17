@@ -7,6 +7,8 @@ using FeintFramework.Forms;
 using LinqToDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Extensions.Primitives;
+using static FeintFramework.Core.Shortcuts;
 
 namespace FeintFramework.Contrib.Admin;
 
@@ -35,13 +37,25 @@ public abstract class ModelAdmin
     {
         get
         {
-            return ListDisplay ?? [];
+            var columns = new List<string>() { "Id" };
+            columns.AddRange(ListDisplay ?? []);
+            return columns.ToArray();
         }
     }
 
-    public abstract string[][] GetRows(int page, int pageSize);
+    public abstract string[][] GetRows(int page = 0, int pageSize = 25);
 
     public abstract Form GetForm(string formType, object? obj = null);
+
+    public string ListUrl
+    {
+        get
+        {
+            var url = ReverseUrl($"admin:{AppName}:{ModelName}:list")!;
+            return url;
+        }
+    }
+
 
     public virtual void Register()
     {
@@ -58,9 +72,11 @@ public abstract class ModelAdmin
 
     public FeintHttpResponse ListView(FeintHttpRequest request)
     {
-        var page = int.Parse(request.Query["page"]!);
-        var pageSize = int.Parse(request.Query["pageSize"]!);
-        var rows = GetRows(page, pageSize);
+        var pageString = request.Query["page"];
+        var pageSizeString = request.Query["pageSize"];
+        // int? page = !StringValues.IsNullOrEmpty(pageString)?int.Parse(pageString!):null;
+        // int? pageSize = !StringValues.IsNullOrEmpty(pageSizeString)?int.Parse(pageSizeString!):null;
+        var rows = GetRows();
         var context = new Dictionary<string, object>();
         context["rows"] = rows;
         context["columnNames"] = ColumnNames;
@@ -73,16 +89,22 @@ public abstract class ModelAdmin
 public abstract class ModelAdmin<T> : ModelAdmin where T : Model
 {
     protected T? Object { get; set; }
-    protected ITable<T>? Manager { get; set; }
+    protected ITable<T> Manager
+    {
+        get
+        {
+            var type = typeof(T);
+            var propertyInfo = type.GetProperty(
+                "Objects",
+                BindingFlags.Public | BindingFlags.Static
+            )!;
+            return (ITable<T>)propertyInfo.GetValue(null)!;
+        }
+    }
 
     public ModelAdmin()
     {
-        var type = typeof(T);
-        var propertyInfo = type.GetProperty(
-            "Objects",
-            BindingFlags.Public | BindingFlags.Static
-        )!;
-        Manager = (ITable<T>)propertyInfo.GetValue(null)!;
+
     }
 
     public override string[]? Fields
@@ -127,7 +149,7 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : Model
         }
     }
 
-    public override string[][] GetRows(int page, int pageSize)
+    public override string[][] GetRows(int page = 0, int pageSize = 25)
     {
         var manager = Manager!;
         var listRows = new List<string[]>();
@@ -137,7 +159,7 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : Model
             var row = new string[ColumnNames.Length];
             for (int i = 0; i < ColumnNames.Length; i++)
             {
-                var fieldName = ListDisplay[i];
+                var fieldName = ColumnNames[i];
                 if (Exclude != null && Exclude.Contains(fieldName))
                 {
                     continue;
@@ -157,14 +179,20 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : Model
         if (propertyInfo != null)
         {
             return propertyInfo.GetValue(obj)?.ToString() ?? "";
-        } else if (methodInfo != null)
+        }
+        else if (methodInfo != null)
         {
             return methodInfo.Invoke(obj, null)?.ToString() ?? "";
-        } else if (fieldInfo != null)
+        }
+        else if (fieldInfo != null)
         {
             return fieldInfo.GetValue(obj)?.ToString() ?? "";
         }
         return "";
+    }
+    public override Form GetForm(string formType, object? obj = null)
+    {
+        return new Form();
     }
 
 }

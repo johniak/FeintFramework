@@ -42,6 +42,7 @@ public static class Configurator
         TagRegistry.Register("extends", ExtendsTag.ParseExtendsTag);
         TagRegistry.Register("block", BlockTag.ParseBlockTag);
         TagRegistry.Register("include", IncludeTag.ParseIncludeTag);
+        TagRegistry.Register("url", UrlTag.ParseUrlTag);
         var builder = WebApplication.CreateBuilder(args);
         builder.WebHost.ConfigureKestrel(options =>
         {

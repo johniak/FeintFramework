@@ -21,5 +21,10 @@ namespace FeintFramework.Contrib.Auth.Models
         [Column(Name = "date_joined"), DateTimeField(NotNull = true, AutoNowAdd = true)]
         public virtual DateTime DateJoined { get; set; }
         public bool IsAuthenticated { get; set; } = true;
+
+        public override string ToString()
+        {
+            return Username;
+        }
     }
 }

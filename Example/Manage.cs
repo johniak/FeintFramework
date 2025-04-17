@@ -5,6 +5,7 @@ using Microsoft.Data.Sqlite;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
 using FeintFramework.Contrib.Auth;
+using FeintFramework.Contrib.Admin;
 
 
 
@@ -13,6 +14,7 @@ Console.WriteLine("***************************************");
 Configurator.Settings = new Example.Core.Settings();
 Configurator.Migrate();
 
+var appRecords = AdminHelpers.AppRecords;
 
 Configurator.Configure(args);
 // using (var db = new MyDbConnection())

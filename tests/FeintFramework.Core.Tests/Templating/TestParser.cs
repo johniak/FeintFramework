@@ -401,6 +401,7 @@ public sealed class TestParser
     [TestMethod]
     public void ForNode_Render_ReturnsEmptyString_WhenIterableIsNotEnumerable()
     {
+        TagRegistry.Register("for", ForTag.ParseForTag);
         string template = "{% for item in items %}{{ item }}{% endfor %}";
 
         Lexer lexer = new Lexer();

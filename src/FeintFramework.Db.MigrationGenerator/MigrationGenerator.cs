@@ -26,6 +26,10 @@ public class MigrationGenerator
         var installedAppWithPaths = appTypes.Select(a => (a.Name, a.FullName)).ToDictionary(a => a.Name, a => SourceFileSearcher.FindSourceFileForType(projectDirectory, a.FullName!));
         foreach (var app in installedAppWithPaths)
         {
+            if (app.Value == null)
+            {
+                continue;
+            }
             var baseDirectory = Path.GetDirectoryName(app.Value);
             string migrationDirectory = Path.Combine(baseDirectory!, "migrations");
             migrationsPath[app.Key] = migrationDirectory;
@@ -163,7 +167,14 @@ public class MigrationGenerator
                 continue;
             foreach (var dependency in kvp.Value.Value.Dependencies)
             {
-                graph.AddEdge(new Edge<string>(dependency, kvp.Key));
+                try
+                {
+                    graph.AddEdge(new Edge<string>(dependency, kvp.Key));
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Dependecy to {dependency} not found.");
+                }
             }
         }
         IEnumerable<string> sortedKeys;

@@ -4,7 +4,7 @@ using LinqToDB.Mapping;
 
 namespace Example.Blog.Models;
 
-[Table(Name = "example_app_blog_post")]
+[Table(Name = "blog_app_blog_post")]
 public partial class BlogPost : IntModel
 {
     [Column, NotNull, CharField(Length = 255)]

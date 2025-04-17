@@ -21,9 +21,11 @@
             "program": "${workspaceFolder}/src/FeintFramework.Db.MigrationGenerator/bin/Debug/net9.0/FeintFramework.Db.MigrationGenerator.dll",
             "args": [
                 "--project",
-                "${workspaceFolder}/src/FeintFramework.Contrib",
-                "--app",
-                "AuthApp"
+                "${workspaceFolder}/Example",
+                "--settings",
+                "Example.Core.Settings"
+                // "--app",
+                // "AuthApp"
             ],
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",

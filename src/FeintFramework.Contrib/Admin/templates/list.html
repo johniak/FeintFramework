@@ -50,22 +50,25 @@
 {% endblock extrahead %}
 {% block content %}
 <div class="app-container">
-  {% for appRecord in appRecords %}
     <div class="app-box">
-      <h2 class="app-title">{{ appRecord.ApplicationName }}</h2>
+      <h2 class="app-title">{{ modelName }}</h2>
       <table class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            {%for column in columnNames%}
+              <th>{{ column }}</th>
+            {% endfor %}
+          </tr>
         <tbody>
-          {% for modelAdmin in appRecord.ModelAdmins %}
+          {% for row in rows %}
             <tr>
-              <td><a href="{{modelAdmin.ListUrl}}">{{ modelAdmin.ModelName }}</a></td>
-              <td>
-                <a href="#">Add</a>
-              </td>
+              {%for cell in row%}
+              <td>{{cell}}</td>
+              {%endfor%}
             </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-  {% endfor %}
 </div>
 {% endblock %}

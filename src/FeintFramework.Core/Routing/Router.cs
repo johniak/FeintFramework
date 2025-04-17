@@ -49,6 +49,8 @@ public class Router
         if (reversedUrls.ContainsKey(urlName))
         {
             var regex = reversedUrls[urlName];
+            regex.Replace("^", "");
+            regex = regex.Replace("$", "");
             if (parameters == null)
                 return regex;
             return FillPattern(regex, parameters);

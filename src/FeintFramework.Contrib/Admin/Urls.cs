@@ -7,8 +7,8 @@ namespace FeintFramework.Contrib.Admin;
 public class AdminUrls : UrlPatterns
 {
     public static List<UrlPattern> PrefixedUrls = new List<UrlPattern>(){
-        new UrlPattern("/login", AuthViews.Login, "login"),
-        new UrlPattern("/", Homepage.AsView, "home"),
+        new UrlPattern("/login$", AuthViews.Login, "login"),
+        new UrlPattern("/$", Homepage.AsView, "home"),
     };
 
     public override List<UrlPattern> Urls

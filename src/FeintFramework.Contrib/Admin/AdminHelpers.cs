@@ -72,6 +72,7 @@ public static class AdminHelpers
         foreach (var modelAdminType in modelAdminTypes)
         {
             var modelAdmin = (ModelAdmin)Activator.CreateInstance(modelAdminType)!;
+            modelAdmin.Register();
             modelAdmins.Add(modelAdmin);
         }
         return modelAdmins.ToArray();
