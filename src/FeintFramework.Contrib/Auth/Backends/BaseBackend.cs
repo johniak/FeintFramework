@@ -1,5 +1,5 @@
 using FeintFramework.Contrib.Sessions;
-using FeintFramework.Core.Http;
+using FeintFramework.Http;
 
 namespace FeintFramework.Contrib.Auth.Backends;
 

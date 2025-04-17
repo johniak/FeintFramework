@@ -1,5 +1,5 @@
 ﻿
-using FeintFramework.Core.Config;
+using FeintFramework.Config;
 using LinqToDB;
 using Microsoft.Data.Sqlite;
 using FeintFramework.Db.Migrator;

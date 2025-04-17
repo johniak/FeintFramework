@@ -1,5 +1,5 @@
-using FeintFramework.Core.Config.Settings;
-using FeintFramework.Core.Routing;
+using FeintFramework.Config.Settings;
+using FeintFramework.Routing;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
 using FeintFramework.Contrib.Sessions;

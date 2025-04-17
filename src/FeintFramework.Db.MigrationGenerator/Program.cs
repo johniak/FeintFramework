@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using FeintFramework.Core.Config.Settings;
+using FeintFramework.Config.Settings;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Threading.Tasks;
-using FeintFramework.Core.Apps;
+using FeintFramework.Apps;
 
 namespace FeintFramework.Db.MigrationGenerator;
 class Program

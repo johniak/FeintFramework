@@ -1,4 +1,4 @@
-using FeintFramework.Core.Apps;
+using FeintFramework.Apps;
 
 namespace Example.Blog
 {

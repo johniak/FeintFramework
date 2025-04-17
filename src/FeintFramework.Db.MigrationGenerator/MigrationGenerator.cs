@@ -1,6 +1,6 @@
 using System.Reflection;
-using FeintFramework.Core.Apps;
-using FeintFramework.Core.Config.Settings;
+using FeintFramework.Apps;
+using FeintFramework.Config.Settings;
 using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Migrator.Fields;
 using FeintFramework.Db.Migrator.Operations;

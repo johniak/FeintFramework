@@ -1,7 +1,7 @@
 using FeintFramework.Contrib.Sessions.Models;
-using FeintFramework.Core.Config;
-using FeintFramework.Core.Http;
-using FeintFramework.Core.Middleware;
+using FeintFramework.Config;
+using FeintFramework.Http;
+using FeintFramework.Middleware;
 using FeintFramework.Contrib.Sessions;
 using FeintFramework.Db;
 using LinqToDB;

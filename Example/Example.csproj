@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\src\FeintFramework.Core\FeintFramework.Core.csproj" />
+    <ProjectReference Include="..\src\FeintFramework\FeintFramework.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Contrib\FeintFramework.Contrib.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Db\FeintFramework.Db.csproj" />
     <ProjectReference Include="..\src\FeintFramework.Forms\FeintFramework.Forms.csproj" />

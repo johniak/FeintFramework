@@ -1,10 +1,10 @@
 using System.Reflection;
 using FeintFramework.Contrib.Auth.Backends;
 using FeintFramework.Contrib.Auth.Models;
-using FeintFramework.Core.Apps;
-using FeintFramework.Core.Config;
-using FeintFramework.Core.Config.Settings;
-using FeintFramework.Core.Http;
+using FeintFramework.Apps;
+using FeintFramework.Config;
+using FeintFramework.Config.Settings;
+using FeintFramework.Http;
 using FeintFramework.Db;
 using LinqToDB;
 using Microsoft.AspNetCore.Http;

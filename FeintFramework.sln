@@ -3,17 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Core", "src\FeintFramework.Core\FeintFramework.Core.csproj", "{F8079EEF-8E81-483F-87CC-A790A627F8AB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework", "src\FeintFramework\FeintFramework.csproj", "{F8079EEF-8E81-483F-87CC-A790A627F8AB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example", "Example\Example.csproj", "{578FA4D6-EA1B-4EF0-BD3F-95AD18F27117}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0AB3BF05-4346-4AA6-1389-037BE0695223}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Core.Tests", "tests\FeintFramework.Core.Tests\FeintFramework.Core.Tests.csproj", "{127FE192-BF14-4107-8106-A94752FA1589}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Db", "src\FeintFramework.Db\FeintFramework.Db.csproj", "{92072858-6F82-49D6-8CDB-D4C01D899BA6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Tests", "tests\FeintFramework.Tests\FeintFramework.Tests.csproj", "{127FE192-BF14-4107-8106-A94752FA1589}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.SourceGenerators", "src\FeintFramework.SourceGenerators\FeintFramework.SourceGenerators.csproj", "{81CBBF98-7798-449B-9EEB-18418CF17544}"
 EndProject
@@ -23,8 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Db.Migration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Contrib", "src\FeintFramework.Contrib\FeintFramework.Contrib.csproj", "{8BB34295-5B54-4D4A-9953-E0C1272F2877}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FeintFramework.Forms", "src\FeintFramework.Forms\FeintFramework.Forms.csproj", "{43687676-31FD-42C4-8AC8-B8EDE2274C19}"
-EndProject
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

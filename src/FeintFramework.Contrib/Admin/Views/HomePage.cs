@@ -1,6 +1,6 @@
 using FeintFramework.Contrib.Auth;
-using FeintFramework.Core.Http;
-using static FeintFramework.Core.Shortcuts;
+using FeintFramework.Http;
+using static FeintFramework.Shortcuts;
 
 namespace FeintFramework.Contrib.Admin.Views;
 

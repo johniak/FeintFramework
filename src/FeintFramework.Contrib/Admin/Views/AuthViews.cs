@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using FeintFramework.Contrib.Admin.Forms;
 using FeintFramework.Contrib.Auth;
-using FeintFramework.Core.Config;
-using FeintFramework.Core.Http;
-using static FeintFramework.Core.Shortcuts;
+using FeintFramework.Config;
+using FeintFramework.Http;
+using static FeintFramework.Shortcuts;
 
 namespace FeintFramework.Contrib.Admin.Views;
 

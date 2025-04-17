@@ -1,7 +1,7 @@
 
 using System.Reflection.Metadata;
-using FeintFramework.Core.Config.Settings;
-using FeintFramework.Core.Http;
+using FeintFramework.Config.Settings;
+using FeintFramework.Http;
 using Microsoft.AspNetCore.Http;
 
 namespace FeintFramework.Contrib.Sessions;

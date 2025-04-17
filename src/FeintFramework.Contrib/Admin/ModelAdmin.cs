@@ -1,14 +1,14 @@
 
 using System.Reflection;
-using FeintFramework.Core.Apps;
-using FeintFramework.Core.Http;
+using FeintFramework.Apps;
+using FeintFramework.Http;
 using FeintFramework.Db;
 using FeintFramework.Forms;
 using LinqToDB;
 using Microsoft.AspNetCore.Http;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Primitives;
-using static FeintFramework.Core.Shortcuts;
+using static FeintFramework.Shortcuts;
 
 namespace FeintFramework.Contrib.Admin;
 
@@ -67,7 +67,7 @@ public abstract class ModelAdmin
         var deletePath = $"/{AppName}/{ModelName}/<pk:int>/delete";
         var addUrlName = $"{AppName}:{ModelName}:add";
         var addPath = $"/{AppName}/{ModelName}/add";
-        AdminUrls.PrefixedUrls.Add(new FeintFramework.Core.Routing.Path(listPath, ListView, listUrlName));
+        AdminUrls.PrefixedUrls.Add(new FeintFramework.Routing.Path(listPath, ListView, listUrlName));
     }
 
     public FeintHttpResponse ListView(FeintHttpRequest request)

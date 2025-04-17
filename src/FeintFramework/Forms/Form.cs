@@ -1,0 +1,159 @@
+using System.Reflection;
+using FeintFramework;
+using FeintFramework.Http;
+using FeintFramework.Forms.Fields;
+using static FeintFramework.Shortcuts;
+
+namespace FeintFramework.Forms;
+
+public class Form
+{
+    public const string NON_FIELD_ERRORS = "__all__";
+    public Dictionary<string, string>? Data { get; set; }
+    protected Dictionary<string, Strings>? errors = null;
+    public Dictionary<string, Strings> Errors
+    {
+        get
+        {
+            if (this.errors == null)
+            {
+                return new Dictionary<string, Strings>();
+            }
+            return errors!;
+        }
+    }
+    public Dictionary<string, UploadedFile> Files { get; set; } = new Dictionary<string, UploadedFile>();
+    public string Prefix { get; set; } = "";
+    public Dictionary<string, string> Initial { get; set; } = new Dictionary<string, string>();
+
+    public Boolean IsValid
+    {
+        get
+        {
+            if (errors == null) FullClean();
+            return Errors.Keys.Count == 0;
+        }
+    }
+
+    public virtual List<BaseFormField> Fields
+    {
+        get
+        {
+            var type = GetType();
+
+            var fields = type
+                .GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(f => typeof(BaseFormField).IsAssignableFrom(f.FieldType))
+                .Select(p =>
+                {
+                    var value = p.GetValue(this) as BaseFormField;
+                    if (value != null && string.IsNullOrEmpty(value.Name))
+                        value.Name = p.Name;
+                    if (Initial.ContainsKey(p.Name))
+                    {
+                        value.Initial = Initial[p.Name];
+                    }
+                    return value;
+                })
+                .Where(value => value != null);
+
+            var properties = type
+                .GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(prop => typeof(BaseFormField).IsAssignableFrom(prop.PropertyType))
+                                .Select(p =>
+                {
+                    var value = p.GetValue(this) as BaseFormField;
+                    if (value != null && string.IsNullOrEmpty(value.Name))
+                        value.Name = p.Name;
+                    if (Initial.ContainsKey(p.Name))
+                    {
+                        value.Initial = Initial[p.Name];
+                    }
+                    return value;
+                })
+                .Where(value => value != null);
+
+            return fields.Concat(properties).ToList()!;
+        }
+    }
+    public Dictionary<string, object> CleanedData { get; set; }
+
+    public void FullClean()
+    {
+        errors = new Dictionary<string, Strings>();
+        CleanedData = new Dictionary<string, object>();
+        cleanFields();
+        clean();
+        postClean();
+    }
+
+    protected virtual void cleanFields()
+    {
+        if (Data == null)
+        {
+            return;
+        }
+        foreach (var field in Fields)
+        {
+            try
+            {
+                Data.TryGetValue(field.Name, out var value);
+                CleanedData[field.Name] = field.Clean(value);
+            }
+            catch (ValidationException e)
+            {
+                AddError(e, field.Name);
+            }
+        }
+    }
+
+    protected virtual void clean()
+    {
+
+    }
+
+    protected virtual void postClean()
+    {
+
+    }
+
+    public void AddError(ValidationException e, string? fieldName = null)
+    {
+        AddError(e.Errors, fieldName);
+    }
+
+    public void AddError(Strings e, string? fieldName = null)
+    {
+        var key = fieldName ?? NON_FIELD_ERRORS;
+        var errorAlreadyExists = Errors!.TryGetValue(key, out var currentErrors);
+        Strings newErrors;
+        if (errorAlreadyExists)
+        {
+            currentErrors!.Concat(e);
+            newErrors = currentErrors!;
+        }
+        else
+            newErrors = e;
+        errors![key] = newErrors;
+    }
+
+    public Strings? GetFieldError(string fieldName)
+    {
+        Errors.TryGetValue(fieldName, out var error);
+        return error;
+    }
+
+    public string AsP
+    {
+        get
+        {
+            var fieldsWithErrors = Fields.Select(f => new FieldError() { Field = f, Errors = GetFieldError(f.Name) });
+            Errors.TryGetValue(NON_FIELD_ERRORS, out var nonFieldErrors);
+            return RenderTemplate("Forms/Templates/form_as_p.html", new
+            {
+                errors = nonFieldErrors,
+                fields = fieldsWithErrors
+            });
+        }
+    }
+}

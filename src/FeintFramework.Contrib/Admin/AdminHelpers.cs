@@ -1,7 +1,7 @@
 using System.Reflection;
 using FeintFramework.Db;
 using FeintFramework.Db.Migrator.Fields;
-using static FeintFramework.Core.Config.Configurator;
+using static FeintFramework.Config.Configurator;
 
 namespace FeintFramework.Contrib.Admin;
 

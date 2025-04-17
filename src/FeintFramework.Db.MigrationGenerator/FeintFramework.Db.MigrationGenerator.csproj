@@ -7,8 +7,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-      <ProjectReference Include="..\FeintFramework.Db\FeintFramework.Db.csproj" />
-      <ProjectReference Include="..\FeintFramework.Core\FeintFramework.Core.csproj" />
+      <ProjectReference Include="..\FeintFramework\FeintFramework.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.13.0" />

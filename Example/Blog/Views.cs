@@ -1,7 +1,7 @@
 
 
 using Example.Blog.Models;
-using FeintFramework.Core.Http;
+using FeintFramework.Http;
 using FeintFramework.Db;
 using LinqToDB;
 using LinqToDB.Data;
@@ -9,7 +9,7 @@ using FeintFramework.Forms.Widgets;
 using FeintFramework.Forms;
 using FeintFramework.Forms.Fields;
 using FeintFramework.Contrib.Auth;
-using FeintFramework.Core.Routing;
+using FeintFramework.Routing;
 
 class AuthForm : Form
 {
@@ -31,6 +31,7 @@ class ExampleView
         Console.WriteLine(html);
         var lo2 = 0;
         var lol = 200/lo2;
+        User.Objects.Where(x=>x.Username == "root").ToArray();
         // var user = new User(){
         //     Username="root",
         //     IsStaff=true,

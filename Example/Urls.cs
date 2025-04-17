@@ -1,8 +1,8 @@
 
 
 using FeintFramework.Contrib.Admin;
-using FeintFramework.Core.Http;
-using FeintFramework.Core.Routing;
+using FeintFramework.Http;
+using FeintFramework.Routing;
 namespace Example
 {
     class MainUrlPatterns : RootUrlPatterns
@@ -14,7 +14,7 @@ namespace Example
                 return new List<UrlPattern>
             {
                 new UrlPattern("/example", new ExampleView().AsView, "example"),
-                new FeintFramework.Core.Routing.Path("/example2/<int:test>", new ExampleView().AsView, "example2"),
+                new FeintFramework.Routing.Path("/example2/<int:test>", new ExampleView().AsView, "example2"),
             
                 new UrlPattern("",new AdminUrls().Urls)
             };

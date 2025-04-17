@@ -1,5 +1,5 @@
 
-using FeintFramework.Core.Apps;
+using FeintFramework.Apps;
 
 namespace FeintFramework.Contrib.Auth
 {

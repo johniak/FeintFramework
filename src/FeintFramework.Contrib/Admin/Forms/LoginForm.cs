@@ -1,5 +1,5 @@
 using FeintFramework.Contrib.Auth;
-using FeintFramework.Core.Config;
+using FeintFramework.Config;
 using FeintFramework.Forms;
 using FeintFramework.Forms.Fields;
 

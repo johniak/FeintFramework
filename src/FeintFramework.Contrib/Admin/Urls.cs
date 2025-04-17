@@ -1,5 +1,5 @@
-using FeintFramework.Core.Routing;
-using FeintFramework.Core.Config;
+using FeintFramework.Routing;
+using FeintFramework.Config;
 using FeintFramework.Contrib.Admin.Views;
 
 namespace FeintFramework.Contrib.Admin;
