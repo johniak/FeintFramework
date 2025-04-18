@@ -1,5 +1,3 @@
-
-
 using System.Collections;
 using System.Text;
 using FeintFramework.Templating.Node;
@@ -20,25 +18,53 @@ public class ForNode : BaseNode
 
     public override string Render(Dictionary<string, object> context)
     {
-        var collectionObj = VariableNode.GetVariableValue(IterableName, context);
+        var sequenceObj = VariableNode.GetVariableValue(IterableName, context);
 
-        if (!(collectionObj is IEnumerable collection))
+        if (!(sequenceObj is IEnumerable sequence))
             return "";
 
         var output = new StringBuilder();
-
-        foreach (var item in collection)
+        
+        
+        var length = -1;
+        if (sequenceObj is ICollection collection)
         {
-            // Tworzymy lokalny kontekst dla każdej iteracji
+            length = collection.Count;
+        }
+        else if (sequenceObj is Array array)
+        {
+            length = array.Length;
+        }
+        else if (sequenceObj is IList list)
+        {
+            length = list.Count;
+        }
+        var index = 0;
+        var parentLoop = context.ContainsKey("forloop") ? (Dictionary<string, object>)context["forloop"] : null;
+        foreach (var item in sequence)
+        {
             var localContext = new Dictionary<string, object>(context)
             {
-                [LoopVariable] = item
+                [LoopVariable] = item,
+                ["forloop"] = new Dictionary<string, object>
+                {
+                    { "counter", index + 1 },
+                    { "counter0", index },
+                    { "revcounter", length - index },
+                    { "revcounter0", length - index - 1 },
+                    { "length", length },
+                    { "first", index == 0 },
+                    { "last", index == length - 1 },
+                    { "parentloop", parentLoop }
+                }
+
             };
 
             foreach (var child in Children)
             {
                 output.Append(child.Render(localContext));
             }
+            index++; // increment index after each iteration
         }
 
         return output.ToString();

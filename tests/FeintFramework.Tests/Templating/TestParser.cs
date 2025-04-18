@@ -181,7 +181,9 @@ public sealed class TestParser
         Parser parser = new Parser(tokens);
         TemplateNode ast = parser.ParseTemplate();
 
-        Dictionary<string, object> context = new Dictionary<string, object>();
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+        };
 
         string output = ast.Render(context);
         Assert.AreEqual("Unknown: ", output);
@@ -350,7 +352,9 @@ public sealed class TestParser
         Parser parser = new Parser(tokens);
         TemplateNode ast = parser.ParseTemplate();
 
-        Dictionary<string, object> context = new Dictionary<string, object>();
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+        };
 
         string output = ast.Render(context);
         Assert.AreEqual("Hello, World!  Goodbye, World!", output);
@@ -392,7 +396,9 @@ public sealed class TestParser
         Parser parser = new Parser(tokens);
         TemplateNode ast = parser.ParseTemplate();
 
-        Dictionary<string, object> context = new Dictionary<string, object>();
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+        };
 
         string output = ast.Render(context);
         Assert.AreEqual("", output);
@@ -447,6 +453,7 @@ public sealed class TestParser
     [TestMethod]
     public void ParserAndRenderer_IfCondition_ParsesAndRendersCorrectly()
     {
+        TagRegistry.Register("if", IfTag.ParseIfTag);
         string template = "{% if x == 5 %}Equal{% else %}Not Equal{% endif %}";
 
         Lexer lexer = new Lexer();
@@ -470,6 +477,8 @@ public sealed class TestParser
     [TestMethod]
     public void ParserAndRenderer_IfCondition_ComparisonOperators()
     {
+        TagRegistry.Register("if", IfTag.ParseIfTag);
+
         string template = "{% if x == 5 %}Equal{% else %}Not Equal{% endif %}";
         Assert.AreEqual("Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 5 } }));
         Assert.AreEqual("Not Equal", RenderTemplate(template, new Dictionary<string, object> { { "x", 10 } }));
@@ -536,5 +545,78 @@ public sealed class TestParser
     private class TestObject
     {
         public string Field;
+    }
+
+    [TestMethod]
+    public void ForLoop_ForloopVariables_RenderCorrectly()
+    {
+        TagRegistry.Register("for", ForTag.ParseForTag);
+        string template = "{% for item in items %}{{ forloop.counter }}-{{ forloop.counter0 }}-{{ forloop.revcounter }}-{{ forloop.revcounter0 }}-{{ forloop.length }}-{{ forloop.first }}-{{ forloop.last }}|{% endfor %}";
+
+        Lexer lexer = new Lexer();
+        List<Token> tokens = lexer.Tokenize(template);
+        Parser parser = new Parser(tokens);
+        TemplateNode ast = parser.ParseTemplate();
+
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+            { "items", new List<string> { "a", "b", "c" } }
+        };
+
+        string output = ast.Render(context);
+        // For 3 items: 
+        // 1st: 1-0-3-2-3-True-False|
+        // 2nd: 2-1-2-1-3-False-False|
+        // 3rd: 3-2-1-0-3-False-True|
+        Assert.AreEqual("1-0-3-2-3-True-False|2-1-2-1-3-False-False|3-2-1-0-3-False-True|", output);
+    }
+
+    [TestMethod]
+    public void ForLoop_ForloopVariables_WithIEnumerableWithoutLength()
+    {
+        TagRegistry.Register("for", ForTag.ParseForTag);
+        // Custom IEnumerable implementation without Count/Length
+        IEnumerable<string> CustomEnumerable()
+        {
+            yield return "x";
+            yield return "y";
+        }
+        string template = "{% for item in items %}{{ forloop.counter }}-{{ forloop.length }}|{% endfor %}";
+
+        Lexer lexer = new Lexer();
+        List<Token> tokens = lexer.Tokenize(template);
+        Parser parser = new Parser(tokens);
+        TemplateNode ast = parser.ParseTemplate();
+
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+            { "items", CustomEnumerable() }
+        };
+
+        string output = ast.Render(context);
+        // forloop.length should be -1 if not available
+        Assert.AreEqual("1--1|2--1|", output);
+    }
+
+    [TestMethod]
+    public void ForLoop_ParentLoopVariable_RendersCorrectly()
+    {
+        TagRegistry.Register("for", ForTag.ParseForTag);
+        string template = "{% for outer in outers %}{% for inner in inners %}{{ forloop.parentloop.counter }}-{{ forloop.counter }}|{% endfor %}{% endfor %}";
+
+        Lexer lexer = new Lexer();
+        List<Token> tokens = lexer.Tokenize(template);
+        Parser parser = new Parser(tokens);
+        TemplateNode ast = parser.ParseTemplate();
+
+        Dictionary<string, object> context = new Dictionary<string, object>
+        {
+            { "outers", new List<string> { "x", "y" } },
+            { "inners", new List<string> { "a", "b" } }
+        };
+
+        string output = ast.Render(context);
+        // For 2 outers and 2 inners: parentloop.counter is 1 for first outer, 2 for second
+        Assert.AreEqual("1-1|1-2|2-1|2-2|", output);
     }
 }

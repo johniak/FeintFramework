@@ -7,6 +7,14 @@ namespace FeintFramework.Forms;
 
 public class ModelForm<T> : Form where T : Model
 {
+    public T? obj { get; protected set; }
+    public ModelForm() : base()
+    {
+    }
+    public ModelForm(T obj) : base()
+    {
+        this.obj = obj;
+    }
     public override List<BaseFormField> Fields
     {
         get
@@ -39,6 +47,11 @@ public class ModelForm<T> : Form where T : Model
                     var field = dbField.FormField!;
                     field.Name = f.Key;
                     field.Label = f.Key;
+                    if (obj != null)
+                    {
+                        var value = GetValue(obj, f.Key);
+                        field.Initial = value;
+                    }
                     return field;
                 });
 
@@ -86,6 +99,18 @@ public class ModelForm<T> : Form where T : Model
             "Meta",
             BindingFlags.Public | BindingFlags.NonPublic
         )!;
+        if (metaType == null)
+        {
+            throw new Exception("Meta class not found");
+        }
+        if (!metaType.IsClass)
+        {
+            throw new Exception("Meta class must be a class");
+        }
+        if (metaType.IsGenericType)
+        {
+            metaType = metaType.MakeGenericType(formType.GenericTypeArguments);
+        }
         var fields = extractMetaFields(metaType);
         var excluded = extractMetaExcluded(metaType);
         if (fields == null && excluded == null)
@@ -129,5 +154,24 @@ public class ModelForm<T> : Form where T : Model
             }
         }
         return fields;
+    }
+    protected string GetValue(object obj, string fieldName)
+    {
+        var propertyInfo = obj.GetType().GetProperty(fieldName);
+        var methodInfo = obj.GetType().GetMethod(fieldName);
+        var fieldInfo = obj.GetType().GetField(fieldName);
+        if (propertyInfo != null)
+        {
+            return propertyInfo.GetValue(obj)?.ToString() ?? "";
+        }
+        else if (methodInfo != null)
+        {
+            return methodInfo.Invoke(obj, null)?.ToString() ?? "";
+        }
+        else if (fieldInfo != null)
+        {
+            return fieldInfo.GetValue(obj)?.ToString() ?? "";
+        }
+        return "";
     }
 }

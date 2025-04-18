@@ -34,7 +34,7 @@ namespace FeintFramework.Config.Settings
 
         public Dictionary<string, object> AdditionalSettings { get; set; } = new Dictionary<string, object>();
 
-        protected abstract void ConfigureAdditionalSettings();
+        public abstract void ConfigureAdditionalSettings();
 
     }
 }

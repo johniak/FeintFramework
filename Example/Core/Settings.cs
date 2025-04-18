@@ -4,6 +4,9 @@ using FeintFramework.Db.Migrator;
 using FeintFramework.Db.Sqlite.Migrator;
 using FeintFramework.Contrib.Sessions;
 using FeintFramework.Contrib.Auth;
+using FeintFramework.Templating;
+using FeintFramework.Templating.Tags;
+using FeintFramework.Contrib.Admin.TemplateTags;
 
 namespace Example.Core
 {
@@ -26,9 +29,9 @@ namespace Example.Core
 
         public override DatabaseHandler DatabaseHandler => new SqliteDatabaseHandler(DatabaseConnectionString);
 
-        protected override void ConfigureAdditionalSettings()
+        public override void ConfigureAdditionalSettings()
         {
-            
+            TagRegistry.Register("admin_url", AdminUrlTag.ParseAdminUrlTag);
         }
     }
 }

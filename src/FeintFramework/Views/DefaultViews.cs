@@ -15,7 +15,7 @@ public static class DefaultViews
 
     public static FeintHttpResponse NotFound(FeintHttpRequest request, Exception e)
     {
-        List<(string Pattern, string? Name)>? patterns = null;
+        List<(string Pattern, string? Name, RequestHandler handler)>? patterns = null;
         if (!string.IsNullOrEmpty(e.Message))
             patterns = Router.BuildFullUrlPatternList(Configurator.Settings.RootUrlPatterns.Urls);
         var urlconf = Configurator.Settings.RootUrlPatterns.GetType().FullName;

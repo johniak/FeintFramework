@@ -45,7 +45,11 @@ public abstract class ModelAdmin
 
     public abstract string[][] GetRows(int page = 0, int pageSize = 25);
 
+    public abstract Model? GetById(int id);
+
     public abstract Form GetForm(string formType, object? obj = null);
+
+    public abstract string GetValue(object obj, string fieldName);
 
     public string ListUrl
     {
@@ -62,12 +66,26 @@ public abstract class ModelAdmin
         var listUrlName = $"{AppName}:{ModelName}:list";
         var listPath = $"/{AppName}/{ModelName}";
         var changeUrlName = $"{AppName}:{ModelName}:change";
-        var changePath = $"/{AppName}/{ModelName}/<pk:int>/change";
+        var changePath = $"/{AppName}/{ModelName}/<int:pk>/change";
         var deleteUrlName = $"{AppName}:{ModelName}:delete";
-        var deletePath = $"/{AppName}/{ModelName}/<pk:int>/delete";
+        var deletePath = $"/{AppName}/{ModelName}/<int:pk>/delete";
         var addUrlName = $"{AppName}:{ModelName}:add";
         var addPath = $"/{AppName}/{ModelName}/add";
         AdminUrls.PrefixedUrls.Add(new FeintFramework.Routing.Path(listPath, ListView, listUrlName));
+        AdminUrls.PrefixedUrls.Add(new FeintFramework.Routing.Path(changePath, ChangeView, changeUrlName));
+    }
+
+    public virtual FeintHttpResponse ChangeView(FeintHttpRequest request)
+    {
+        var pkString = request.PathParams["pk"];
+        var pk = int.Parse(pkString);
+        var obj = GetById(pk);
+        var form = GetForm("change", obj);
+        var context = new Dictionary<string, object>();
+        context["form"] = form;
+        context["modelName"] = ModelName;
+        context["appName"] = AppName;
+        return new FeintTemplateResponse("Admin/templates/change.html", context);
     }
 
     public FeintHttpResponse ListView(FeintHttpRequest request)
@@ -86,8 +104,23 @@ public abstract class ModelAdmin
     }
 }
 
-public abstract class ModelAdmin<T> : ModelAdmin where T : Model
+public abstract class ModelAdmin<T> : ModelAdmin where T : IntModel
 {
+
+    class AdminForm : ModelForm<T>
+    {
+        public AdminForm() : base()
+        {
+        }
+        public AdminForm(T obj) : base(obj)
+        {
+
+        }
+        static class Meta
+        {
+            public static string[] Excluded { get; set; } = [nameof(IntModel.Id)];
+        }
+    }
     protected T? Object { get; set; }
     protected ITable<T> Manager
     {
@@ -171,7 +204,8 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : Model
         return listRows.ToArray();
     }
 
-    public string GetValue(object obj, string fieldName)
+
+    public override string GetValue(object obj, string fieldName)
     {
         var propertyInfo = obj.GetType().GetProperty(fieldName);
         var methodInfo = obj.GetType().GetMethod(fieldName);
@@ -192,7 +226,17 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : Model
     }
     public override Form GetForm(string formType, object? obj = null)
     {
-        return new Form();
+        if(obj == null)
+        {
+            return new AdminForm();
+        }
+        return new AdminForm((T)obj);
     }
 
+    public override Model? GetById(int id)
+    {
+        var manager = Manager!;
+        var result = manager.FirstOrDefault(x => x.Id == id);
+        return result;
+    }
 }

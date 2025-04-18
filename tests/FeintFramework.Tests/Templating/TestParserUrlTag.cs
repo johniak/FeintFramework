@@ -26,7 +26,7 @@ public sealed class TestParserUrlTag
 
         public override DatabaseHandler DatabaseHandler => throw new NotImplementedException();
 
-        protected override void ConfigureAdditionalSettings()
+        public override void ConfigureAdditionalSettings()
         {
             
         }

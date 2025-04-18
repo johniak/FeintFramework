@@ -32,6 +32,8 @@ public class FeintHttpRequest
 
     public required QueryDict Post { get; set; }
 
+    public Dictionary<string, string> PathParams { get; } = new Dictionary<string, string>();
+
     public Dictionary<string, object> AdditionalData { get; set; } = new Dictionary<string, object>();
 
 

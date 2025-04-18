@@ -73,6 +73,7 @@ public static class Configurator
                 }
             }
         });
+        Settings.ConfigureAdditionalSettings();
         app.Run("http://0.0.0.0:9000");
     }
 

@@ -12,6 +12,13 @@ public class VariableNode : BaseNode
 
     public static object? GetVariableValue(string variableName, Dictionary<string, object> context)
     {
+        if (string.IsNullOrEmpty(variableName))
+            return null;
+        variableName = variableName.Trim();
+        if ((variableName.StartsWith("'")|| variableName.StartsWith("\"")) && (variableName.EndsWith("'") || variableName.EndsWith("\"")))
+        {
+            return variableName[1..^1];
+        }
         object? value = null;
         var parts = variableName.Split('.');
         if (!context.TryGetValue(parts[0], out value))

@@ -36,10 +36,10 @@ class ExampleView
             { "test", "21" }
         };
         var url = Router.Reverse("example2", parameters);
-        Console.WriteLine(html);
+        // Console.WriteLine(html);
         // var lo2 = 0;
         // var lol = 200 / lo2;
-        User.Objects.Where(x => x.Username == "root").ToArray();
+        // User.Objects.Where(x => x.Username == "root").ToArray();
         // var user = new User(){
         //     Username="root",
         //     IsStaff=true,
@@ -51,10 +51,13 @@ class ExampleView
         // Console.WriteLine(user.Password);
         // user.Save();
 
-        // Connections.Connection!.GetTable<Blog>();
-        // var blog = new Blog{
-        //     Url = "https://example.com"
+        // Connections.Connection!.GetTable<BlogPost>();
+        // var author = new Author()
+        // {
+        //     FullName = "Test Author",
+        //     Email = ""
         // };
+        // author.Save();
 
         // var author = Author.Objects.ToArray().First();
 

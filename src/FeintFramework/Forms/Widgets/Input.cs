@@ -32,3 +32,10 @@ public class PasswordInput : Input
     public override string Type => "password";
 }
 
+public class CheckboxInput : Input
+{
+    public CheckboxInput(): base()
+    {
+    }
+    public override string Type => "checkbox";
+}

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FeintFramework\FeintFramework.csproj" />
+    <ProjectReference Include="..\..\src\FeintFramework.Contrib\FeintFramework.Contrib.csproj" />
   </ItemGroup>
   <ItemGroup>
       <None Update="**\*.html">

@@ -2,13 +2,16 @@ using System.Text.RegularExpressions;
 using FeintFramework.Config;
 using FeintFramework.Http;
 using FeintFramework.Http.Exceptions;
-using Microsoft.AspNetCore.Http.HttpResults;
-using QuikGraph;
-
 namespace FeintFramework.Routing;
+
+public record MatchedUrl(string Pattern, string? Name, RequestHandler? Handler)
+{
+    public Dictionary<string, string> PathParams { get; set; } = new Dictionary<string, string>();
+}
 public class Router
 {
     private readonly UrlPatterns urlPatterns;
+    private List<(string Pattern, string? Name, RequestHandler handler)>? fullPatternList = null;
 
     public Router(UrlPatterns urlPatterns)
     {
@@ -24,19 +27,33 @@ public class Router
             throw new Http404();
         }
         var handler = url.Handler;
+        foreach (var param in url.PathParams)
+        {
+            request.PathParams[param.Key] = param.Value;
+        }
         return handler!(request);
     }
 
-    protected UrlPattern? matchPath(string path, List<UrlPattern> urls)
+    protected MatchedUrl? matchPath(string path, List<UrlPattern> urls)
     {
-        foreach (var url in urls)
+        if (fullPatternList == null)
         {
-            if (!url.Match(path))
-                continue;
-            if (url.Handler != null)
-                return url;
-            var newPath = Regex.Replace(path, url.RegexPattern, "");
-            return matchPath(newPath, url.Patterns!);
+            fullPatternList = BuildFullUrlPatternList(urls);
+        }
+        foreach (var url in fullPatternList)
+        {
+            var regex = new Regex(url.Pattern, RegexOptions.Compiled);
+            var match = regex.Match(path);
+            if (match.Success)
+            {
+                var pathParams = regex.GetGroupNames()
+                    .Where(name => name != "0" && match.Groups[name].Success)
+                    .ToDictionary(
+                        name => name,
+                        name => match.Groups[name].Value
+                    );
+                return new MatchedUrl(url.Pattern, url.Name, url.handler) { PathParams = pathParams };
+            }
         }
         return null;
     }
@@ -98,11 +115,12 @@ public class Router
         }
     }
 
-    public static List<(string Pattern, string? Name)> BuildFullUrlPatternList(List<UrlPattern> urlPatterns, List<(string Pattern, string? Name)>? fullPatternList = null, List<string>? baseNames = null, string baseUrl = "")
+    // TODO: Use records instead of tuples
+    public static List<(string Pattern, string? Name, RequestHandler handler)> BuildFullUrlPatternList(List<UrlPattern> urlPatterns, List<(string Pattern, string? Name, RequestHandler handler)>? fullPatternList = null, List<string>? baseNames = null, string baseUrl = "")
     {
         if (fullPatternList == null)
         {
-            fullPatternList = new List<(string Pattern, string? Name)>();
+            fullPatternList = new List<(string Pattern, string? Name, RequestHandler handler)>();
         }
         if (baseNames == null)
         {
@@ -124,13 +142,13 @@ public class Router
             }
             if (urlPattern.Name == null)
             {
-                fullPatternList.Add((url, null));
+                fullPatternList.Add(($"^{url}$", null, urlPattern.Handler!));
                 continue;
             }
             var finalNameList = new List<string>();
             finalNameList.AddRange(names);
             finalNameList.Add(urlPattern.Name);
-            fullPatternList.Add((url, String.Join(":", finalNameList)));
+            fullPatternList.Add(($"^{url}$", String.Join(":", finalNameList), urlPattern.Handler!));
         }
         return fullPatternList;
     }
