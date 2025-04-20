@@ -15,7 +15,7 @@ public class BooleanFormField : BaseFormField
             { "required", this.Required.ToString()},
             { "disabled", this.Disabled.ToString()}
             };
-            var widget = new TextInput();
+            var widget = new CheckboxInput();
             widget.Attributes =widget.Attributes.Concat(attrs).ToDictionary();
             return widget;
         }

@@ -85,6 +85,7 @@ public abstract class ModelAdmin
         context["form"] = form;
         context["modelName"] = ModelName;
         context["appName"] = AppName;
+        context["obj"] = obj!;
         return new FeintTemplateResponse("Admin/templates/change.html", context);
     }
 
@@ -226,7 +227,7 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : IntModel
     }
     public override Form GetForm(string formType, object? obj = null)
     {
-        if(obj == null)
+        if (obj == null)
         {
             return new AdminForm();
         }

@@ -34,6 +34,8 @@ public class PasswordInput : Input
 
 public class CheckboxInput : Input
 {
+    public override string TemplateFilePath => "Forms/Widgets/Templates/CheckboxInput.html";
+
     public CheckboxInput(): base()
     {
     }

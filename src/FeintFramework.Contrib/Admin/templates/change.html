@@ -52,7 +52,10 @@
 <div class="app-container">
     <div class="app-box">
       <h2 class="app-title">{{ modelName }}</h2>
+      <form method="POST" action="{% admin_url appName  modelName 'change' obj.Id%}">
         {{ form.AsP}}
+        <input type="submit" value="Save Changes" class="btn btn-primary">
+      </form>
     </div>
 </div>
 {% endblock %}

@@ -1,3 +1,4 @@
+using FeintFramework.Forms.Fields;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -21,5 +22,15 @@ public class BooleanField : BaseField<bool>
                this.DefaultValue ? SyntaxKind.TrueLiteralExpression : SyntaxKind.FalseLiteralExpression
             )
         );
+    }
+    public override BaseFormField? FormField
+    {
+        get
+        {
+            return new BooleanFormField()
+            {
+                Required = this.NotNull,
+            };
+        }
     }
 }

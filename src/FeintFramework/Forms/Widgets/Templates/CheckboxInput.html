@@ -1,0 +1,10 @@
+{%if attributes.label%}
+<label for="{{attributes.name}}">{{attributes.label}}: </label>
+{%endif%}
+<input  
+type="{{attributes.type}}"
+name="{{attributes.name}}"
+{%if attributes.value%} checked {%endif%}
+{%if attributes.required%} required {%endif%}
+
+/>
