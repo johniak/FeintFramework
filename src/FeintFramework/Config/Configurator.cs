@@ -74,6 +74,14 @@ public static class Configurator
             }
         });
         Settings.ConfigureAdditionalSettings();
+
+        if (Settings.Debug)
+        {
+            var exts = new[] { ".html", ".css", ".js" };
+            var watcher = new HtmlWatcher(exts);
+            watcher.Start();
+            Settings.AdditionalSettings.Add("HtmlWatcher", watcher);
+        }
         app.Run("http://0.0.0.0:9000");
     }
 

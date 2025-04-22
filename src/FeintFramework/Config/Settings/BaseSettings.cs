@@ -11,7 +11,7 @@ namespace FeintFramework.Config.Settings
             ConfigureAdditionalSettings();
         }
 
-        public bool Debug { get; }
+        public virtual bool Debug { get; }
 
         public abstract Type[] InstalledApps { get; }
         public abstract RootUrlPatterns RootUrlPatterns { get; }

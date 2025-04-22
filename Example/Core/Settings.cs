@@ -12,6 +12,7 @@ namespace Example.Core
 {
     public class Settings : BaseSettings
     {
+        public override bool Debug => true;
         public override Type[] InstalledApps => [
             typeof(Blog.BlogApp),
             typeof(SessionsApp),
@@ -33,5 +34,6 @@ namespace Example.Core
         {
             TagRegistry.Register("admin_url", AdminUrlTag.ParseAdminUrlTag);
         }
+        
     }
 }
