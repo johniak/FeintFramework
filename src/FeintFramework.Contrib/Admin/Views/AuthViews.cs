@@ -12,11 +12,10 @@ public class AuthViews
 
     public static FeintHttpResponse Login(FeintHttpRequest request)
     {
-        if (request.User().IsAuthenticated){
+        if (request.User().IsAuthenticated){ 
             return Redirect("admin:home");
         }
         var form = new LoginForm();
-        var watcher = Configurator.Settings.AdditionalSettings["HtmlWatcher"];
         Console.WriteLine(form.Errors);
         if (request.Method == HttpMethods.Post)
         {
