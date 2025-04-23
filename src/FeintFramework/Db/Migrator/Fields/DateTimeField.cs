@@ -1,3 +1,4 @@
+using FeintFramework.Forms.Fields;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -55,5 +56,15 @@ public class DateTimeField : BaseField<DateTime>
     public override int GetHashCode()
     {
         return HashCode.Combine(NotNull, PrimaryKey, Unique, DbIndex, DefaultValue, AutoNowAdd);
+    }
+    public override BaseFormField? FormField
+    {
+        get
+        {
+            return new DateTimeFormField()
+            {
+                Required = this.NotNull,
+            };
+        }
     }
 }

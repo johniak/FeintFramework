@@ -174,4 +174,44 @@ public class ModelForm<T> : Form where T : Model
         }
         return "";
     }
+
+    protected void SetValue(object obj, string fieldName, object value)
+    {
+        var propertyInfo = obj.GetType().GetProperty(fieldName);
+        var fieldInfo = obj.GetType().GetField(fieldName);
+        if (propertyInfo != null)
+        {
+            propertyInfo.SetValue(obj, value);
+        }
+        else if (fieldInfo != null)
+        {
+            fieldInfo.SetValue(obj, value);
+        }
+    }
+
+    protected T GetModel()
+    {
+        if (obj != null)
+        {
+            return obj;
+        }
+        var model = Activator.CreateInstance<T>();
+        return model;
+    }
+    public T Save(){
+        this.FullClean();
+        if (!IsValid)
+        {
+            throw new ValidationException(Errors);
+        }
+        var model = GetModel();
+        foreach (var field in Fields)
+        {
+            var value = CleanedData[field.Name];
+            SetValue(model, field.Name, value);
+        }
+        dynamic modelDynamic = model;
+        modelDynamic.Save();
+        return model;
+    }
 }

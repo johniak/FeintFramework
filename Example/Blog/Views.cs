@@ -40,24 +40,24 @@ class ExampleView
         // var lo2 = 0;
         // var lol = 200 / lo2;
         // User.Objects.Where(x => x.Username == "root").ToArray();
-        // var user = new User(){
-        //     Username="root",
-        //     IsStaff=true,
-        //     IsSuperuser=true,
-        //     Email="root@root.com"
-        // };
-        // user.SetPassword("root1234");
-        // Console.WriteLine("Pass");
-        // Console.WriteLine(user.Password);
-        // user.Save();
+        var user = new User(){
+            Username="root",
+            IsStaff=true,
+            IsSuperuser=true,
+            Email="root@root.com"
+        };
+        user.SetPassword("root1234");
+        Console.WriteLine("Pass");
+        Console.WriteLine(user.Password);
+        user.Save();
 
         // Connections.Connection!.GetTable<BlogPost>();
-        // var author = new Author()
-        // {
-        //     FullName = "Test Author",
-        //     Email = ""
-        // };
-        // author.Save();
+        var author = new Author()
+        {
+            FullName = "Test Author",
+            Email = "xD@xd.pl"
+        };
+        author.Save();
 
         // var author = Author.Objects.ToArray().First();
 

@@ -59,7 +59,7 @@ public abstract class ModelAdmin
             return url;
         }
     }
-
+    protected abstract void saveForm(Form form);
 
     public virtual void Register()
     {
@@ -81,6 +81,15 @@ public abstract class ModelAdmin
         var pk = int.Parse(pkString);
         var obj = GetById(pk);
         var form = GetForm("change", obj);
+        if (request.Method == Http.HttpMethods.Post)
+        {
+            form.Data = request.Post;
+            form.FullClean();
+            if (form.IsValid)
+            {
+                saveForm(form);
+            }
+        }
         var context = new Dictionary<string, object>();
         context["form"] = form;
         context["modelName"] = ModelName;
@@ -239,5 +248,14 @@ public abstract class ModelAdmin<T> : ModelAdmin where T : IntModel
         var manager = Manager!;
         var result = manager.FirstOrDefault(x => x.Id == id);
         return result;
+    }
+    protected override void saveForm(Form form)
+    {
+        var modelForm = form as ModelForm<T>;
+        if (modelForm == null)
+        {
+            throw new Exception("Form is not a ModelForm");
+        }
+        var model = modelForm.Save();
     }
 }
