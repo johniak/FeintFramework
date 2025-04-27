@@ -7,6 +7,7 @@
     max-width: 960px;
     padding: 0 10px;
   }
+
   /* Pojedyncza aplikacja */
   .app-box {
     margin-bottom: 30px;
@@ -14,35 +15,43 @@
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
+
   /* Tytuł aplikacji */
   .app-title {
     font-size: 24px;
     margin-bottom: 20px;
     color: #333;
   }
+
   /* Style dla tabeli */
   table {
     width: 100%;
     border-collapse: collapse;
   }
-  th, td {
+
+  th,
+  td {
     padding: 10px;
     text-align: left;
     border: 1px solid #ddd;
   }
+
   thead {
     background-color: #f8f8f8;
   }
+
   tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
   }
+
   /* Linki */
   a {
     text-decoration: none;
     color: #337ab7;
   }
+
   a:hover {
     text-decoration: underline;
   }
@@ -50,12 +59,13 @@
 {% endblock extrahead %}
 {% block content %}
 <div class="app-container">
-    <div class="app-box">
-      <h2 class="app-title">{{ modelName }}</h2>
-      <form method="POST" action="{% admin_url appName  modelName 'change' obj.Id%}">
-        {{ form.AsP}}
-        <input type="submit" value="Save Changes" class="btn btn-primary">
-      </form>
-    </div>
+  {{ message}}
+  <div class="app-box">
+    <h2 class="app-title">{{ modelName }}</h2>
+    <form method="POST" action="{% admin_url appName  modelName 'change' obj.Id%}">
+      {{ form.AsP}}
+      <input type="submit" value="Save Changes" class="btn btn-primary">
+    </form>
+  </div>
 </div>
 {% endblock %}

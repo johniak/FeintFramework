@@ -9,7 +9,16 @@ namespace FeintFramework.Forms;
 public class Form
 {
     public const string NON_FIELD_ERRORS = "__all__";
-    public Dictionary<string, string>? Data { get; set; }
+    private Dictionary<string, string>? data { get; set; }
+    public Dictionary<string, string>? Data { get{
+        return data;
+    } set{
+        data = value;
+        if (data != null)
+        {
+            Initial = data;
+        }
+    } }
     protected Dictionary<string, Strings>? errors = null;
     public Dictionary<string, Strings> Errors
     {

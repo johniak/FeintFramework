@@ -40,4 +40,8 @@ public static class SessionExtensions
     {
         settings.AdditionalSettings[SessionConsts.SETTINGS_SESSION_COOKIE_NAME] = name;
     }
+    public static void AddMessage(this FeintHttpRequest request, string message)
+    {
+        request.AdditionalData[SessionConsts.REQUEST_MESSAGES_KEY] = message;
+    }
 }

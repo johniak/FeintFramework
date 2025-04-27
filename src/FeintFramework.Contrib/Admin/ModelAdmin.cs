@@ -81,6 +81,7 @@ public abstract class ModelAdmin
         var pk = int.Parse(pkString);
         var obj = GetById(pk);
         var form = GetForm("change", obj);
+        var context = new Dictionary<string, object>();
         if (request.Method == Http.HttpMethods.Post)
         {
             form.Data = request.Post;
@@ -88,9 +89,9 @@ public abstract class ModelAdmin
             if (form.IsValid)
             {
                 saveForm(form);
+                context["message"] = "Saved successfully";
             }
         }
-        var context = new Dictionary<string, object>();
         context["form"] = form;
         context["modelName"] = ModelName;
         context["appName"] = AppName;

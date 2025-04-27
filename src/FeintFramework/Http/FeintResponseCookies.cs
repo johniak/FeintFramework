@@ -28,7 +28,18 @@ public class FeintFrameworkResponseCookies : IResponseCookies, IEnumerable<(stri
     {
         var domain = options.Domain ?? "";
         var path = options.Path ?? "";
-        Cookies.Remove((key, domain, path));
+        var tupleKey = (key, domain, path);
+        var deleteOptions = new CookieOptions
+        {
+            Domain = options.Domain,
+            Path = options.Path,
+            Expires = DateTimeOffset.UtcNow.AddDays(-1),
+            MaxAge = TimeSpan.FromDays(-1),
+            Secure = options.Secure,
+            HttpOnly = options.HttpOnly,
+            SameSite = options.SameSite
+        };
+        Cookies[tupleKey] = ("", deleteOptions);
     }
 
     public IEnumerator<(string Key, string Value, CookieOptions Options)> GetEnumerator()
@@ -42,5 +53,16 @@ public class FeintFrameworkResponseCookies : IResponseCookies, IEnumerable<(stri
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
+    }
+
+    public bool ContainsKey(string key)
+    {
+        return Cookies.ContainsKey((key, "", ""));
+    }
+    public bool ContainsKey(string key, CookieOptions options)
+    {
+        var domain = options.Domain ?? "";
+        var path = options.Path ?? "";
+        return Cookies.ContainsKey((key, domain, path));
     }
 }
