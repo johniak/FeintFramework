@@ -50,7 +50,13 @@ public class ModelForm<T> : Form where T : Model
                     if (obj != null)
                     {
                         var value = GetValue(obj, f.Key);
-                        field.Initial = value;
+                        if (!Initial.ContainsKey(f.Key))
+                        {
+                            field.Initial = value;
+                        }else
+                        {
+                            field.Initial = Initial[f.Key];
+                        }
                     }
                     return field;
                 });
@@ -198,7 +204,8 @@ public class ModelForm<T> : Form where T : Model
         var model = Activator.CreateInstance<T>();
         return model;
     }
-    public T Save(){
+    public T Save()
+    {
         this.FullClean();
         if (!IsValid)
         {

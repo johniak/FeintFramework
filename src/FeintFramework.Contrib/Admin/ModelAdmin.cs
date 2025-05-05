@@ -61,6 +61,16 @@ public abstract class ModelAdmin
     }
     protected abstract void saveForm(Form form);
 
+    public virtual Dictionary<string, object> GetAdminContext()
+    {
+        var context = new Dictionary<string, object>();
+        var appRecords = AdminHelpers.AppRecords;
+        context["appRecords"] = appRecords;
+        context["modelName"] = ModelName;
+        context["appName"] = AppName;
+        return context;
+    }
+
     public virtual void Register()
     {
         var listUrlName = $"{AppName}:{ModelName}:list";
@@ -81,10 +91,11 @@ public abstract class ModelAdmin
         var pk = int.Parse(pkString);
         var obj = GetById(pk);
         var form = GetForm("change", obj);
-        var context = new Dictionary<string, object>();
+        var context = GetAdminContext();
         if (request.Method == Http.HttpMethods.Post)
         {
             form.Data = request.Post;
+            form.Initial = request.Post;
             form.FullClean();
             if (form.IsValid)
             {
@@ -93,8 +104,6 @@ public abstract class ModelAdmin
             }
         }
         context["form"] = form;
-        context["modelName"] = ModelName;
-        context["appName"] = AppName;
         context["obj"] = obj!;
         return new FeintTemplateResponse("Admin/templates/change.html", context);
     }
@@ -106,11 +115,9 @@ public abstract class ModelAdmin
         // int? page = !StringValues.IsNullOrEmpty(pageString)?int.Parse(pageString!):null;
         // int? pageSize = !StringValues.IsNullOrEmpty(pageSizeString)?int.Parse(pageSizeString!):null;
         var rows = GetRows();
-        var context = new Dictionary<string, object>();
+        var context = GetAdminContext();
         context["rows"] = rows;
         context["columnNames"] = ColumnNames;
-        context["modelName"] = ModelName;
-        context["appName"] = AppName;
         return new FeintTemplateResponse("Admin/templates/list.html", context);
     }
 }

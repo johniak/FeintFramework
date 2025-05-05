@@ -1,56 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <title>{{ title }}</title>
   <style>
     /* Ensure the page takes the full viewport height */
-    html, body {
+    html,
+    body {
       height: 100%;
       margin: 0;
       padding: 0;
     }
+
     /* Set up the page as a vertical flex container */
     body {
       display: flex;
       flex-direction: column;
       font-family: Arial, sans-serif;
-      background-color: #FAF9F7; /* very light pastel background */
+      background-color: #FAF9F7;
+      /* very light pastel background */
     }
+
     header {
-      background-color: #FFCBA4; /* pastel peach */
-      color: #333; /* dark text for readability */
+      background-color: #FFCBA4;
+      /* pastel peach */
+      color: #333;
+      /* dark text for readability */
       padding: 1rem;
     }
+
     nav {
-      background-color: #FFE4C4; /* lighter pastel peach */
+      background-color: #FFE4C4;
+      /* lighter pastel peach */
       padding: 0.5rem;
     }
+
     /* Ensure navigation links contrast well */
     nav a {
       color: #333;
       text-decoration: none;
     }
+
     /* This container now fills the available vertical space */
     .container {
       display: flex;
-      flex: 1; /* expands to push the footer to the bottom */
+      flex: 1;
+      /* expands to push the footer to the bottom */
     }
+
     .admin-sidebar {
-      background-color: #FFF2E5; /* very soft pastel */
+      background-color: #FFF2E5;
+      /* very soft pastel */
       padding: 1rem;
       min-width: 200px;
     }
+
     main {
       padding: 1rem;
       flex-grow: 1;
     }
+
     footer {
-      background-color: #FFCBA4; /* matching the header for cohesion */
+      background-color: #FFCBA4;
+      /* matching the header for cohesion */
       color: #333;
       padding: 0.5rem;
       text-align: center;
     }
+
     a {
       text-decoration: none;
       color: inherit;
@@ -60,6 +78,7 @@
   <!-- Additional head content can be inserted here -->
   {% endblock %}
 </head>
+
 <body>
   <header>
     <h1>Feint Administration</h1>
@@ -69,19 +88,23 @@
     <!-- Default Navigation -->
     <ul style="list-style: none; margin: 0; padding: 0; display: flex;">
       <li style="margin-right: 1rem;"><a href="{%url "admin:home" %}">Home</a></li>
-      <li style="margin-right: 1rem;"><a href="/users">Users</a></li>
-      <li><a href="/settings">Settings</a></li>
     </ul>
     {% endblock %}
   </nav>
   <div class="container">
     <aside class="admin-sidebar">
       {% block sidebar %}
-      <!-- Default Sidebar Content -->
-      <ul style="list-style: none; padding: 0;">
-        <li><a href="/dashboard">Dashboard</a></li>
-        <li><a href="/reports">Reports</a></li>
-        <li><a href="/logs">Logs</a></li>
+      <ul>
+        {% for appRecord in appRecords %}
+        <li>
+          <h4>{{ appRecord.ApplicationName }}</h4>
+          <ul>
+            {% for modelAdmin in appRecord.ModelAdmins %}
+            <li><a href="{{modelAdmin.ListUrl}}">{{ modelAdmin.ModelName }}</a></li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% endfor %}
       </ul>
       {% endblock %}
     </aside>
@@ -90,7 +113,7 @@
 
       </div>
       {% block content %}
-      <!-- Default Content -->
+
       <p>Welcome to the admin panel.</p>
       {% endblock %}
     </main>
@@ -102,4 +125,5 @@
     {% endblock %}
   </footer>
 </body>
+
 </html>
