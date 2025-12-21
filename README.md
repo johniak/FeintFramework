@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 ```
 ███████╗███████╗██╗███╗   ██╗████████╗
@@ -285,8 +285,9 @@ var url = Router.Reverse("post_detail", new Dictionary<string, object> { ["id"] 
 var url = Shortcuts.ReverseUrl("blog:post_detail", new() { ["id"] = 42 });
 ```
 
-```html
-<!-- In templates -->
+In templates:
+
+```django
 <a href="{% url 'post_detail' id=post.Id %}">View Post</a>
 ```
 
@@ -356,7 +357,7 @@ FeintFramework uses a Django-like template syntax.
 
 #### Variables
 
-```html
+```django
 <h1>{{ title }}</h1>
 <p>Author: {{ post.Author.Name }}</p>
 ```
@@ -374,8 +375,8 @@ FeintFramework uses a Django-like template syntax.
 
 #### Template Inheritance
 
+**templates/base.html:**
 ```html
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -387,8 +388,8 @@ FeintFramework uses a Django-like template syntax.
 </html>
 ```
 
-```html
-<!-- templates/home.html -->
+**templates/home.html:**
+```django
 {% extends "templates/base.html" %}
 
 {% block title %}Home - {{ block.super }}{% endblock %}
@@ -400,7 +401,7 @@ FeintFramework uses a Django-like template syntax.
 
 #### For Loop Context
 
-```html
+```django
 {% for item in items %}
     {{ forloop.counter }}    <!-- 1, 2, 3... -->
     {{ forloop.counter0 }}   <!-- 0, 1, 2... -->
@@ -412,7 +413,7 @@ FeintFramework uses a Django-like template syntax.
 
 #### Conditionals
 
-```html
+```django
 {% if user.IsAuthenticated %}
     <p>Welcome, {{ user.Username }}!</p>
 {% else %}
@@ -667,8 +668,9 @@ FeintHttpResponse CreatePostView(FeintHttpRequest request)
 
 #### Rendering Forms
 
-```html
-<!-- In template -->
+In template:
+
+```django
 <form method="post">
     {{ form.AsP }}
     <button type="submit">Submit</button>
@@ -1136,4 +1138,3 @@ SOFTWARE.
 [Report Bug](https://github.com/your-username/FeintFramework/issues) · [Request Feature](https://github.com/your-username/FeintFramework/issues) · [Discussions](https://github.com/your-username/FeintFramework/discussions)
 
 </div>
-]]>
